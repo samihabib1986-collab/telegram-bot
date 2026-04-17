@@ -9,21 +9,15 @@ from telegram.ext import (
     ContextTypes
 )
 
-# =======================
-# logging (مهم لRender)
-# =======================
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 
-# =======================
-# TOKEN
-# =======================
 TOKEN = os.environ.get("TOKEN")
 
 if not TOKEN:
-    raise ValueError("TOKEN is missing from environment variables")
+    raise ValueError("TOKEN is missing")
 
 # بنك الأسئلة
 questions = [
@@ -183,14 +177,13 @@ questions = [
 },
 
 ]
+
 subjects = {"bio": questions}
 
 user_data = {}
 leaderboard = {}
 
-# =======================
 # start
-# =======================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
@@ -210,9 +203,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# =======================
 # إرسال سؤال
-# =======================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
@@ -247,9 +238,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# =======================
 # buttons
-# =======================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -257,7 +246,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # leaderboard
     if data == "leaderboard":
         if not leaderboard:
             await query.edit_message_text("لا يوجد نتائج بعد.")
@@ -272,7 +260,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text)
         return
 
-    # اختيار مادة
     if data in subjects:
         user_data[user_id] = {
             "score": 0,
@@ -284,7 +271,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-    # إجابة
     subject = user_data[user_id]["subject"]
     index = user_data[user_id]["q_index"]
 
@@ -304,9 +290,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(text)
     await send_question(update, context)
 
-# =======================
-# تشغيل البوت
-# =======================
+# تشغيل
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
