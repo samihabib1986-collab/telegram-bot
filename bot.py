@@ -1,10 +1,9 @@
 
-from turtle import update
-
+import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = "8554297658:AAHPiuExDp1Ra0yIwIuUWfMKXAhIOuAzHB0"
+TOKEN = os.environ.get("TOKEN")
 
 # بنك الأسئلة
 questions = [
