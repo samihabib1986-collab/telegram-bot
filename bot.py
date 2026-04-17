@@ -1,10 +1,9 @@
-
-import os
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
-
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
 TOKEN = os.environ.get("TOKEN")
-
+if not TOKEN:
+    raise ValueError("TOKEN is missing from environment variables")
 # بنك الأسئلة
 questions = [
 {
@@ -163,7 +162,6 @@ questions = [
 },
 
 ]
-
 subjects = {"bio": questions}
 
 user_data = {}
