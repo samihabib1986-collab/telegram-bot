@@ -1,9 +1,30 @@
+import os
+import logging
+
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes
+)
+
+# =======================
+# logging (مهم لRender)
+# =======================
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
+)
+
+# =======================
+# TOKEN
+# =======================
 TOKEN = os.environ.get("TOKEN")
+
 if not TOKEN:
     raise ValueError("TOKEN is missing from environment variables")
+
 # بنك الأسئلة
 questions = [
 {
