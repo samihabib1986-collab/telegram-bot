@@ -163,23 +163,15 @@ questions = [
 },
 
 ]
-subjects = {
-    "bio": questions
-}
 
-# =======================
-# 🧠 بيانات المستخدمين
-# =======================
+subjects = {"bio": questions}
 
 user_data = {}
-
-# 🏆 Leaderboard (أفضل النتائج)
 leaderboard = {}
 
 # =======================
-# 🚀 start
+# start
 # =======================
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
@@ -200,29 +192,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # =======================
-# ❓ إرسال سؤال
+# إرسال سؤال
 # =======================
+async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
 
-async def send_question(update, context):
-    query = update.callback_query if update.callback_query else None
-
-    user_id = query.from_user.id if query else update.effective_user.id
-    chat_id = query.message.chat_id if query else update.effective_chat.id
+    user_id = query.from_user.id
+    chat_id = query.message.chat_id
 
     subject = user_data[user_id]["subject"]
-    q_list = subjects[subject]
-
     index = user_data[user_id]["q_index"]
+
+    q_list = subjects[subject]
 
     if index >= len(q_list):
         score = user_data[user_id]["score"]
-
-        # 🏆 حفظ في leaderboard
         leaderboard[user_id] = max(score, leaderboard.get(user_id, 0))
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
         )
         return
 
@@ -240,9 +229,8 @@ async def send_question(update, context):
     )
 
 # =======================
-# 🎮 التعامل مع الأزرار
+# buttons
 # =======================
-
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -250,7 +238,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # 🏆 leaderboard
+    # leaderboard
     if data == "leaderboard":
         if not leaderboard:
             await query.edit_message_text("لا يوجد نتائج بعد.")
@@ -260,12 +248,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sorted_board = sorted(leaderboard.items(), key=lambda x: x[1], reverse=True)
 
         for i, (uid, score) in enumerate(sorted_board[:10], 1):
-            text += f"{i}. 👤 {uid} - {score} نقطة\n"
+            text += f"{i}. 👤 {uid} - {score}\n"
 
         await query.edit_message_text(text)
         return
 
-    # 🎯 اختيار مادة
+    # اختيار مادة
     if data in subjects:
         user_data[user_id] = {
             "score": 0,
@@ -277,31 +265,29 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-    # ❓ إجابة سؤال
-    index = user_data[user_id]["q_index"]
+    # إجابة
     subject = user_data[user_id]["subject"]
+    index = user_data[user_id]["q_index"]
+
     q_list = subjects[subject]
+    q = q_list[index]
 
-    selected = int(data)
-    selected_answer = q_list[index]["options"][selected]
-    correct_answer = q_list[index]["answer"]
+    selected = q["options"][int(data)]
 
-    if selected_answer == correct_answer:
+    if selected == q["answer"]:
         user_data[user_id]["score"] += 10
-        text = "✅ صحيح! +10 🔥"
+        text = "✅ صحيح!"
     else:
-        text = f"❌ خطأ! الإجابة: {correct_answer}"
+        text = f"❌ خطأ! الإجابة الصحيحة: {q['answer']}"
 
     user_data[user_id]["q_index"] += 1
 
     await query.edit_message_text(text)
-
     await send_question(update, context)
 
 # =======================
-# ▶️ تشغيل البوت
+# تشغيل البوت
 # =======================
-
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
