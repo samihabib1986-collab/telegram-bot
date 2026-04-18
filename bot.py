@@ -317,6 +317,10 @@ async def main():
 
     await app.initialize()
     await app.start()
-    await app.updater.start_polling()
 
-asyncio.run(main())
+    # تشغيل polling بشكل صحيح
+    await app.updater.start_polling()
+    await app.updater.idle()
+
+if __name__ == "__main__":
+    asyncio.run(main())
