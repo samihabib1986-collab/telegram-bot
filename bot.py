@@ -335,26 +335,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-    # ================== الإجابة ==================
-    subject = user_data[user_id]["subject"]
-    category = user_data[user_id]["category"]
-    index = user_data[user_id]["q_index"]
+   # ================== الإجابة ==================
+subject = user_data[user_id]["subject"]
+category = user_data[user_id]["category"]
+index = user_data[user_id]["q_index"]
 
-    q = subjects[subject][category][index]
-    selected = q["options"][int(data)]
+q = subjects[subject][category][index]
+selected = q["options"][int(data)]
 
-    if selected == q["answer"]:
-        user_data[user_id]["score"] += 10
-        result = "✅ صحيح"
-    else:
-        result = f"❌ خطأ\nالإجابة: {q['answer']}"
+if selected == q["answer"]:
+    user_data[user_id]["score"] += 10
+    result = "✅ صحيح"
+else:
+    result = f"❌ خطأ\nالإجابة: {q['answer']}"
 
-    user_data[user_id]["q_index"] += 1
+user_data[user_id]["q_index"] += 1
 
-    await query.edit_message_text(result)
-    await asyncio.sleep(1)
+# 🔥 بدل edit_message_text
+await context.bot.send_message(
+    chat_id=query.message.chat_id,
+    text=result
+)
 
-    await send_question(update, context)
+await asyncio.sleep(1)
+
+await send_question(update, context)
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
