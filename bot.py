@@ -28,7 +28,7 @@ pending_users = set()
 
 # ================== الصور ==================
 uploaded_images = {
-    "الهيكل العظمي": "PUT_YOUR_FILE_ID_HERE"
+    "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ"
 }
 
 # ================== بنك الأسئلة ==================
