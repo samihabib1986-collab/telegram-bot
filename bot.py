@@ -291,7 +291,12 @@ app = ApplicationBuilder().token(TOKEN).build()
 if os.path.exists("images.json"):
     with open("images.json", "r") as f:
         uploaded_images = json.load(f)
-
+try:
+    if os.path.exists("images.json"):
+        with open("images.json", "r") as f:
+            uploaded_images = json.load(f)
+except json.JSONDecodeError:
+    uploaded_images = {}
 
 
 
