@@ -211,17 +211,11 @@ async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     uploaded_images[name] = file_id
 
-    # 🔥 حفظ في JSON
-    with open("images.json", "w", encoding="utf-8") as f:
-        json.dump(uploaded_images, f, ensure_ascii=False, indent=4)
-
-    await update.message.reply_text(f"✅ تم حفظ: {name}")
-
-    del context.user_data["pending_file_id"]
+await context.bot_data["IMAGES"].put(name, file_id)
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
-
+app.bot_data["IMAGES"] = IMAGES
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
