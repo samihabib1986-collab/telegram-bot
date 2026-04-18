@@ -1,6 +1,6 @@
 import os
 import logging
-
+import json
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -15,6 +15,10 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
+uploaded_images[name] = file_id
+
+with open("images.json", "w") as f:
+    json.dump(uploaded_images, f)
 
 TOKEN = os.environ.get("TOKEN")
 
@@ -268,6 +272,12 @@ async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
+if os.path.exists("images.json"):
+    with open("images.json", "r") as f:
+        uploaded_images = json.load(f)
+
+
+
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
