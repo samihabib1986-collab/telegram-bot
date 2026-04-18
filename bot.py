@@ -47,12 +47,18 @@ subjects = {
                 "question": "لماذا عظم الفك السفلي متحرك؟",
                 "options": ["لتسهيل المضغ والنطق", "لحماية الدماغ", "لتخفيف الوزن"],
                 "answer": "لتسهيل المضغ والنطق"
+            },
+            {
+                "question": "لماذا توجد أقراص غضروفية بين الفقرات؟",
+                "options": ["لمنع الاحتكاك", "لزيادة الطول", "لتقوية العضلات"],
+                "answer": "لمنع الاحتكاك"
             }
         ],
+
         "images": [
             {
                 "type": "image",
-                "image": None,  # سيتم ربطها من uploaded_images
+                "image": "الهيكل العظمي",  # اسم الصورة داخل JSON
                 "question": "ما هذا العظم؟",
                 "options": ["جمجمة", "فخذ", "ترقوة"],
                 "answer": "جمجمة"
@@ -117,13 +123,12 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     user_id = int(context.args[0])
-
     approved_users.add(user_id)
 
     await update.message.reply_text("✅ تم التفعيل")
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
 
-# ================== إرسال سؤال ==================
+# ================== إرسال الأسئلة ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
@@ -136,7 +141,8 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q_list = subjects[subject][category]
 
     if index >= len(q_list):
-        await context.bot.send_message(chat_id, "🎉 انتهيت!")
+        score = user_data[user_id]["score"]
+        await context.bot.send_message(chat_id, f"🎉 انتهيت!\n📊 نتيجتك: {score}")
         return
 
     q = q_list[index]
@@ -146,13 +152,20 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for i, opt in enumerate(q["options"])
     ]
 
+    # ================== صورة ==================
     if q.get("type") == "image":
-        await context.bot.send_photo(
-            chat_id=chat_id,
-            photo=q["image"],
-            caption=q["question"],
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        image_name = q["image"]
+        file_id = uploaded_images.get(image_name)
+
+        if file_id:
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=file_id,
+                caption=q["question"],
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        else:
+            await context.bot.send_message(chat_id, "❌ الصورة غير موجودة")
     else:
         await context.bot.send_message(
             chat_id=chat_id,
@@ -211,11 +224,17 @@ async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     uploaded_images[name] = file_id
 
-await context.bot_data["IMAGES"].put(name, file_id)
+    # 🔥 حفظ في JSON
+    with open("images.json", "w", encoding="utf-8") as f:
+        json.dump(uploaded_images, f, ensure_ascii=False, indent=4)
+
+    await update.message.reply_text(f"✅ تم حفظ الصورة باسم: {name}")
+
+    del context.user_data["pending_file_id"]
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
-app.bot_data["IMAGES"] = IMAGES
+
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
