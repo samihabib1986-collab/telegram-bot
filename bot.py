@@ -15,10 +15,7 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
-uploaded_images[name] = file_id
 
-with open("images.json", "w") as f:
-    json.dump(uploaded_images, f)
 
 TOKEN = os.environ.get("TOKEN")
 
@@ -245,11 +242,30 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     photo = update.message.photo[-1]
-    file_id = photo.file_id
+    file_id = photo.file_id  # ✅ لازم هذا السطر
 
     context.user_data["pending_file_id"] = file_id
 
-    await update.message.reply_text("✏️ أرسل اسم الصورة")
+    await update.message.reply_text("✍️ أرسل اسم الصورة الآن")
+
+
+async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    if user_id != ADMIN_ID:
+        return
+
+    if "pending_file_id" not in context.user_data:
+        return
+
+    name = update.message.text
+    file_id = context.user_data["pending_file_id"]  # ✅ هنا يتم استخدامه
+
+    uploaded_images[name] = file_id  # ✅ هذا صحيح الآن
+
+    await update.message.reply_text(f"✅ تم حفظ الصورة باسم: {name}")
+
+    del context.user_data["pending_file_id"]
 
 # ================== حفظ اسم الصورة ==================
 async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
