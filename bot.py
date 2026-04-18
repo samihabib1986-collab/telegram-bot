@@ -22,7 +22,7 @@ if not TOKEN:
     raise ValueError("TOKEN is missing")
 
 # ================== الاشتراك ==================
-ADMIN_ID = 123456789  # 🔴 ضع ايديك هنا
+ADMIN_ID = 8491023024  # 🔴 ضع ايديك هنا
 
 approved_users = set()
 pending_users = set()
