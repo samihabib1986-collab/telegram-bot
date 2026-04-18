@@ -232,7 +232,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["pending_file_id"] = file_id
 
     await update.message.reply_text("✍️ أرسل اسم الصورة")
-
+    await update.message.reply_text(update.message.photo[-1].file_id)
 # ================== حفظ الصورة ==================
 async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
