@@ -1,6 +1,5 @@
 import os
 import logging
-import json
 import asyncio
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -8,9 +7,7 @@ from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     CallbackQueryHandler,
-    MessageHandler,
-    ContextTypes,
-    filters
+    ContextTypes
 )
 
 logging.basicConfig(
@@ -29,16 +26,10 @@ ADMIN_ID = 8491023024
 approved_users = set()
 pending_users = set()
 
-# ================== الصور ==================
-uploaded_images = {}
-
-# تحميل الصور من JSON
-if os.path.exists("images.json") and os.path.getsize("images.json") > 0:
-    try:
-        with open("images.json", "r", encoding="utf-8") as f:
-            uploaded_images = json.load(f)
-    except json.JSONDecodeError:
-        uploaded_images = {}
+# ================== 🔥 الصور (ثابتة داخل الكود) ==================
+uploaded_images = {
+    "الهيكل العظمي": "PUT_YOUR_FILE_ID_HERE"
+}
 
 # ================== بنك الأسئلة ==================
 subjects = {
@@ -141,7 +132,7 @@ subjects = {
         ],
 
         "images": [
-           {
+            {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "3",
@@ -287,7 +278,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q_list = subjects[subject][category]
 
-    # 🏁 نهاية الاختبار
+    # نهاية الاختبار
     if index >= len(q_list):
         score = user_data[user_id]["score"]
 
@@ -335,6 +326,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("🏆 لا يوجد نتائج")
         return
 
+    # اختيار تصنيف
     if "_" in data:
         subject, category = data.split("_")
 
@@ -355,7 +347,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     index = user_data[user_id]["q_index"]
 
     q = subjects[subject][category][index]
-
     selected = q["options"][int(data)]
 
     if selected == q["answer"]:
@@ -371,36 +362,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await send_question(update, context)
 
-# ================== رفع الصور ==================
-async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
-        return
-
-    file_id = update.message.photo[-1].file_id
-    context.user_data["pending_file_id"] = file_id
-
-    await update.message.reply_text("✍️ أرسل اسم الصورة")
-
-# ================== حفظ الصورة ==================
-async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
-        return
-
-    if "pending_file_id" not in context.user_data:
-        return
-
-    name = update.message.text
-    file_id = context.user_data["pending_file_id"]
-
-    uploaded_images[name] = file_id
-
-    with open("images.json", "w", encoding="utf-8") as f:
-        json.dump(uploaded_images, f, ensure_ascii=False, indent=4)
-
-    await update.message.reply_text(f"✅ تم حفظ: {name}")
-
-    del context.user_data["pending_file_id"]
-
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
@@ -409,9 +370,6 @@ app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
 
 app.add_handler(CallbackQueryHandler(button))
-
-app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, save_image_name))
 
 if __name__ == "__main__":
     app.run_polling()
