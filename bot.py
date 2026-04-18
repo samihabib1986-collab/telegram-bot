@@ -26,9 +26,9 @@ ADMIN_ID = 8491023024
 approved_users = set()
 pending_users = set()
 
-# ================== 🔥 الصور (ثابتة داخل الكود) ==================
+# ================== الصور ==================
 uploaded_images = {
-    "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ"
+    "الهيكل العظمي": "PUT_YOUR_FILE_ID_HERE"
 }
 
 # ================== بنك الأسئلة ==================
@@ -36,6 +36,83 @@ subjects = {
     "bio": {
         "taaleel": [
             {
+"question": "1. لماذا عظم الفك السفلي متحرك؟",
+"options": [" لتسهيل التنفس"," لتسهيل المضغ والنطق "," لحماية الدماغ"],
+"answer": " لتسهيل المضغ والنطق "
+},
+
+
+
+{
+"question": "2. لماذا توجد فتحات عظمية في عظام القحف عند الرضيع؟",
+"options": [" لتخفيف وزن الرأس"," لتسهيل التنفس","لتسمح لدماغ الرضيع بالنمو"],
+"answer": "لتسمح لدماغ الرضيع بالنمو"
+},
+
+
+
+{
+"question": "3. لماذا توجد أقراص غضروفية بين فقرات العمود الفقري؟",
+"options": ["لمنع احتكاك الفقرات مع بعضها البعض"," لزيادة الطول"," لتقوية العضلات"],
+"answer": "لمنع احتكاك الفقرات مع بعضها البعض"
+},
+
+
+
+{
+"question": "4. لماذا يزداد طول رواد الفضاء؟",
+"options": [" بسبب زيادة الكالسيوم"," بسبب غياب الجاذبية مما يقلل الضغط على الفقرات "," بسبب التمارين الرياضية"],
+"answer": " بسبب غياب الجاذبية مما يقلل الضغط على الفقرات "
+},
+
+
+
+{
+"question": "5. لماذا سميت الأضلاع السائبة بهذا الاسم؟",
+"options": [" لأنها ضعيفة"," لأنها قصيرة"," لأنها لا تتصل مع عظم القص من الأمام "],
+"answer": " لأنها لا تتصل مع عظم القص من الأمام "
+},
+
+
+
+{
+"question": "6. لماذا لا يمكن ثني الساعد نحو الخلف؟",
+"options": [" بسبب العضلات"," بسبب المفصل","لوجود نتوء مرفقي في نهاية الزند العليا"],
+"answer": "لوجود نتوء مرفقي في نهاية الزند العليا"
+},
+
+
+
+{
+"question": "7. لماذا لا يمكن ثني الساق نحو الأمام؟",
+"options": [" بسبب الأربطة"," لوجود عظم الرضفة في مفصل الركبة "," بسبب العضلات"],
+"answer": " لوجود عظم الرضفة في مفصل الركبة "
+},
+
+
+
+{
+"question": "8. لماذا عدد العظام عند البالغ أقل من الطفل؟",
+"options": [" لأن بعضها يتآكل"," لأن الجسم يفقد عظام"," لأن العديد منها يلتحم خلال النمو "],
+"answer": " لأن العديد منها يلتحم خلال النمو "
+},
+
+
+
+{
+"question": "9. لماذا توجد ثقوب في جسم العظم الطويل؟",
+"options": [" لمرور الأوعية الدموية والأعصاب داخل العظم "," لتخفيف الوزن"," لتخزين الدهون"],
+"answer": " لمرور الأوعية الدموية والأعصاب داخل العظم "
+},
+
+
+
+{
+"question": "10. لماذا للهيكل العظمي دور في تكوين خلايا الدم؟",
+"options": [" لأنه يخزن الدم"," لأنه يولد كريات الدم الحمراء والبيضاء والصفيحات "," لأنه ينقل الدم"],
+"answer": " لأنه يولد كريات الدم الحمراء والبيضاء والصفيحات "
+},
+{
 "question": "11. لماذا تتصف العظام بالصلابة والقساوة؟",
 "options": [" لوجود الروابط الوثيقة بين أملاح الكالسيوم ومادة العظم "," بسبب العضلات"," لاحتوائها على ماء"],
 "answer": " لوجود الروابط الوثيقة بين أملاح الكالسيوم ومادة العظم "
@@ -132,7 +209,20 @@ subjects = {
         ],
 
         "images": [
-
+            {
+"type": "image",
+"image": "الهيكل العظمي",
+"question": "1",
+"options": ["الجمجمة (عظام الوجه + عظام القحف)","الهيكل المحوري","القص"],
+"answer": "الهيكل المحوري"
+},
+{
+"type": "image",
+"image": "الهيكل العظمي",
+"question": "3",
+"options": ["الجمجمة (عظام الوجه + عظام القحف)","القص","هيكل الجذع"],
+"answer": "الجمجمة (عظام الوجه + عظام القحف)"
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
@@ -203,7 +293,6 @@ subjects = {
 
 # ================== بيانات المستخدم ==================
 user_data = {}
-leaderboard = {}
 
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -214,17 +303,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
-    user_data[user_id] = {
-        "score": 0,
-        "q_index": 0,
-        "subject": None,
-        "category": None
-    }
-
     keyboard = [
         [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
-        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
-        [InlineKeyboardButton("🏆 النتائج", callback_data="leaderboard")]
+        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")]
     ]
 
     await update.message.reply_text(
@@ -235,10 +316,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== الدفع ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-
-    if user_id in approved_users:
-        await update.message.reply_text("✅ أنت مشترك")
-        return
 
     pending_users.add(user_id)
 
@@ -316,10 +393,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    if data == "leaderboard":
-        await query.edit_message_text("🏆 لا يوجد نتائج")
-        return
-
     # اختيار تصنيف
     if "_" in data:
         subject, category = data.split("_")
@@ -335,31 +408,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-   # ================== الإجابة ==================
-subject = user_data[user_id]["subject"]
-category = user_data[user_id]["category"]
-index = user_data[user_id]["q_index"]
+    # ================== الإجابة ==================
+    subject = user_data[user_id]["subject"]
+    category = user_data[user_id]["category"]
+    index = user_data[user_id]["q_index"]
 
-q = subjects[subject][category][index]
-selected = q["options"][int(data)]
+    q = subjects[subject][category][index]
+    selected = q["options"][int(data)]
 
-if selected == q["answer"]:
-    user_data[user_id]["score"] += 10
-    result = "✅ صحيح"
-else:
-    result = f"❌ خطأ\nالإجابة: {q['answer']}"
+    if selected == q["answer"]:
+        user_data[user_id]["score"] += 10
+        result = "✅ صحيح"
+    else:
+        result = f"❌ خطأ\nالإجابة: {q['answer']}"
 
-user_data[user_id]["q_index"] += 1
+    user_data[user_id]["q_index"] += 1
 
-# 🔥 بدل edit_message_text
-await context.bot.send_message(
-    chat_id=query.message.chat_id,
-    text=result
-)
+    # ❗ الحل هنا (بدل edit_message_text)
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text=result
+    )
 
-await asyncio.sleep(1)
+    await asyncio.sleep(1)
 
-await send_question(update, context)
+    await send_question(update, context)
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
