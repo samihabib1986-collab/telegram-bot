@@ -1,7 +1,13 @@
 import os
 import logging
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes
+)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -9,8 +15,7 @@ logging.basicConfig(
 )
 
 TOKEN = os.environ.get("TOKEN")
-if not TOKEN:
-    raise ValueError("TOKEN is missing")
+
 
 # بنك الأسئلة
 questions = [
@@ -168,18 +173,37 @@ questions = [
 "options": [" لأنها تتمتع بخاصية المرونة "," بسبب الأعصاب"," بسبب الدم"],
 "answer": " لأنها تتمتع بخاصية المرونة "
 },
+{
+"question": "21. لماذا عضلات الرقبة والفك السفلي لا تتعب بسهولة؟",
+"options": ["لأنها تتمتع بخاصية المقوية العضلية (تحافظ على تقلصها)","لأنها صغيرة","لأنها سريعة"],
+"answer": "لأنها تتمتع بخاصية المقوية العضلية (تحافظ على تقلصها)"
+},
+
+
+
+{
+"question": "22. لماذا تبقى الرأس منتصبة أثناء اليقظة؟",
+"options": ["بسبب العظام","بسبب الأعصاب","لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"],
+"answer": "لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"
+},
+
 
 ]
 
 subjects = {"bio": questions}
+
 user_data = {}
 leaderboard = {}
 
-# START
+# start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    user_data[user_id] = {"score": 0, "q_index": 0, "subject": None}
+    user_data[user_id] = {
+        "score": 0,
+        "q_index": 0,
+        "subject": None
+    }
 
     keyboard = [
         [InlineKeyboardButton("🦴 الجهاز العظمي", callback_data="bio")],
@@ -187,27 +211,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await update.message.reply_text(
-        "🎯 اختر المادة:",
+        "🎯 اختر:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
 # إرسال سؤال
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+
     user_id = query.from_user.id
     chat_id = query.message.chat_id
 
     subject = user_data[user_id]["subject"]
     index = user_data[user_id]["q_index"]
+
     q_list = subjects[subject]
 
     if index >= len(q_list):
         score = user_data[user_id]["score"]
-        leaderboard[user_id] = score
+        leaderboard[user_id] = max(score, leaderboard.get(user_id, 0))
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}من {len(q_list)*10}"
         )
         return
 
@@ -224,7 +250,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# BUTTONS
+# buttons
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -232,7 +258,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # leaderboard
     if data == "leaderboard":
         if not leaderboard:
             await query.edit_message_text("لا يوجد نتائج بعد.")
@@ -247,33 +272,37 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text)
         return
 
-    # اختيار مادة
     if data in subjects:
-        user_data[user_id] = {"score": 0, "q_index": 0, "subject": data}
+        user_data[user_id] = {
+            "score": 0,
+            "q_index": 0,
+            "subject": data
+        }
 
-        await query.edit_message_text("🚀 بدأ الاختبار!")
+        await query.edit_message_text("🚀 تم بدء الاختبار!")
         await send_question(update, context)
         return
 
-    # إجابة
     subject = user_data[user_id]["subject"]
     index = user_data[user_id]["q_index"]
 
-    q = subjects[subject][index]
+    q_list = subjects[subject]
+    q = q_list[index]
+
     selected = q["options"][int(data)]
 
     if selected == q["answer"]:
         user_data[user_id]["score"] += 10
         text = "✅ صحيح!"
     else:
-        text = f"❌ خطأ! الإجابة: {q['answer']}"
+        text = f"❌ خطأ! الإجابة الصحيحة: {q['answer']}"
 
     user_data[user_id]["q_index"] += 1
 
     await query.edit_message_text(text)
     await send_question(update, context)
 
-# تشغيل البوت
+# تشغيل
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
