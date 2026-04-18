@@ -17,9 +17,7 @@ logging.basicConfig(
 TOKEN = os.environ.get("TOKEN")
 
 if not TOKEN:
-    raise ValueError("TOKEN is missing from environment variables")
-
-
+    raise ValueError("TOKEN is missing")
 
 # بنك الأسئلة
 questions = [
@@ -194,6 +192,12 @@ questions = [
 
 ]
 
+subjects = {"bio": questions}
+
+user_data = {}
+leaderboard = {}
+
+# ================= START =================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
@@ -213,17 +217,99 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
+# ================= SEND QUESTION =================
+async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    user_id = query.from_user.id
+    chat_id = query.message.chat_id
 
-# =======================
-# تشغيل البوت
-# =======================
+    subject = user_data[user_id]["subject"]
+    index = user_data[user_id]["q_index"]
+
+    q_list = subjects[subject]
+
+    if index >= len(q_list):
+        score = user_data[user_id]["score"]
+        leaderboard[user_id] = max(score, leaderboard.get(user_id, 0))
+
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
+        )
+        return
+
+    q = q_list[index]
+
+    keyboard = [
+        [InlineKeyboardButton(opt, callback_data=str(i))]
+        for i, opt in enumerate(q["options"])
+    ]
+
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text=q["question"],
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+# ================= BUTTON HANDLER =================
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    user_id = query.from_user.id
+    data = query.data
+
+    # leaderboard
+    if data == "leaderboard":
+        if not leaderboard:
+            await query.edit_message_text("لا يوجد نتائج بعد.")
+            return
+
+        text = "🏆 أفضل الطلاب:\n\n"
+        sorted_board = sorted(leaderboard.items(), key=lambda x: x[1], reverse=True)
+
+        for i, (uid, score) in enumerate(sorted_board[:10], 1):
+            text += f"{i}. 👤 {uid} - {score}\n"
+
+        await query.edit_message_text(text)
+        return
+
+    # اختيار مادة
+    if data in subjects:
+        user_data[user_id] = {
+            "score": 0,
+            "q_index": 0,
+            "subject": data
+        }
+
+        await query.edit_message_text("🚀 تم بدء الاختبار!")
+        await send_question(update, context)
+        return
+
+    # إجابة
+    subject = user_data[user_id]["subject"]
+    index = user_data[user_id]["q_index"]
+
+    q = subjects[subject][index]
+
+    selected = q["options"][int(data)]
+
+    if selected == q["answer"]:
+        user_data[user_id]["score"] += 10
+        text = "✅ صحيح!"
+    else:
+        text = f"❌ خطأ! الإجابة: {q['answer']}"
+
+    user_data[user_id]["q_index"] += 1
+
+    await query.edit_message_text(text)
+    await send_question(update, context)
+
+# ================= MAIN =================
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CallbackQueryHandler(button))
+
 if __name__ == "__main__":
-    app = ApplicationBuilder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button))
-
-    print("BOT IS RUNNING...")
-
-    # أهم سطر (بدون asyncio)
-    app.run_polling(drop_pending_updates=True)
+    app.run_polling()
