@@ -222,7 +222,6 @@ subjects = {
         ],
 
         "images": [
-            {
 {
 "type": "image",
 "image": "الهيكل العظمي",
