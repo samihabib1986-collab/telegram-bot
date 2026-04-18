@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+import asyncio
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -31,7 +32,7 @@ pending_users = set()
 # ================== الصور ==================
 uploaded_images = {}
 
-# 🔥 تحميل الصور من JSON
+# تحميل الصور من JSON
 if os.path.exists("images.json") and os.path.getsize("images.json") > 0:
     try:
         with open("images.json", "r", encoding="utf-8") as f:
@@ -56,15 +57,13 @@ subjects = {
         ],
 
         "images": [
-           {
-"type": "image",
-"image": "الهيكل العظمي",
-"question": "1",
-"options": ["الجمجمة (عظام الوجه + عظام القحف)","الهيكل المحوري","القص"],
-"answer": "1"
-}
-
-
+            {
+                "type": "image",
+                "image": "الهيكل العظمي",
+                "question": "ما هذا العظم؟",
+                "options": ["جمجمة", "فخذ", "ترقوة"],
+                "answer": "جمجمة"
+            }
         ]
     }
 }
@@ -79,9 +78,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user_id not in approved_users:
         pending_users.add(user_id)
-        await update.message.reply_text(
-            "💰 هذا البوت مدفوع\n\nاكتب /paid للطلب"
-        )
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
     user_data[user_id] = {
@@ -94,7 +91,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
         [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
-        [InlineKeyboardButton("🏆 أفضل الطلاب", callback_data="leaderboard")]
+        [InlineKeyboardButton("🏆 النتائج", callback_data="leaderboard")]
     ]
 
     await update.message.reply_text(
@@ -107,7 +104,7 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     if user_id in approved_users:
-        await update.message.reply_text("✅ أنت مشترك بالفعل")
+        await update.message.reply_text("✅ أنت مشترك")
         return
 
     pending_users.add(user_id)
@@ -130,7 +127,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("✅ تم التفعيل")
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
 
-# ================== إرسال الأسئلة ==================
+# ================== إرسال السؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
@@ -142,9 +139,14 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q_list = subjects[subject][category]
 
+    # 🏁 نهاية الاختبار
     if index >= len(q_list):
         score = user_data[user_id]["score"]
-        await context.bot.send_message(chat_id, f"🎉 انتهيت!\n📊 نتيجتك: {score}")
+
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}"
+        )
         return
 
     q = q_list[index]
@@ -154,10 +156,8 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for i, opt in enumerate(q["options"])
     ]
 
-    # ================== صورة ==================
     if q.get("type") == "image":
-        image_name = q["image"]
-        file_id = uploaded_images.get(image_name)
+        file_id = uploaded_images.get(q["image"])
 
         if file_id:
             await context.bot.send_photo(
@@ -201,14 +201,34 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-# ================== رفع الصورة ==================
+    # ================== الإجابة ==================
+    subject = user_data[user_id]["subject"]
+    category = user_data[user_id]["category"]
+    index = user_data[user_id]["q_index"]
+
+    q = subjects[subject][category][index]
+
+    selected = q["options"][int(data)]
+
+    if selected == q["answer"]:
+        user_data[user_id]["score"] += 10
+        result = "✅ صحيح"
+    else:
+        result = f"❌ خطأ\nالإجابة: {q['answer']}"
+
+    user_data[user_id]["q_index"] += 1
+
+    await query.edit_message_text(result)
+    await asyncio.sleep(1)
+
+    await send_question(update, context)
+
+# ================== رفع الصور ==================
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
 
-    photo = update.message.photo[-1]
-    file_id = photo.file_id
-
+    file_id = update.message.photo[-1].file_id
     context.user_data["pending_file_id"] = file_id
 
     await update.message.reply_text("✍️ أرسل اسم الصورة")
@@ -226,11 +246,10 @@ async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     uploaded_images[name] = file_id
 
-    # 🔥 حفظ في JSON
     with open("images.json", "w", encoding="utf-8") as f:
         json.dump(uploaded_images, f, ensure_ascii=False, indent=4)
 
-    await update.message.reply_text(f"✅ تم حفظ الصورة باسم: {name}")
+    await update.message.reply_text(f"✅ تم حفظ: {name}")
 
     del context.user_data["pending_file_id"]
 
