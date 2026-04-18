@@ -234,7 +234,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}من {len(q_list)*10}"
         )
         return
 
