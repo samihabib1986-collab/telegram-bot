@@ -1,7 +1,7 @@
 import os
 import logging
 import asyncio
-
+from telegram.ext import MessageHandler, filters
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -433,14 +433,21 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(1)
 
     await send_question(update, context)
+# ================== اظهار file_id ==================
+async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    photo = update.message.photo[-1]
+    file_id = photo.file_id
 
+    await update.message.reply_text(
+        f"📌 file_id:\n{file_id}"
+    )
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
-
+app.add_handler(MessageHandler(filters.PHOTO, get_file_id))
 app.add_handler(CallbackQueryHandler(button))
 
 if __name__ == "__main__":
