@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 import asyncio
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -7,7 +8,9 @@ from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     CallbackQueryHandler,
-    ContextTypes
+    MessageHandler,
+    ContextTypes,
+    filters
 )
 
 logging.basicConfig(
@@ -26,10 +29,16 @@ ADMIN_ID = 8491023024
 approved_users = set()
 pending_users = set()
 
-# ================== 🔥 الصور (ثابتة داخل الكود) ==================
-uploaded_images = {
-    "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ"
-}
+# ================== الصور ==================
+uploaded_images = {}
+
+# تحميل الصور من JSON
+if os.path.exists("images.json") and os.path.getsize("images.json") > 0:
+    try:
+        with open("images.json", "r", encoding="utf-8") as f:
+            uploaded_images = json.load(f)
+    except json.JSONDecodeError:
+        uploaded_images = {}
 
 # ================== بنك الأسئلة ==================
 subjects = {
@@ -128,86 +137,80 @@ subjects = {
 "options": ["بسبب العظام","بسبب الأعصاب","لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"],
 "answer": "لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"
 },
+
         ],
 
         "images": [
-            {
-"type": "image",
-"image": "الهيكل العظمي",
-"question": "1",
-"options": ["الجمجمة (عظام الوجه + عظام القحف)","الهيكل المحوري","القص"],
-"answer": "الهيكل المحوري"
-}
-{
+           {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "3",
 "options": ["الجمجمة (عظام الوجه + عظام القحف)","القص","هيكل الجذع"],
 "answer": "الجمجمة (عظام الوجه + عظام القحف)"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "5",
 "options": ["هيكل الجذع","القص","الزنار الكتفي"],
 "answer": "القص"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "8",
 "options": ["الزنار الكتفي","الطرف العلوي","هيكل الجذع"],
 "answer": "هيكل الجذع"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "4",
 "options": ["الزنار الكتفي","الطرف العلوي","هيكل الجذع"],
 "answer": "الزنار الكتفي"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "9",
 "options": ["الزنار الكتفي","الهيكل الطرفي","الطرف العلوي"],
 "answer": "الطرف العلوي"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "10",
 "options": ["الطرف السفلي","الزنار الحوضي","الهيكل الطرفي"],
 "answer": "الزنار الحوضي"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "11",
 "options": ["الهيكل الطرفي","الطرف السفلي","الزنار الحوضي"],
 "answer": "الطرف السفلي"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "2",
 "options": ["الزنار الحوضي","الطرف السفلي","الهيكل الطرفي"],
 "answer": "الهيكل الطرفي"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "6",
 "options": ["العمود الفقري","الاضلاع","الهيكل الطرفي"],
 "answer": "الاضلاع"
-}
+},
 {
 "type": "image",
 "image": "الهيكل العظمي",
 "question": "7",
 "options": ["العمود الفقري","الهيكل الطرفي","الاضلاع"],
 "answer": "العمود الفقري"
-}
+},
 
         ]
     }
@@ -284,7 +287,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q_list = subjects[subject][category]
 
-    # نهاية الاختبار
+    # 🏁 نهاية الاختبار
     if index >= len(q_list):
         score = user_data[user_id]["score"]
 
@@ -332,7 +335,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("🏆 لا يوجد نتائج")
         return
 
-    # اختيار تصنيف
     if "_" in data:
         subject, category = data.split("_")
 
@@ -353,6 +355,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     index = user_data[user_id]["q_index"]
 
     q = subjects[subject][category][index]
+
     selected = q["options"][int(data)]
 
     if selected == q["answer"]:
@@ -368,6 +371,36 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await send_question(update, context)
 
+# ================== رفع الصور ==================
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    file_id = update.message.photo[-1].file_id
+    context.user_data["pending_file_id"] = file_id
+
+    await update.message.reply_text("✍️ أرسل اسم الصورة")
+
+# ================== حفظ الصورة ==================
+async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if "pending_file_id" not in context.user_data:
+        return
+
+    name = update.message.text
+    file_id = context.user_data["pending_file_id"]
+
+    uploaded_images[name] = file_id
+
+    with open("images.json", "w", encoding="utf-8") as f:
+        json.dump(uploaded_images, f, ensure_ascii=False, indent=4)
+
+    await update.message.reply_text(f"✅ تم حفظ: {name}")
+
+    del context.user_data["pending_file_id"]
+
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
@@ -376,6 +409,9 @@ app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
 
 app.add_handler(CallbackQueryHandler(button))
+
+app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, save_image_name))
 
 if __name__ == "__main__":
     app.run_polling()
