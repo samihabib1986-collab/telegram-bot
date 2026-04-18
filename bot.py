@@ -6,7 +6,9 @@ from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     CallbackQueryHandler,
-    ContextTypes
+    MessageHandler,
+    ContextTypes,
+    filters
 )
 
 logging.basicConfig(
@@ -19,222 +21,136 @@ TOKEN = os.environ.get("TOKEN")
 if not TOKEN:
     raise ValueError("TOKEN is missing")
 
-# بنك الأسئلة
-questions = [
-{
-"question": "1. لماذا عظم الفك السفلي متحرك؟",
-"options": [" لتسهيل التنفس"," لتسهيل المضغ والنطق "," لحماية الدماغ"],
-"answer": " لتسهيل المضغ والنطق ",
-},
+# ================== الاشتراك ==================
+ADMIN_ID = 123456789  # 🔴 ضع ايديك هنا
 
+approved_users = set()
+pending_users = set()
 
+# ================== تخزين الصور ==================
+uploaded_images = {}
 
-{
-"question": "2. لماذا توجد فتحات عظمية في عظام القحف عند الرضيع؟",
-"options": [" لتخفيف وزن الرأس"," لتسهيل التنفس","لتسمح لدماغ الرضيع بالنمو"],
-"answer": "لتسمح لدماغ الرضيع بالنمو"
-},
+# ================== بنك الأسئلة (تصنيفات) ==================
+subjects = {
+    "bio": {
+        "taaleel": [
+            {
+                "question": "لماذا عظم الفك السفلي متحرك؟",
+                "options": ["لتسهيل المضغ والنطق", "لحماية الدماغ", "لتخفيف الوزن"],
+                "answer": "لتسهيل المضغ والنطق"
+            },
+            {
+                "question": "لماذا توجد أقراص غضروفية بين الفقرات؟",
+                "options": ["لمنع الاحتكاك", "لزيادة الطول", "لتقوية العضلات"],
+                "answer": "لمنع الاحتكاك"
+            }
+        ],
 
+        "images": [
+    {
+"type": "image",
+"image": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Human_skull_side_simplified.png",
+"question": "الهيكل المحوري",
+"options": ["1,2,3,4,5,6,7,8,9,10,11"],
+"answer": "1"
+}
 
+        ]
+    }
+}
 
-{
-"question": "3. لماذا توجد أقراص غضروفية بين فقرات العمود الفقري؟",
-"options": ["لمنع احتكاك الفقرات مع بعضها البعض"," لزيادة الطول"," لتقوية العضلات"],
-"answer": "لمنع احتكاك الفقرات مع بعضها البعض"
-},
-
-
-
-{
-"question": "4. لماذا يزداد طول رواد الفضاء؟",
-"options": [" بسبب زيادة الكالسيوم"," بسبب غياب الجاذبية مما يقلل الضغط على الفقرات "," بسبب التمارين الرياضية"],
-"answer": " بسبب غياب الجاذبية مما يقلل الضغط على الفقرات "
-},
-
-
-
-{
-"question": "5. لماذا سميت الأضلاع السائبة بهذا الاسم؟",
-"options": [" لأنها ضعيفة"," لأنها قصيرة"," لأنها لا تتصل مع عظم القص من الأمام "],
-"answer": " لأنها لا تتصل مع عظم القص من الأمام "
-},
-
-
-
-{
-"question": "6. لماذا لا يمكن ثني الساعد نحو الخلف؟",
-"options": [" بسبب العضلات"," بسبب المفصل","لوجود نتوء مرفقي في نهاية الزند العليا"],
-"answer": "لوجود نتوء مرفقي في نهاية الزند العليا"
-},
-
-
-
-{
-"question": "7. لماذا لا يمكن ثني الساق نحو الأمام؟",
-"options": [" بسبب الأربطة"," لوجود عظم الرضفة في مفصل الركبة "," بسبب العضلات"],
-"answer": " لوجود عظم الرضفة في مفصل الركبة "
-},
-
-
-
-{
-"question": "8. لماذا عدد العظام عند البالغ أقل من الطفل؟",
-"options": [" لأن بعضها يتآكل"," لأن الجسم يفقد عظام"," لأن العديد منها يلتحم خلال النمو "],
-"answer": " لأن العديد منها يلتحم خلال النمو "
-},
-
-
-
-{
-"question": "9. لماذا توجد ثقوب في جسم العظم الطويل؟",
-"options": [" لمرور الأوعية الدموية والأعصاب داخل العظم "," لتخفيف الوزن"," لتخزين الدهون"],
-"answer": " لمرور الأوعية الدموية والأعصاب داخل العظم "
-},
-
-
-
-{
-"question": "10. لماذا للهيكل العظمي دور في تكوين خلايا الدم؟",
-"options": [" لأنه يخزن الدم"," لأنه يولد كريات الدم الحمراء والبيضاء والصفيحات "," لأنه ينقل الدم"],
-"answer": " لأنه يولد كريات الدم الحمراء والبيضاء والصفيحات "
-},
-{
-"question": "11. لماذا تتصف العظام بالصلابة والقساوة؟",
-"options": [" لوجود الروابط الوثيقة بين أملاح الكالسيوم ومادة العظم "," بسبب العضلات"," لاحتوائها على ماء"],
-"answer": " لوجود الروابط الوثيقة بين أملاح الكالسيوم ومادة العظم "
-},
-
-
-
-{
-"question": "12. لماذا عظام القحف غير متحركة؟",
-"options": [" لأنها صغيرة"," لأن المفاصل بينها ثابتة "," لأنها خفيفة"],
-"answer": " لأن المفاصل بينها ثابتة "
-},
-
-
-
-{
-"question": "13. لماذا فقرات العمود الفقري محدودة الحركة؟",
-"options": [" لأنها ضعيفة"," لأن المفاصل بينها نصف متحركة "," لأنها كثيرة"],
-"answer": " لأن المفاصل بينها نصف متحركة "
-},
-
-
-
-{
-"question": "14. لماذا حركة المفصل العضدي الكتفي واسعة؟",
-"options": [" لأنه ثابت"," لأنه مفصل متحرك "," لأنه صغير"],
-"answer": " لأنه مفصل متحرك "
-},
-
-
-
-{
-"question": "15. لماذا يحدث خلع المفصل؟",
-"options": [" بسبب كسر العظم"," بسبب خروج العظم من مكانه الطبيعي "," بسبب ضعف العضلات"],
-"answer": " بسبب خروج العظم من مكانه الطبيعي "
-},
-
-
-
-{
-"question": "16. لماذا للسمحاق دور في جبر الكسور؟",
-"options": [" لأنه يفرز مادة تساعد على وصل العظم المكسور "," لأنه صلب"," لأنه يحمي العظم"],
-"answer": " لأنه يفرز مادة تساعد على وصل العظم المكسور "
-},
-
-
-
-{
-"question": "17. لماذا يتوقف النمو الطولي عند عمر 18 سنة؟",
-"options": [" بسبب نقص الغذاء"," بسبب تعظم غضاريف النمو "," بسبب قلة الحركة"],
-"answer": " بسبب تعظم غضاريف النمو "
-},
-
-
-
-{
-"question": "18. لماذا تسمى العضلات الملساء عضلات حشوية؟",
-"options": [" لأنها قوية"," لوجودها في جدران الأحشاء (المعدة والأمعاء) "," لأنها سريعة"],
-"answer": " لوجودها في جدران الأحشاء (المعدة والأمعاء) "
-},
-
-
-
-{
-"question": "19. لماذا تسمى العضلات المخططة عضلات هيكلية؟",
-"options": [" لأنها كبيرة"," لأنها بطيئة"," لأنها مرتبطة بالعظام في الهيكل العظمي "],
-"answer": " لأنها مرتبطة بالعظام في الهيكل العظمي "
-},
-
-
-
-{
-"question": "20. لماذا تعود العضلة إلى وضعها الطبيعي بعد الشد؟",
-"options": [" لأنها تتمتع بخاصية المرونة "," بسبب الأعصاب"," بسبب الدم"],
-"answer": " لأنها تتمتع بخاصية المرونة "
-},
-{
-"question": "21. لماذا عضلات الرقبة والفك السفلي لا تتعب بسهولة؟",
-"options": ["لأنها تتمتع بخاصية المقوية العضلية (تحافظ على تقلصها)","لأنها صغيرة","لأنها سريعة"],
-"answer": "لأنها تتمتع بخاصية المقوية العضلية (تحافظ على تقلصها)"
-},
-
-
-
-{
-"question": "22. لماذا تبقى الرأس منتصبة أثناء اليقظة؟",
-"options": ["بسبب العظام","بسبب الأعصاب","لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"],
-"answer": "لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"
-},
-
-
-]
-
-subjects = {"bio": questions}
-
+# ================== بيانات المستخدم ==================
 user_data = {}
 leaderboard = {}
 
-# ================= START =================
+# ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
+
+    if user_id not in approved_users:
+        pending_users.add(user_id)
+
+        await update.message.reply_text(
+            "💰 هذا البوت مدفوع\n\n"
+            "1️⃣ ادفع\n"
+            "2️⃣ ثم اكتب /paid"
+        )
+        return
 
     user_data[user_id] = {
         "score": 0,
         "q_index": 0,
-        "subject": None
+        "subject": None,
+        "category": None
     }
 
     keyboard = [
-        [InlineKeyboardButton("🦴 الجهاز العظمي", callback_data="bio")],
+        [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
+        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
         [InlineKeyboardButton("🏆 أفضل الطلاب", callback_data="leaderboard")]
     ]
 
     await update.message.reply_text(
-        "🎯 اختر:",
+        "🎯 اختر التصنيف:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ================= SEND QUESTION =================
+# ================== الدفع ==================
+async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    if user_id in approved_users:
+        await update.message.reply_text("✅ أنت مشترك بالفعل")
+        return
+
+    pending_users.add(user_id)
+
+    await context.bot.send_message(
+        chat_id=ADMIN_ID,
+        text=f"💳 طلب اشتراك:\nUser ID: {user_id}\n/approve {user_id}"
+    )
+
+    await update.message.reply_text("⏳ تم إرسال طلبك")
+
+# ================== الموافقة ==================
+async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if not context.args:
+        await update.message.reply_text("استخدم: /approve USER_ID")
+        return
+
+    user_id = int(context.args[0])
+    approved_users.add(user_id)
+    pending_users.discard(user_id)
+
+    await update.message.reply_text("✅ تم التفعيل")
+
+    await context.bot.send_message(
+        chat_id=user_id,
+        text="🎉 تم قبول اشتراكك"
+    )
+
+# ================== إرسال سؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
     chat_id = query.message.chat_id
 
     subject = user_data[user_id]["subject"]
+    category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
 
-    q_list = subjects[subject]
+    q_list = subjects[subject][category]
 
     if index >= len(q_list):
         score = user_data[user_id]["score"]
-        leaderboard[user_id] = max(score, leaderboard.get(user_id, 0))
+        leaderboard[user_id] = score
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}من {len(q_list)*10}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
         )
         return
 
@@ -245,13 +161,22 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for i, opt in enumerate(q["options"])
     ]
 
-    await context.bot.send_message(
-        chat_id=chat_id,
-        text=q["question"],
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    # 📸 صورة
+    if q.get("type") == "image":
+        await context.bot.send_photo(
+            chat_id=chat_id,
+            photo=q["image"],
+            caption=q["question"],
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    else:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=q["question"],
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
-# ================= BUTTON HANDLER =================
+# ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -262,36 +187,39 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # leaderboard
     if data == "leaderboard":
         if not leaderboard:
-            await query.edit_message_text("لا يوجد نتائج بعد.")
+            await query.edit_message_text("لا يوجد نتائج")
             return
 
-        text = "🏆 أفضل الطلاب:\n\n"
+        text = "🏆 النتائج:\n\n"
         sorted_board = sorted(leaderboard.items(), key=lambda x: x[1], reverse=True)
 
         for i, (uid, score) in enumerate(sorted_board[:10], 1):
-            text += f"{i}. 👤 {uid} - {score}\n"
+            text += f"{i}. {uid} - {score}\n"
 
         await query.edit_message_text(text)
         return
 
-    # اختيار مادة
-    if data in subjects:
+    # اختيار تصنيف
+    if "_" in data:
+        subject, category = data.split("_")
+
         user_data[user_id] = {
             "score": 0,
             "q_index": 0,
-            "subject": data
+            "subject": subject,
+            "category": category
         }
 
-        await query.edit_message_text("🚀 تم بدء الاختبار!")
+        await query.edit_message_text("🚀 بدأ الاختبار")
         await send_question(update, context)
         return
 
     # إجابة
     subject = user_data[user_id]["subject"]
+    category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
 
-    q = subjects[subject][index]
-
+    q = subjects[subject][category][index]
     selected = q["options"][int(data)]
 
     if selected == q["answer"]:
@@ -305,11 +233,50 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(text)
     await send_question(update, context)
 
-# ================= MAIN =================
+# ================== رفع الصور من الموبايل ==================
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    if user_id != ADMIN_ID:
+        return
+
+    photo = update.message.photo[-1]
+    file_id = photo.file_id
+
+    context.user_data["pending_file_id"] = file_id
+
+    await update.message.reply_text("✏️ أرسل اسم الصورة")
+
+# ================== حفظ اسم الصورة ==================
+async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    if user_id != ADMIN_ID:
+        return
+
+    if "pending_file_id" not in context.user_data:
+        return
+
+    name = update.message.text
+    file_id = context.user_data["pending_file_id"]
+
+    uploaded_images[name] = file_id
+
+    await update.message.reply_text(f"✅ تم حفظ الصورة باسم: {name}")
+
+    del context.user_data["pending_file_id"]
+
+# ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("paid", paid))
+app.add_handler(CommandHandler("approve", approve))
+
 app.add_handler(CallbackQueryHandler(button))
+
+app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, save_image_name))
 
 if __name__ == "__main__":
     app.run_polling()
