@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -16,22 +17,29 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-
 TOKEN = os.environ.get("TOKEN")
 
 if not TOKEN:
     raise ValueError("TOKEN is missing")
 
-# ================== الاشتراك ==================
-ADMIN_ID = 8491023024  # 🔴 ضع ايديك هنا
+# ================== الأدمن ==================
+ADMIN_ID = 8491023024
 
 approved_users = set()
 pending_users = set()
 
-# ================== تخزين الصور ==================
+# ================== الصور ==================
 uploaded_images = {}
 
-# ================== بنك الأسئلة (تصنيفات) ==================
+# 🔥 تحميل الصور من JSON
+if os.path.exists("images.json") and os.path.getsize("images.json") > 0:
+    try:
+        with open("images.json", "r", encoding="utf-8") as f:
+            uploaded_images = json.load(f)
+    except json.JSONDecodeError:
+        uploaded_images = {}
+
+# ================== بنك الأسئلة ==================
 subjects = {
     "bio": {
         "taaleel": [
@@ -39,23 +47,16 @@ subjects = {
                 "question": "لماذا عظم الفك السفلي متحرك؟",
                 "options": ["لتسهيل المضغ والنطق", "لحماية الدماغ", "لتخفيف الوزن"],
                 "answer": "لتسهيل المضغ والنطق"
-            },
-            {
-                "question": "لماذا توجد أقراص غضروفية بين الفقرات؟",
-                "options": ["لمنع الاحتكاك", "لزيادة الطول", "لتقوية العضلات"],
-                "answer": "لمنع الاحتكاك"
             }
         ],
-
         "images": [
- #   {
-#"type": "image",
-#"image": uploaded_images["الهيكل العظمي"],
-#"question": "الهيكل المحوري",
-#"options": ["1,2,3,4,5,6,7,8,9,10,11"],
-#"answer": "1"
-#}
-
+            {
+                "type": "image",
+                "image": None,  # سيتم ربطها من uploaded_images
+                "question": "ما هذا العظم؟",
+                "options": ["جمجمة", "فخذ", "ترقوة"],
+                "answer": "جمجمة"
+            }
         ]
     }
 }
@@ -70,11 +71,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user_id not in approved_users:
         pending_users.add(user_id)
-
         await update.message.reply_text(
-            "💰 هذا البوت مدفوع\n\n"
-            "1️⃣ ادفع\n"
-            "2️⃣ ثم اكتب /paid"
+            "💰 هذا البوت مدفوع\n\nاكتب /paid للطلب"
         )
         return
 
@@ -92,7 +90,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await update.message.reply_text(
-        "🎯 اختر التصنيف:",
+        "🎯 اختر:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -108,30 +106,22 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"💳 طلب اشتراك:\nUser ID: {user_id}\n/approve {user_id}"
+        text=f"💳 طلب اشتراك:\n/approve {user_id}"
     )
 
-    await update.message.reply_text("⏳ تم إرسال طلبك")
+    await update.message.reply_text("⏳ تم الإرسال")
 
 # ================== الموافقة ==================
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
 
-    if not context.args:
-        await update.message.reply_text("استخدم: /approve USER_ID")
-        return
-
     user_id = int(context.args[0])
+
     approved_users.add(user_id)
-    pending_users.discard(user_id)
 
     await update.message.reply_text("✅ تم التفعيل")
-
-    await context.bot.send_message(
-        chat_id=user_id,
-        text="🎉 تم قبول اشتراكك"
-    )
+    await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
 
 # ================== إرسال سؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -146,13 +136,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q_list = subjects[subject][category]
 
     if index >= len(q_list):
-        score = user_data[user_id]["score"]
-        leaderboard[user_id] = score
-
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
-        )
+        await context.bot.send_message(chat_id, "🎉 انتهيت!")
         return
 
     q = q_list[index]
@@ -162,7 +146,6 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for i, opt in enumerate(q["options"])
     ]
 
-    # 📸 صورة
     if q.get("type") == "image":
         await context.bot.send_photo(
             chat_id=chat_id,
@@ -185,22 +168,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # leaderboard
     if data == "leaderboard":
-        if not leaderboard:
-            await query.edit_message_text("لا يوجد نتائج")
-            return
-
-        text = "🏆 النتائج:\n\n"
-        sorted_board = sorted(leaderboard.items(), key=lambda x: x[1], reverse=True)
-
-        for i, (uid, score) in enumerate(sorted_board[:10], 1):
-            text += f"{i}. {uid} - {score}\n"
-
-        await query.edit_message_text(text)
+        await query.edit_message_text("🏆 لا يوجد نتائج")
         return
 
-    # اختيار تصنيف
     if "_" in data:
         subject, category = data.split("_")
 
@@ -215,63 +186,21 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-    # إجابة
-    subject = user_data[user_id]["subject"]
-    category = user_data[user_id]["category"]
-    index = user_data[user_id]["q_index"]
-
-    q = subjects[subject][category][index]
-    selected = q["options"][int(data)]
-
-    if selected == q["answer"]:
-        user_data[user_id]["score"] += 10
-        text = "✅ صحيح!"
-    else:
-        text = f"❌ خطأ! الإجابة: {q['answer']}"
-
-    user_data[user_id]["q_index"] += 1
-
-    await query.edit_message_text(text)
-    await send_question(update, context)
-
-# ================== رفع الصور من الموبايل ==================
+# ================== رفع الصورة ==================
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-
-    if user_id != ADMIN_ID:
+    if update.effective_user.id != ADMIN_ID:
         return
 
     photo = update.message.photo[-1]
-    file_id = photo.file_id  # ✅ لازم هذا السطر
+    file_id = photo.file_id
 
     context.user_data["pending_file_id"] = file_id
 
-    await update.message.reply_text("✍️ أرسل اسم الصورة الآن")
+    await update.message.reply_text("✍️ أرسل اسم الصورة")
 
-
+# ================== حفظ الصورة ==================
 async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-
-    if user_id != ADMIN_ID:
-        return
-
-    if "pending_file_id" not in context.user_data:
-        return
-
-    name = update.message.text
-    file_id = context.user_data["pending_file_id"]  # ✅ هنا يتم استخدامه
-
-    uploaded_images[name] = file_id  # ✅ هذا صحيح الآن
-
-    await update.message.reply_text(f"✅ تم حفظ الصورة باسم: {name}")
-
-    del context.user_data["pending_file_id"]
-
-# ================== حفظ اسم الصورة ==================
-async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-
-    if user_id != ADMIN_ID:
+    if update.effective_user.id != ADMIN_ID:
         return
 
     if "pending_file_id" not in context.user_data:
@@ -282,23 +211,16 @@ async def save_image_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     uploaded_images[name] = file_id
 
-    await update.message.reply_text(f"✅ تم حفظ الصورة باسم: {name}")
+    # 🔥 حفظ في JSON
+    with open("images.json", "w", encoding="utf-8") as f:
+        json.dump(uploaded_images, f, ensure_ascii=False, indent=4)
+
+    await update.message.reply_text(f"✅ تم حفظ: {name}")
 
     del context.user_data["pending_file_id"]
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
-if os.path.exists("images.json"):
-    with open("images.json", "r") as f:
-        uploaded_images = json.load(f)
-try:
-    if os.path.exists("images.json"):
-        with open("images.json", "r") as f:
-            uploaded_images = json.load(f)
-except json.JSONDecodeError:
-    uploaded_images = {}
-
-
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
