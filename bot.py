@@ -307,5 +307,16 @@ app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
+import asyncio
 
-app.run_polling()
+async def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button))
+
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+
+asyncio.run(main())
