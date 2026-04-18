@@ -49,7 +49,7 @@ subjects = {
         "images": [
     {
 "type": "image",
-"image": "الهيكل العظمي",
+"image": uploaded_images["الهيكل العظمي"],
 "question": "الهيكل المحوري",
 "options": ["1,2,3,4,5,6,7,8,9,10,11"],
 "answer": "1"
