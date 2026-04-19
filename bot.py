@@ -855,11 +855,15 @@ app.add_handler(CallbackQueryHandler(button))
 USERS_FILE = "users.json"
 
 # تحميل البيانات
-if os.path.exists(USERS_FILE) and os.path.getsize(USERS_FILE) > 0:
-    with open(USERS_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        approved_users = set(data.get("approved_users", []))
-        pending_users = set(data.get("pending_users", []))
+if os.path.exists(USERS_FILE):
+    try:
+        with open(USERS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            approved_users = set(data.get("approved_users", []))
+            pending_users = set(data.get("pending_users", []))
+    except json.JSONDecodeError:
+        approved_users = set()
+        pending_users = set()
 else:
     approved_users = set()
     pending_users = set()
