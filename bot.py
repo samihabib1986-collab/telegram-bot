@@ -24,8 +24,38 @@ if not TOKEN:
 # ================== الأدمن ==================
 ADMIN_ID = 8491023024
 
+# ================== ملف الحفظ ==================
+USERS_FILE = "users.json"
+
 approved_users = set()
 pending_users = set()
+
+# ================== تحميل وحفظ المستخدمين ==================
+def load_users():
+    global approved_users, pending_users
+
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                approved_users = set(data.get("approved_users", []))
+                pending_users = set(data.get("pending_users", []))
+        except json.JSONDecodeError:
+            approved_users = set()
+            pending_users = set()
+    else:
+        approved_users = set()
+        pending_users = set()
+
+
+def save_users():
+    data = {
+        "approved_users": list(approved_users),
+        "pending_users": list(pending_users)
+    }
+
+    with open(USERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 # ================== الصور ==================
 uploaded_images = {
@@ -682,15 +712,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user_id not in approved_users:
         pending_users.add(user_id)
+        save_users()
+
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
     keyboard = [
         [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
-        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
-        [InlineKeyboardButton("🗺️ حدد موقع", callback_data="bio_where")],
-        [InlineKeyboardButton("📋🔢 رتب مراحل", callback_data="bio_level")],
-        [InlineKeyboardButton("➡️💡 ماذا ينتج", callback_data="bio_result")]
+        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")]
     ]
 
     await update.message.reply_text(
@@ -703,14 +732,12 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     pending_users.add(user_id)
+    save_users()
 
     await context.bot.send_message(
         chat_id=ADMIN_ID,
         text=f"💳 طلب اشتراك:\n/approve {user_id}"
-        
     )
-    pending_users.add(user_id)
-    save_users()
 
     await update.message.reply_text("⏳ تم الإرسال")
 
@@ -720,13 +747,14 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     user_id = int(context.args[0])
+
     approved_users.add(user_id)
+    pending_users.discard(user_id)
+
+    save_users()
 
     await update.message.reply_text("✅ تم التفعيل")
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
-    approved_users.add(user_id)
-    pending_users.discard(user_id)
-    save_users()
 
 # ================== إرسال السؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -740,13 +768,12 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q_list = subjects[subject][category]
 
-    # نهاية الاختبار
     if index >= len(q_list):
         score = user_data[user_id]["score"]
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}\n للعودة واختبار اقسام اخرى اضغط /start"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
         )
         return
 
@@ -784,7 +811,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # اختيار تصنيف
     if "_" in data:
         subject, category = data.split("_")
 
@@ -795,11 +821,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "category": category
         }
 
-        await query.edit_message_text("قمت باختيار القسم {subject}، سيتم إرسال الأسئلة الآن.../n 🚀 بدأ الاختبار")
+        await query.edit_message_text("🚀 بدأ الاختبار")
         await send_question(update, context)
         return
 
-    # ================== الإجابة ==================
     subject = user_data[user_id]["subject"]
     category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
@@ -809,63 +834,30 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if selected == q["answer"]:
         user_data[user_id]["score"] += 10
-        result = "✅ صحيح"
+        text = "✅ صحيح"
     else:
-        result = f"❌ خطأ\nالإجابة: {q['answer']}"
+        text = f"❌ خطأ\nالإجابة: {q['answer']}"
 
     user_data[user_id]["q_index"] += 1
 
-    # ❗ الحل هنا (بدل edit_message_text)
     await context.bot.send_message(
         chat_id=query.message.chat_id,
-        text=result
+        text=text
     )
 
     await asyncio.sleep(1)
-
     await send_question(update, context)
-# ================== اظهار file_id ==================
-async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    photo = update.message.photo[-1]
-    file_id = photo.file_id
 
-    await update.message.reply_text(
-        f"📌 file_id:\n{file_id}"
-    )
-# ================== حفظ البيانات ==================
-def save_users():
-    data = {
-        "approved_users": list(approved_users),
-        "pending_users": list(pending_users)
-    }
-
-    with open(USERS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-
-
-# ================== تشغيل البوت ==================
+# ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
-app.add_handler(MessageHandler(filters.PHOTO, get_file_id))
 app.add_handler(CallbackQueryHandler(button))
-USERS_FILE = "users.json"
 
-# تحميل البيانات
-if os.path.exists(USERS_FILE):
-    try:
-        with open(USERS_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            approved_users = set(data.get("approved_users", []))
-            pending_users = set(data.get("pending_users", []))
-    except json.JSONDecodeError:
-        approved_users = set()
-        pending_users = set()
-else:
-    approved_users = set()
-    pending_users = set()
+# 🔥 تحميل البيانات قبل التشغيل
+load_users()
+
 if __name__ == "__main__":
     app.run_polling()
