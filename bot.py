@@ -621,6 +621,53 @@ subjects = {
 "options": ["1➡️4➡️2➡️3","1➡️2➡️4➡️3","1➡️4➡️3➡️2"],
 "answer": "1➡️4➡️2➡️3"
 },     
+        ],
+        "result": [
+            {
+"question": "1. ماذا ينتج عن تتالي الثقوب الفقرية؟",
+"options": ["القفص الصدري","القناة الفقرية","الحوض"],
+"answer": "القناة الفقرية"
+},
+
+
+
+{
+"question": "2. ماذا ينتج عن ارتباط الأضلاع مع الفقرات الظهرية من الخلف وعظم القص من الأمام؟",
+"options": ["العمود الفقري","الحوض","القفص الصدري"],
+"answer": "القفص الصدري"
+},
+
+
+
+{
+"question": "3. ماذا ينتج عن ارتباط عظام الزنار الحوضي مع عظم العجز؟",
+"options": ["القفص الصدري","الحوض","العمود الفقري"],
+"answer": "الحوض"
+},
+
+
+
+{
+"question": "4. لماذا تكتسب العظام الصلابة والقساوة؟",
+"options": ["بسبب الماء","بسبب العضلات","بسبب ارتباط أملاح الكالسيوم بمادة العظمين"],
+"answer": "بسبب ارتباط أملاح الكالسيوم بمادة العظمين"
+},
+
+
+
+{
+"question": "5. ما هو خلع المفصل؟",
+"options": ["كسر العظم","خروج العظم من مكانه الطبيعي","تمزق العضلات"],
+"answer": "خروج العظم من مكانه الطبيعي"
+},
+
+
+
+{
+"question": "6. لماذا يتوقف النمو الطولي للعظم بعمر 18؟",
+"options": ["بسبب نقص الغذاء","بسبب قلة الحركة","بسبب تعظم غضاريف النمو"],
+"answer": "بسبب تعظم غضاريف النمو"
+},
         ]
     }
 }
@@ -641,7 +688,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
         [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
         [InlineKeyboardButton("🗺️ حدد موقع", callback_data="bio_where")],
-        [InlineKeyboardButton("📋🔢 رتب مراحل", callback_data="bio_level")]
+        [InlineKeyboardButton("📋🔢 رتب مراحل", callback_data="bio_level")],
+        [InlineKeyboardButton("➡️💡 ماذا ينتج", callback_data="bio_result")]
     ]
 
     await update.message.reply_text(
