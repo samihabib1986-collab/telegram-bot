@@ -1,4 +1,3 @@
-import json
 import os
 import logging
 import asyncio
@@ -24,38 +23,8 @@ if not TOKEN:
 # ================== الأدمن ==================
 ADMIN_ID = 8491023024
 
-# ================== ملف الحفظ ==================
-USERS_FILE = "users.json"
-
 approved_users = set()
 pending_users = set()
-
-# ================== تحميل وحفظ المستخدمين ==================
-def load_users():
-    global approved_users, pending_users
-
-    if os.path.exists(USERS_FILE):
-        try:
-            with open(USERS_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                approved_users = set(data.get("approved_users", []))
-                pending_users = set(data.get("pending_users", []))
-        except json.JSONDecodeError:
-            approved_users = set()
-            pending_users = set()
-    else:
-        approved_users = set()
-        pending_users = set()
-
-
-def save_users():
-    data = {
-        "approved_users": list(approved_users),
-        "pending_users": list(pending_users)
-    }
-
-    with open(USERS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
 
 # ================== الصور ==================
 uploaded_images = {
@@ -712,14 +681,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user_id not in approved_users:
         pending_users.add(user_id)
-        save_users()
-
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
     keyboard = [
         [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
-        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")]
+        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
+        [InlineKeyboardButton("🗺️ حدد موقع", callback_data="bio_where")],
+        [InlineKeyboardButton("📋🔢 رتب مراحل", callback_data="bio_level")],
+        [InlineKeyboardButton("➡️💡 ماذا ينتج", callback_data="bio_result")]
     ]
 
     await update.message.reply_text(
@@ -732,7 +702,6 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     pending_users.add(user_id)
-    save_users()
 
     await context.bot.send_message(
         chat_id=ADMIN_ID,
@@ -747,11 +716,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     user_id = int(context.args[0])
-
     approved_users.add(user_id)
-    pending_users.discard(user_id)
-
-    save_users()
 
     await update.message.reply_text("✅ تم التفعيل")
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
@@ -768,12 +733,13 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q_list = subjects[subject][category]
 
+    # نهاية الاختبار
     if index >= len(q_list):
         score = user_data[user_id]["score"]
 
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}"
         )
         return
 
@@ -811,6 +777,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
+    # اختيار تصنيف
     if "_" in data:
         subject, category = data.split("_")
 
@@ -825,6 +792,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
+    # ================== الإجابة ==================
     subject = user_data[user_id]["subject"]
     category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
@@ -834,30 +802,37 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if selected == q["answer"]:
         user_data[user_id]["score"] += 10
-        text = "✅ صحيح"
+        result = "✅ صحيح"
     else:
-        text = f"❌ خطأ\nالإجابة: {q['answer']}"
+        result = f"❌ خطأ\nالإجابة: {q['answer']}"
 
     user_data[user_id]["q_index"] += 1
 
+    # ❗ الحل هنا (بدل edit_message_text)
     await context.bot.send_message(
         chat_id=query.message.chat_id,
-        text=text
+        text=result
     )
 
     await asyncio.sleep(1)
-    await send_question(update, context)
 
-# ================== تشغيل ==================
+    await send_question(update, context)
+# ================== اظهار file_id ==================
+async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    photo = update.message.photo[-1]
+    file_id = photo.file_id
+
+    await update.message.reply_text(
+        f"📌 file_id:\n{file_id}"
+    )
+# ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
+app.add_handler(MessageHandler(filters.PHOTO, get_file_id))
 app.add_handler(CallbackQueryHandler(button))
-
-# 🔥 تحميل البيانات قبل التشغيل
-load_users()
 
 if __name__ == "__main__":
     app.run_polling()
