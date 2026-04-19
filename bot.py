@@ -479,7 +479,7 @@ subjects = {
 
 
         ],
-        "taaleel": [
+        "where": [
 {
 "question": "1. أين يقع النتوء المرفقي؟",
 "options": ["في عظم الفخذ","في نهاية عظم الزند العليا","في عظم العضد"],
@@ -531,7 +531,7 @@ subjects = {
 {
 "question": "7. أين توجد النتوءات؟",
 "options": ["على سطح الجلد","داخل العضلات","على جسم العظم"],
-"answer": ""
+"answer": "على جسم العظم"
 },
 
 
@@ -539,7 +539,7 @@ subjects = {
 {
 "question": "8. أين توجد الثقوب في العظم؟",
 "options": ["في الجلد","في القلب","على جسم العظم"],
-"answer": ""
+"answer": "على جسم العظم"
 },
 
 
@@ -619,7 +619,7 @@ subjects = {
        {
 "question": "  1. رتب الطبقات المكونة لجسم العظم الطويل من الخارج إلى الداخل؟\n 1-السمحاق2- القناة المركزية 3- نقي العظم4- النسيج العظمي الكثيف",
 "options": ["1➡️4➡️2➡️3","1➡️2➡️4➡️3","1➡️4➡️3➡️2"],
-"answer": "1-2-3-4"
+"answer": "1➡️4➡️2➡️3"
 },     
         ]
     }
@@ -639,8 +639,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
-        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")]
-        [InlineKeyboardButton("🗺️ حدد موقع", callback_data="bio_where")]
+        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
+        [InlineKeyboardButton("🗺️ حدد موقع", callback_data="bio_where")],
         [InlineKeyboardButton("📋🔢 رتب مراحل", callback_data="bio_level")]
     ]
 
