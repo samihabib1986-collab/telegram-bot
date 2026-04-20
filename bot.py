@@ -394,7 +394,7 @@ subjects = {
 },
 {
 "type": "image",
-"image": "",
+"image": "4",
 "question": "عظام الجمجمة",
 "options": ["العظم القفوي","العظم الجداري","العظم الصدغي"],
 "answer": "العظم القفوي"
@@ -741,9 +741,12 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
 
-    # حماية من الخطأ
+    # حماية من الأخطاء
     if subject not in subjects or category not in subjects[subject]:
-        await context.bot.send_message(chat_id=chat_id, text="⚠️ لا توجد أسئلة لهذه الوحدة بعد")
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="⚠️ لا توجد أسئلة لهذه الوحدة بعد"
+        )
         return
 
     q_list = subjects[subject][category]
@@ -759,6 +762,20 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q = q_list[index]
 
+    # ================== عرض السؤال (نص أو صورة) ==================
+    if "type" in q and q["type"] == "image" and q.get("image"):
+        await context.bot.send_photo(
+            chat_id=chat_id,
+            photo=uploaded_images[q["image"]],
+            caption=q["question"]
+        )
+    else:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=q["question"]
+        )
+
+    # ================== الأزرار ==================
     keyboard = [
         [InlineKeyboardButton(opt, callback_data=str(i))]
         for i, opt in enumerate(q["options"])
@@ -766,10 +783,9 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=chat_id,
-        text=q["question"],
+        text="اختر الإجابة:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
-
 # ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -796,24 +812,30 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== اختيار الوحدة ==================
     if data.startswith("bio_u"):
-        unit = data.split("_")[1]  # u1
+        unit = data.split("_")[1]
 
-        keyboard = [
-            [InlineKeyboardButton("1- تعاليل", callback_data=f"{unit}_taaleel")],
-            [InlineKeyboardButton("2- صور", callback_data=f"{unit}_images")],
-            [InlineKeyboardButton("3- حدد موقع", callback_data=f"{unit}_where")],
-            [InlineKeyboardButton("4- رتب مراحل", callback_data=f"{unit}_level")],
-            [InlineKeyboardButton("5- ماذا ينتج عن", callback_data=f"{unit}_result")],
-            [InlineKeyboardButton("6- قارن بين", callback_data=f"{unit}_compare")],
-            [InlineKeyboardButton("7- وظائف", callback_data=f"{unit}_functions")]
-        ]
+    user_data[user_id] = {
+        "subject": "bio",
+        "unit": unit
+    }
 
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="📂 اختر القسم:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
+    # 🎬 إرسال الفيديو مرة واحدة فقط
+    await context.bot.send_video(
+        chat_id=query.message.chat_id,
+        video=INTRO_VIDEO,
+        caption="📺 شرح الوحدة"
+    )
+
+    keyboard = [
+        [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="choose_category")]
+    ]
+
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text="🚀 بعد مشاهدة الفيديو اختر الاختبار:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+    return
 
     # ================== اختيار القسم ==================
     if data.startswith("u"):
@@ -835,7 +857,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         keyboard = [
-            [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
             [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
         ]
 
