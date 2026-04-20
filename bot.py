@@ -675,9 +675,8 @@ subjects = {
     }
 }
 
-
 # ================== بيانات المستخدم ==================
-user_data = {"8491023024"}
+user_data = {}
 
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -688,16 +687,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
+    await update.message.reply_text("✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
+
     keyboard = [
-        [InlineKeyboardButton("📘 تعاليل", callback_data="bio_taaleel")],
-        [InlineKeyboardButton("🖼 صور", callback_data="bio_images")],
-        [InlineKeyboardButton("🗺️ حدد موقع", callback_data="bio_where")],
-        [InlineKeyboardButton("📋🔢 رتب مراحل", callback_data="bio_level")],
-        [InlineKeyboardButton("➡️💡 ماذا ينتج", callback_data="bio_result")]
+        [InlineKeyboardButton("📘 رياضيات", callback_data="math")],
+        [InlineKeyboardButton("📖 اللغة العربية", callback_data="arabic")],
+        [InlineKeyboardButton("🧬 علم الأحياء و الأرض", callback_data="bio")],
+        [InlineKeyboardButton("🌍 جغرافية الوطن العربية و سوريا", callback_data="geo")],
+        [InlineKeyboardButton("📜 التاريخ", callback_data="history")],
+        [InlineKeyboardButton("⚗️ الفيزياء و الكيمياء", callback_data="physics")]
     ]
 
     await update.message.reply_text(
-        "🎯 اختر:",
+        "📚 اختر المادة:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -730,6 +732,9 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
     chat_id = query.message.chat_id
+
+    if user_id not in user_data:
+        return
 
     subject = user_data[user_id]["subject"]
     category = user_data[user_id]["category"]
@@ -767,18 +772,32 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # ================== اختيار القسم ==================
-    if "_" in data:
-        subject, category = data.split("_")
+    # ================== اختيار المادة ==================
+    if data == "bio":
+        keyboard = [
+            [InlineKeyboardButton("الوحدة 1: الدعامة والتنسيق", callback_data="bio_u1")],
+            [InlineKeyboardButton("الوحدة 2: وظائف التغذية", callback_data="bio_u2")],
+            [InlineKeyboardButton("الوحدة 3: علم الوراثة والتكاثر", callback_data="bio_u3")],
+            [InlineKeyboardButton("الوحدة 4: النبات والبيئة", callback_data="bio_u4")]
+        ]
+
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="🧬 اختر الوحدة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== اختيار الوحدة ==================
+    if data.startswith("bio_u"):
+        unit = data.split("_")[1]
 
         user_data[user_id] = {
             "score": 0,
             "q_index": 0,
-            "subject": subject,
-            "category": category
+            "subject": "bio",
+            "category": f"{unit}_taaleel"
         }
-
-        await query.edit_message_text("🎯 اختر ما تريد:")
 
         keyboard = [
             [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
@@ -787,12 +806,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_message(
             chat_id=query.message.chat_id,
-            text="📚 يمكنك مشاهدة الفيديو أو بدء الاختبار مباشرة",
+            text="📚 يمكنك الآن:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
 
-    # ================== مشاهدة الفيديو ==================
+    # ================== الفيديو ==================
     if data == "watch_video":
         await context.bot.send_video(
             chat_id=query.message.chat_id,
@@ -807,11 +826,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=query.message.chat_id,
             text="🚀 بدأ الاختبار"
         )
-
         await send_question(update, context)
         return
 
     # ================== الإجابة ==================
+    if user_id not in user_data:
+        return
+
     subject = user_data[user_id]["subject"]
     category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
