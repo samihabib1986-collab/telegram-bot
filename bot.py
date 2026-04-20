@@ -734,11 +734,17 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = query.message.chat_id
 
     if user_id not in user_data:
+        await context.bot.send_message(chat_id=chat_id, text="⚠️ حدث خطأ، أعد /start")
         return
 
     subject = user_data[user_id]["subject"]
     category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
+
+    # حماية من الخطأ
+    if subject not in subjects or category not in subjects[subject]:
+        await context.bot.send_message(chat_id=chat_id, text="⚠️ لا توجد أسئلة لهذه الوحدة بعد")
+        return
 
     q_list = subjects[subject][category]
 
@@ -823,12 +829,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
         await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="🚀 بدأ الاختبار"
-        )
-        await send_question(update, context)
-        return
-
+        chat_id=query.message.chat_id,
+        text="🚀 بدأ الاختبار"
+    )
+    
+    # مهم: نمرر query بشكل صحيح
+    await send_question(update, context)
+    return
     # ================== الإجابة ==================
     if user_id not in user_data:
         return
