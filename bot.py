@@ -775,25 +775,33 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=q["question"]
         )
 
-    # ================== الأزرار ==================
+# ================== اختيار الأقسام ==================
+    if data == "choose_category":
+     if user_id not in user_data or "unit" not in user_data[user_id]:
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="⚠️ حدث خطأ، أعد /start"
+        )
+        return
+
+    unit = user_data[user_id]["unit"]
+
     keyboard = [
-        [InlineKeyboardButton(opt, callback_data=str(i))]
-        for i, opt in enumerate(q["options"])
+        [InlineKeyboardButton("1- تعاليل", callback_data=f"{unit}_taaleel")],
+        [InlineKeyboardButton("2- صور", callback_data=f"{unit}_images")],
+        [InlineKeyboardButton("3- حدد موقع", callback_data=f"{unit}_where")],
+        [InlineKeyboardButton("4- رتب مراحل", callback_data=f"{unit}_level")],
+        [InlineKeyboardButton("5- ماذا ينتج عن", callback_data=f"{unit}_result")],
+        [InlineKeyboardButton("6- قارن بين", callback_data=f"{unit}_compare")],
+        [InlineKeyboardButton("7- وظائف", callback_data=f"{unit}_functions")]
     ]
 
     await context.bot.send_message(
-        chat_id=chat_id,
-        text="اختر الإجابة:",
+        chat_id=query.message.chat_id,
+        text="📂 اختر القسم:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
-# ================== الأزرار ==================
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    user_id = query.from_user.id
-    data = query.data
-
+    return
     # ================== اختيار المادة ==================
     if data == "bio":
         keyboard = [
@@ -819,7 +827,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "unit": unit
     }
 
-    # 🎬 إرسال الفيديو مرة واحدة فقط
     await context.bot.send_video(
         chat_id=query.message.chat_id,
         video=INTRO_VIDEO,
@@ -832,7 +839,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=query.message.chat_id,
-        text="🚀 بعد مشاهدة الفيديو اختر الاختبار:",
+        text="🚀 بعد مشاهدة الفيديو:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
     return
@@ -857,7 +864,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         keyboard = [
-            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
+            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="choose_category")]
         ]
 
         await context.bot.send_message(
