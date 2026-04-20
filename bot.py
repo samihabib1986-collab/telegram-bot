@@ -796,14 +796,43 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== اختيار الوحدة ==================
     if data.startswith("bio_u"):
-        unit = data.split("_")[1]
+        unit = data.split("_")[1]  # u1
+
+        keyboard = [
+            [InlineKeyboardButton("1- تعاليل", callback_data=f"{unit}_taaleel")],
+            [InlineKeyboardButton("2- صور", callback_data=f"{unit}_images")],
+            [InlineKeyboardButton("3- حدد موقع", callback_data=f"{unit}_where")],
+            [InlineKeyboardButton("4- رتب مراحل", callback_data=f"{unit}_level")],
+            [InlineKeyboardButton("5- ماذا ينتج عن", callback_data=f"{unit}_result")],
+            [InlineKeyboardButton("6- قارن بين", callback_data=f"{unit}_compare")],
+            [InlineKeyboardButton("7- وظائف", callback_data=f"{unit}_functions")]
+        ]
+
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="📂 اختر القسم:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== اختيار القسم ==================
+    if data.startswith("u"):
+        category = data  # مثل u1_taaleel
 
         user_data[user_id] = {
             "score": 0,
             "q_index": 0,
             "subject": "bio",
-            "category": f"{unit}_taaleel"
+            "category": category
         }
+
+        # تحقق من وجود أسئلة
+        if category not in subjects["bio"]:
+            await context.bot.send_message(
+                chat_id=query.message.chat_id,
+                text="⚠️ لا توجد أسئلة في هذا القسم بعد"
+            )
+            return
 
         keyboard = [
             [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
@@ -812,7 +841,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_message(
             chat_id=query.message.chat_id,
-            text="📚 يمكنك الآن:",
+            text="📚 اختر:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
@@ -829,13 +858,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
         await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text="🚀 بدأ الاختبار"
-    )
+            chat_id=query.message.chat_id,
+            text="🚀 بدأ الاختبار"
+        )
+        await send_question(update, context)
+        return
 
-    # مهم: نمرر query بشكل صحيح
-    await send_question(update, context)
-    return
     # ================== الإجابة ==================
     if user_id not in user_data:
         return
