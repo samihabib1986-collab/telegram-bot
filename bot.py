@@ -27,7 +27,7 @@ approved_users = set()
 pending_users = set()
 
 # ================== الفيديو ==================
-INTRO_VIDEO = "PUT_YOUR_VIDEO_FILE_ID_HERE"
+INTRO_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
 
 # ================== الصور ==================
 uploaded_images = {
