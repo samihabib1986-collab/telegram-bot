@@ -26,6 +26,9 @@ ADMIN_ID = 8491023024
 approved_users = set()
 pending_users = set()
 
+# ================== الفيديو ==================
+INTRO_VIDEO = "PUT_YOUR_VIDEO_FILE_ID_HERE"
+
 # ================== الصور ==================
 uploaded_images = {
 "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ",
@@ -672,6 +675,7 @@ subjects = {
     }
 }
 
+
 # ================== بيانات المستخدم ==================
 user_data = {}
 
@@ -733,7 +737,6 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q_list = subjects[subject][category]
 
-    # نهاية الاختبار
     if index >= len(q_list):
         score = user_data[user_id]["score"]
 
@@ -750,24 +753,11 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for i, opt in enumerate(q["options"])
     ]
 
-    if q.get("type") == "image":
-        file_id = uploaded_images.get(q["image"])
-
-        if file_id:
-            await context.bot.send_photo(
-                chat_id=chat_id,
-                photo=file_id,
-                caption=q["question"],
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-        else:
-            await context.bot.send_message(chat_id, "❌ الصورة غير موجودة")
-    else:
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text=q["question"],
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text=q["question"],
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 # ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -777,7 +767,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # اختيار تصنيف
+    # ================== اختيار القسم ==================
     if "_" in data:
         subject, category = data.split("_")
 
@@ -788,7 +778,29 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "category": category
         }
 
-        await query.edit_message_text("🚀 بدأ الاختبار")
+        await query.edit_message_text("🎬 شاهد الفيديو أولاً")
+
+        keyboard = [
+            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
+        ]
+
+        await context.bot.send_video(
+            chat_id=query.message.chat_id,
+            video=INTRO_VIDEO,
+            caption="📺 شاهد الفيديو ثم اضغط لبدء الاختبار",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== بدء الاختبار ==================
+    if data == "start_quiz":
+        await query.message.edit_reply_markup(reply_markup=None)
+
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="🚀 بدأ الاختبار"
+        )
+
         await send_question(update, context)
         return
 
@@ -808,7 +820,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_data[user_id]["q_index"] += 1
 
-    # ❗ الحل هنا (بدل edit_message_text)
     await context.bot.send_message(
         chat_id=query.message.chat_id,
         text=result
@@ -817,14 +828,23 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(1)
 
     await send_question(update, context)
-# ================== اظهار file_id ==================
+
+# ================== اظهار file_idللصور ==================
 async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo = update.message.photo[-1]
     file_id = photo.file_id
 
+    await update.message.reply_text(f"📌 file_id:\n{file_id}")
+# ================== اظهار file_id للفيديو ==================
+async def get_video_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    video = update.message.video
+    file_id = video.file_id
+
     await update.message.reply_text(
-        f"📌 file_id:\n{file_id}"
+        f"📌 VIDEO file_id:\n{file_id}"
     )
+
+
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
@@ -832,6 +852,7 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
 app.add_handler(MessageHandler(filters.PHOTO, get_file_id))
+app.add_handler(MessageHandler(filters.VIDEO, get_video_file_id))
 app.add_handler(CallbackQueryHandler(button))
 
 if __name__ == "__main__":
