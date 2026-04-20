@@ -677,7 +677,7 @@ subjects = {
 
 
 # ================== بيانات المستخدم ==================
-user_data = {}
+user_data = {"8491023024"}
 
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -778,24 +778,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "category": category
         }
 
-        await query.edit_message_text("🎬 شاهد الفيديو أولاً")
+        await query.edit_message_text("🎯 اختر ما تريد:")
 
         keyboard = [
+            [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
             [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
         ]
 
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="📚 يمكنك مشاهدة الفيديو أو بدء الاختبار مباشرة",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== مشاهدة الفيديو ==================
+    if data == "watch_video":
         await context.bot.send_video(
             chat_id=query.message.chat_id,
             video=INTRO_VIDEO,
-            caption="📺 شاهد الفيديو ثم اضغط لبدء الاختبار",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            caption="📺 فيديو تعليمي"
         )
         return
 
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
-        await query.message.edit_reply_markup(reply_markup=None)
-
         await context.bot.send_message(
             chat_id=query.message.chat_id,
             text="🚀 بدأ الاختبار"
@@ -826,24 +833,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     await asyncio.sleep(1)
-
     await send_question(update, context)
 
-# ================== اظهار file_idللصور ==================
+# ================== file_id ==================
 async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    photo = update.message.photo[-1]
-    file_id = photo.file_id
-
-    await update.message.reply_text(f"📌 file_id:\n{file_id}")
-# ================== اظهار file_id للفيديو ==================
-async def get_video_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    video = update.message.video
-    file_id = video.file_id
-
-    await update.message.reply_text(
-        f"📌 VIDEO file_id:\n{file_id}"
-    )
-
+    if update.message.video:
+        file_id = update.message.video.file_id
+        await update.message.reply_text(f"📌 VIDEO file_id:\n{file_id}")
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
@@ -851,8 +847,7 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
-app.add_handler(MessageHandler(filters.PHOTO, get_file_id))
-app.add_handler(MessageHandler(filters.VIDEO, get_video_file_id))
+app.add_handler(MessageHandler(filters.VIDEO, get_file_id))
 app.add_handler(CallbackQueryHandler(button))
 
 if __name__ == "__main__":
