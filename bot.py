@@ -50,7 +50,7 @@ uploaded_images = {
 # ================== بنك الأسئلة ==================
 subjects = {
     "bio": {
-        "taaleel": [
+        "u1_taaleel": [
             {
 "question": "1. لماذا عظم الفك السفلي متحرك؟",
 "options": [" لتسهيل التنفس"," لتسهيل المضغ والنطق "," لحماية الدماغ"],
@@ -224,7 +224,7 @@ subjects = {
 
         ],
 
-        "images": [
+        "u1_images": [
 {
 "type": "image",
 "image": "الهيكل العظمي",
@@ -482,7 +482,7 @@ subjects = {
 
 
         ],
-        "where": [
+        "u1_where": [
 {
 "question": "1. أين يقع النتوء المرفقي؟",
 "options": ["في عظم الفخذ","في نهاية عظم الزند العليا","في عظم العضد"],
@@ -618,14 +618,14 @@ subjects = {
 },
 
         ],
-        "level": [
+        "u1_level": [
        {
 "question": "  1. رتب الطبقات المكونة لجسم العظم الطويل من الخارج إلى الداخل؟\n 1-السمحاق2- القناة المركزية 3- نقي العظم4- النسيج العظمي الكثيف",
 "options": ["1➡️4➡️2➡️3","1➡️2➡️4➡️3","1➡️4➡️3➡️2"],
 "answer": "1➡️4➡️2➡️3"
 },     
         ],
-        "result": [
+        "u1_result": [
             {
 "question": "1. ماذا ينتج عن تتالي الثقوب الفقرية؟",
 "options": ["القفص الصدري","القناة الفقرية","الحوض"],
@@ -832,7 +832,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=query.message.chat_id,
         text="🚀 بدأ الاختبار"
     )
-    
+
     # مهم: نمرر query بشكل صحيح
     await send_question(update, context)
     return
