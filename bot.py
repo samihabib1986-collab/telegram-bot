@@ -28,9 +28,6 @@ if not TOKEN:
 # ================== الأدمن ==================
 ADMIN_ID = 8491023024
 
-approved_users = set()
-pending_users = set()
-
 # ================== الفيديو ==================
 INTRO_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
 
@@ -687,13 +684,6 @@ user_data = {}
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    if user_id not in approved_users:
-        pending_users.add(user_id)
-        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-        return
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-
     user = users.find_one({"user_id": user_id})
 
     if not user:
@@ -706,7 +696,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
-    await update.message.reply_text("✨ نرحب بك")
     await update.message.reply_text("✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
 
     keyboard = [
@@ -741,15 +730,6 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("⏳ تم الإرسال")
 
 # ================== الموافقة ==================
-async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
-        return
-
-    user_id = int(context.args[0])
-    approved_users.add(user_id)
-
-    await update.message.reply_text("✅ تم التفعيل")
-    await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
@@ -790,6 +770,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
    q = q_list[index]
 
 # ✅ إذا السؤال فيه صورة
+
 if q.get("type") == "image":
     await context.bot.send_photo(
         chat_id=chat_id,
