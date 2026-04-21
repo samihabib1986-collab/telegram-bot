@@ -822,6 +822,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return
     # ================== اختيار المادة ==================
     if data == "bio":
+        user_data[user_id] = {
+    "subject": "bio"
+                }
         keyboard = [
             [InlineKeyboardButton("الوحدة 1: الدعامة والتنسيق", callback_data="bio_u1")],
             [InlineKeyboardButton("الوحدة 2: وظائف التغذية", callback_data="bio_u2")],
