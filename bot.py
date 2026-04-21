@@ -802,10 +802,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ✅ إذا السؤال فيه صورة
 if q.get("type") == "image":
-    await context.bot.send_photo(
-        chat_id=chat_id,
-        photo=uploaded_images[q["image"]]
-    )
+    await context.bot.send_photo(chat_id=chat_id, photo=uploaded_images[q["image"]])
 
 keyboard = [
     [InlineKeyboardButton(opt, callback_data=str(i))]
