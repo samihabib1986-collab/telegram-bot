@@ -798,19 +798,25 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    q = q_list[index]
+   q = q_list[index]
 
-    keyboard = [
-        [InlineKeyboardButton(opt, callback_data=str(i))]
-        for i, opt in enumerate(q["options"])
-    ]
-
-    await context.bot.send_message(
+# ✅ إذا السؤال فيه صورة
+if q.get("type") == "image":
+    await context.bot.send_photo(
         chat_id=chat_id,
-        text=q["question"],
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        photo=uploaded_images[q["image"]]
     )
 
+keyboard = [
+    [InlineKeyboardButton(opt, callback_data=str(i))]
+    for i, opt in enumerate(q["options"])
+]
+
+await context.bot.send_message(
+    chat_id=chat_id,
+    text=q["question"],
+    reply_markup=InlineKeyboardMarkup(keyboard)
+)
 # ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
