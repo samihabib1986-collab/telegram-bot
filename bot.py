@@ -692,8 +692,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not user:
         users.insert_one({"user_id": user_id, "approved": False})
+        user = {"approved": False}
 
-    if not user or not user.get("approved"):
+    if not user.get("approved"):
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
@@ -809,6 +812,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if data.startswith("bio_u"):
+        
         user_data[user_id] = {
             "score": 0,
             "q_index": 0,
