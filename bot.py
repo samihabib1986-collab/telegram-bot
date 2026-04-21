@@ -691,7 +691,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         pending_users.add(user_id)
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
 
+    user = users.find_one({"user_id": user_id})
+
+    if not user:
+        users.insert_one({
+            "user_id": user_id,
+            "approved": False
+        })
+
+    if not user or not user.get("approved"):
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
+
+    await update.message.reply_text("✨ نرحب بك")
     await update.message.reply_text("✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
 
     keyboard = [
@@ -720,6 +735,21 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     await update.message.reply_text("⏳ تم الإرسال")
+    async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    users.update_one(
+        {"user_id": user_id},
+        {"$set": {"pending": True}},
+        upsert=True
+    )
+
+    await context.bot.send_message(
+        chat_id=ADMIN_ID,
+        text=f"💳 طلب اشتراك:\n/approve {user_id}"
+    )
+
+    await update.message.reply_text("⏳ تم الإرسال")
 
 # ================== الموافقة ==================
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -731,7 +761,19 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("✅ تم التفعيل")
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
+async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
 
+    user_id = int(context.args[0])
+
+    users.update_one(
+        {"user_id": user_id},
+        {"$set": {"approved": True, "pending": False}}
+    )
+
+    await update.message.reply_text("✅ تم التفعيل")
+    await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
 # ================== إرسال السؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
