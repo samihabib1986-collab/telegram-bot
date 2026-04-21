@@ -11,11 +11,19 @@ from telegram.ext import (
     MessageHandler,
     filters
 )
+MONGO_URL = os.environ.get("MONGO_URL")
 
+if not MONGO_URL:
+    raise ValueError("MONGO_URL is missing")
+
+client = MongoClient(MONGO_URL)
+
+db = client["quiz_bot"]
+users = db["users"]
 # ================== إعدادات ==================
 MONGO_URL = os.environ.get("mongodb+srv://samihabib1986_db_user:a5c7t6@cluster0.bm9w0u0.mongodb.net/?appName=Cluster0")
 TOKEN = os.environ.get("TOKEN")
-print(users.find_one())
+
 if not TOKEN:
     raise ValueError("TOKEN is missing")
 
