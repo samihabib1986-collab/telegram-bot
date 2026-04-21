@@ -843,8 +843,7 @@ if data.startswith("bio_u"):
         )
         await send_question(update, context)
         return
-    # ==================اختيار نوع السؤال  ==================
-if data in ["taaleel", "images", "where", "level", "result"]:
+        if data in ["taaleel", "images", "where", "level", "result"]:
     unit = user_data[user_id]["unit"]
 
     category = f"{unit}_{data}"
