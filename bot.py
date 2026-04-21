@@ -727,17 +727,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    pending_users.add(user_id)
-
-    await context.bot.send_message(
-        chat_id=ADMIN_ID,
-        text=f"💳 طلب اشتراك:\n/approve {user_id}"
-    )
-
-    await update.message.reply_text("⏳ تم الإرسال")
-        async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-
     users.update_one(
         {"user_id": user_id},
         {"$set": {"pending": True}},
