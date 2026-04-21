@@ -26,11 +26,6 @@ TOKEN = os.environ.get("TOKEN")
 
 if not TOKEN:
     raise ValueError("TOKEN is missing")
-
-client = MongoClient(MONGO_URL)
-db = client["quiz_bot"]
-users = db["users"]
-
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
