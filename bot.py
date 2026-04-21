@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+from turtle import update
 from telegram.ext import MessageHandler, filters
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -778,6 +779,47 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
+    # ================== 2الأزرار ==================
+    if data in ["taaleel", "images", "where", "level", "result", "compare", "functions"]:
+        if user_id not in user_data:
+            return
+
+    subject = user_data[user_id]["subject"]
+    unit = user_data[user_id]["category"].split("_")[0]  # u1 مثلاً
+
+    # ربط الأزرار بالمفاتيح
+    mapping = {
+        "taaleel": f"{unit}_taaleel",
+        "images": f"{unit}_images",
+        "where": f"{unit}_where",
+        "level": f"{unit}_level",
+        "result": f"{unit}_result",
+        "compare": f"{unit}_compare",
+        "functions": f"{unit}_functions",
+    }
+
+    category = mapping.get(data)
+
+    # تحقق إذا القسم موجود
+    if category not in subjects[subject]:
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="⚠️ هذا القسم غير متوفر حالياً"
+        )
+        return
+
+    # إعادة ضبط البيانات
+    user_data[user_id]["category"] = category
+    user_data[user_id]["q_index"] = 0
+    user_data[user_id]["score"] = 0
+
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text="🚀 بدأ الاختبار"
+    )
+
+    await send_question(update, context)
+    return
     # ================== اختيار المادة ==================
     if data == "bio":
         keyboard = [
@@ -828,13 +870,21 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
-        await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text="🚀 بدأ الاختبار"
-    )
+        keyboard = [
+        [InlineKeyboardButton("1️⃣ تعاليل", callback_data="taaleel")],
+        [InlineKeyboardButton("2️⃣ صور", callback_data="images")],
+        [InlineKeyboardButton("3️⃣ حدد موقع", callback_data="where")],
+        [InlineKeyboardButton("4️⃣ رتب مراحل", callback_data="level")],
+        [InlineKeyboardButton("5️⃣ ماذا ينتج عن", callback_data="result")],
+        [InlineKeyboardButton("6️⃣ قارن بين", callback_data="compare")],
+        [InlineKeyboardButton("7️⃣ وظائف", callback_data="functions")]
+    ]
 
-    # مهم: نمرر query بشكل صحيح
-    await send_question(update, context)
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text="📚 اختر نوع الاختبار:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
     return
     # ================== الإجابة ==================
     if user_id not in user_data:
