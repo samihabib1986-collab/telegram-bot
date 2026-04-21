@@ -10,11 +10,13 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes
 )
+
 MONGO_URL = os.environ.get("MONGO_URL")
 
 client = MongoClient(MONGO_URL)
 db = client["quiz_bot"]
 users = db["users"]
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
@@ -28,6 +30,7 @@ if not TOKEN:
 # ================== الأدمن ==================
 ADMIN_ID = 8491023024
 
+# ================== الفيديو ==================
 # ================== الفيديو ==================
 INTRO_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
 
@@ -677,6 +680,7 @@ subjects = {
     }
 }
 
+
 # ================== بيانات المستخدم ==================
 user_data = {}
 
@@ -687,10 +691,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = users.find_one({"user_id": user_id})
 
     if not user:
-        users.insert_one({
-            "user_id": user_id,
-            "approved": False
-        })
+        users.insert_one({"user_id": user_id, "approved": False})
 
     if not user or not user.get("approved"):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
@@ -743,6 +744,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("✅ تم التفعيل")
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
+
 # ================== إرسال السؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -760,32 +762,32 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if index >= len(q_list):
         score = user_data[user_id]["score"]
-
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
         )
         return
 
-   q = q_list[index]
+    q = q_list[index]
 
-# ✅ إذا السؤال فيه صورة
+    # ✅ صورة
+    if q.get("type") == "image":
+        await context.bot.send_photo(
+            chat_id=chat_id,
+            photo=uploaded_images[q["image"]]
+        )
 
-if q.get("type") == "image":
-    await context.bot.send_photo(
+    keyboard = [
+        [InlineKeyboardButton(opt, callback_data=str(i))]
+        for i, opt in enumerate(q["options"])
+    ]
+
+    await context.bot.send_message(
         chat_id=chat_id,
-        photo=uploaded_images[q["image"]]
+        text=q["question"],
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
-keyboard = [
-    [InlineKeyboardButton(opt, callback_data=str(i))]
-    for i, opt in enumerate(q["options"])
-]
 
-await context.bot.send_message(
-    chat_id=chat_id,
-    text=q["question"],
-    reply_markup=InlineKeyboardMarkup(keyboard)
-)
 # ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -794,13 +796,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # ================== اختيار المادة ==================
     if data == "bio":
         keyboard = [
-            [InlineKeyboardButton("الوحدة 1: الدعامة والتنسيق", callback_data="bio_u1")],
-            [InlineKeyboardButton("الوحدة 2: وظائف التغذية", callback_data="bio_u2")],
-            [InlineKeyboardButton("الوحدة 3: علم الوراثة والتكاثر", callback_data="bio_u3")],
-            [InlineKeyboardButton("الوحدة 4: النبات والبيئة", callback_data="bio_u4")]
+            [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")]
         ]
 
         await context.bot.send_message(
@@ -810,109 +808,36 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # ================== اختيار الوحدة ==================
     if data.startswith("bio_u"):
-        unit = data.split("_")[1]
-
         user_data[user_id] = {
             "score": 0,
             "q_index": 0,
             "subject": "bio",
-            "unit": unit
+            "unit": data.split("_")[1]
         }
 
         keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-            [InlineKeyboardButton("📍 أين", callback_data="where")],
-            [InlineKeyboardButton("📊 رتب مراحل", callback_data="level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result")]
+            [InlineKeyboardButton("تعليل", callback_data="taaleel")],
+            [InlineKeyboardButton("ابدأ", callback_data="start_quiz")]
         ]
 
         await context.bot.send_message(
             chat_id=query.message.chat_id,
-            text="اختر نوع الأسئلة:",
+            text="اختر النوع:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
 
-    # ================== اختيار نوع الأسئلة ==================
-    if data in ["taaleel", "images", "where", "level", "result"]:
-        unit = user_data[user_id]["unit"]
-        category = f"{unit}_{data}"
-
-        user_data[user_id]["category"] = category
-
-        keyboard = [
-            [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
-            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
-        ]
-
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="📚 يمكنك الآن:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
-
-    # ================== الفيديو ==================
-    if data == "watch_video":
-        await context.bot.send_video(
-            chat_id=query.message.chat_id,
-            video=INTRO_VIDEO,
-            caption="📺 فيديو تعليمي"
-        )
-        return
-
-    # ================== بدء الاختبار ==================
     if data == "start_quiz":
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="🚀 بدأ الاختبار"
-        )
         await send_question(update, context)
         return
 
-    # ================== الإجابة ==================
-    if user_id not in user_data:
-        return
-
-    subject = user_data[user_id]["subject"]
-    category = user_data[user_id]["category"]
-    index = user_data[user_id]["q_index"]
-
-    q = subjects[subject][category][index]
-    selected = q["options"][int(data)]
-
-    if selected == q["answer"]:
-        user_data[user_id]["score"] += 10
-        result = "✅ صحيح"
-    else:
-        result = f"❌ خطأ\nالإجابة: {q['answer']}"
-
-    user_data[user_id]["q_index"] += 1
-
-    await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text=result
-    )
-
-    await asyncio.sleep(1)
-    await send_question(update, context)
-
-# ================== file_id ==================
-async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.video:
-        file_id = update.message.video.file_id
-        await update.message.reply_text(f"📌 VIDEO file_id:\n{file_id}")
-
-# ================== تشغيل البوت ==================
+# ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
-app.add_handler(MessageHandler(filters.VIDEO, get_file_id))
 app.add_handler(CallbackQueryHandler(button))
 
 if __name__ == "__main__":
