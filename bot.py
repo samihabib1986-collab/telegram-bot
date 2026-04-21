@@ -821,6 +821,28 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== اختيار نوع الأسئلة ==================
     if data in ["taaleel", "images", "where", "level", "result"]:
+    unit = user_data[user_id]["unit"]
+    category = f"{unit}_{data}"
+    user_data[user_id]["category"] = category
+    user_data[user_id]["q_index"] = 0
+    user_data[user_id]["score"] = 0
+
+    # ✅ إذا اختار صور
+    if data == "images":
+        q_list = subjects["bio"]["u1_images"]
+
+        for q in q_list:
+            image_key = q["image"]
+            file_id = uploaded_images.get(image_key)
+
+            if file_id:
+                await context.bot.send_photo(
+                    chat_id=query.message.chat_id,
+                    photo=file_id,
+                    caption=q["question"]
+                )
+
+        return
         unit = user_data[user_id]["unit"]
         category = f"{unit}_{data}"
 
