@@ -30,7 +30,9 @@ ADMIN_ID = 8491023024
 
 def get_user(user_id):
     return users.find_one({"_id": user_id})
-
+def is_approved(user_id):
+    user = users.find_one({"_id": user_id})
+    return user and user.get("approved", False)
 
 def create_user(user_id):
     users.update_one(
@@ -702,8 +704,8 @@ user_data = {}
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-
-    if user_id not in approved_users:
+    create_user(user_id)
+    if not is_approved(user_id):
         pending_users.add(user_id)
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
