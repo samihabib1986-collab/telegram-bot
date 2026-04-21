@@ -818,24 +818,7 @@ if data.startswith("bio_u"):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
     return
-if data in ["taaleel", "images", "where", "level", "result"]:
-    unit = user_data[user_id]["unit"]
 
-    category = f"{unit}_{data}"
-
-    user_data[user_id]["category"] = category
-
-    keyboard = [
-        [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
-        [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
-    ]
-
-    await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text="📚 يمكنك الآن:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-    return
         await context.bot.send_message(
             chat_id=query.message.chat_id,
             text="📚 يمكنك الآن:",
@@ -860,7 +843,25 @@ if data in ["taaleel", "images", "where", "level", "result"]:
         )
         await send_question(update, context)
         return
+    # ==================اختيار نوع السؤال  ==================
+if data in ["taaleel", "images", "where", "level", "result"]:
+    unit = user_data[user_id]["unit"]
 
+    category = f"{unit}_{data}"
+
+    user_data[user_id]["category"] = category
+
+    keyboard = [
+        [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
+        [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
+    ]
+
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text="📚 يمكنك الآن:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+    return
     # ================== الإجابة ==================
     if user_id not in user_data:
         return
