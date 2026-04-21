@@ -735,7 +735,7 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     await update.message.reply_text("⏳ تم الإرسال")
-    async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     users.update_one(
