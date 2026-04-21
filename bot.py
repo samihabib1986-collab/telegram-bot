@@ -18,9 +18,6 @@ ADMIN_ID = 8491023024
 approved_users = set()
 pending_users = set()
 
-# ================== الأدمن ==================
-ADMIN_ID = 8491023024
-approved_users = set()
 # ================== الفيديو ==================
 INTRO_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
 
@@ -690,7 +687,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ================== دفع ==================
+# ================== الدفع ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
@@ -701,7 +698,7 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("⏳ تم إرسال طلبك")
 
-# ================== موافقة ==================
+# ================== الموافقة ==================
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
@@ -726,11 +723,9 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if index >= len(q_list):
         score = data["score"]
-        total = len(q_list) * 10
-
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}/{total}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
         )
         return
 
@@ -740,12 +735,6 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton(opt, callback_data=str(i))]
         for i, opt in enumerate(q["options"])
     ]
-
-    # صورة إذا موجودة
-    if q.get("type") == "image":
-        file_id = uploaded_images.get(q["image"])
-        if file_id:
-            await context.bot.send_photo(chat_id=chat_id, photo=file_id)
 
     await context.bot.send_message(
         chat_id=chat_id,
@@ -761,11 +750,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # اختيار المادة
+    # ===== اختيار المادة =====
     if data == "bio":
         keyboard = [
             [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")]
         ]
+
         await context.bot.send_message(
             chat_id=query.message.chat_id,
             text="اختر الوحدة:",
@@ -773,7 +763,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # اختيار الوحدة
+    # ===== اختيار الوحدة =====
     if data.startswith("bio_u"):
         unit = data.split("_")[1]
 
@@ -793,11 +783,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # اختيار نوع الاختبار
+    # ===== اختيار نوع الاختبار =====
     if data == "start_quiz":
         keyboard = [
             [InlineKeyboardButton("تعاليل", callback_data="taaleel")],
-            [InlineKeyboardButton("صور", callback_data="images")],
             [InlineKeyboardButton("حدد موقع", callback_data="where")]
         ]
 
@@ -808,8 +797,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # تحديد القسم
-    if data in ["taaleel", "images", "where"]:
+    # ===== تحديد القسم =====
+    if data in ["taaleel", "where"]:
         subject = user_data[user_id]["subject"]
         unit = user_data[user_id]["unit"]
 
@@ -836,7 +825,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-    # الإجابة
+    # ===== الإجابة =====
     if user_id not in user_data or "category" not in user_data[user_id]:
         return
 
@@ -853,10 +842,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         result = "✅ صحيح"
     else:
         result = f"❌ خطأ\nالإجابة: {q['answer']}"
-
-    # إضافة الشرح
-    if "explanation" in q:
-        result += f"\n📘 الشرح: {q['explanation']}"
 
     data_user["q_index"] += 1
 
