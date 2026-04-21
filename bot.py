@@ -2,34 +2,37 @@ import os
 import logging
 import asyncio
 from pymongo import MongoClient
-from telegram.ext import MessageHandler, filters
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     CallbackQueryHandler,
-    ContextTypes
+    ContextTypes,
+    MessageHandler,
+    filters
 )
-MONGO_URL = os.environ.get("MONGO_URL")
 
+# ================== MONGO ==================
+MONGO_URL = os.environ.get("MONGO_URL")
 client = MongoClient(MONGO_URL)
 db = client["quiz_bot"]
 users = db["users"]
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
-)
 
+# ================== TOKEN ==================
 TOKEN = os.environ.get("TOKEN")
 
 if not TOKEN:
     raise ValueError("TOKEN is missing")
 
-# ================== الأدمن ==================
+# ================== ADMIN ==================
 ADMIN_ID = 8491023024
 
-approved_users = set()
-pending_users = set()
+# ================== LOGGING ==================
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
 
 # ================== الفيديو ==================
 INTRO_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
@@ -680,79 +683,168 @@ subjects = {
     }
 }
 
-# ================== بيانات المستخدم ==================
-user_data = {}
+
+# ================== DB HELPERS ==================
+def get_user(user_id):
+    return users.find_one({"_id": user_id})
+
+def create_user(user_id):
+    users.update_one(
+        {"_id": user_id},
+        {"$setOnInsert": {
+            "_id": user_id,
+            "approved": False,
+            "pending": True,
+            "score": 0,
+            "q_index": 0,
+            "subject": None,
+            "unit": None,
+            "category": None
+        }},
+        upsert=True
+    )
 
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    if user_id not in approved_users:
-        pending_users.add(user_id)
+    create_user(user_id)
+    user = get_user(user_id)
+
+    if not user["approved"]:
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
-    await update.message.reply_text("✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
-
     keyboard = [
-        [InlineKeyboardButton("📘 رياضيات", callback_data="math")],
-        [InlineKeyboardButton("📖 اللغة العربية", callback_data="arabic")],
-        [InlineKeyboardButton("🧬 علم الأحياء و الأرض", callback_data="bio")],
-        [InlineKeyboardButton("🌍 جغرافية الوطن العربية و سوريا", callback_data="geo")],
-        [InlineKeyboardButton("📜 التاريخ", callback_data="history")],
-        [InlineKeyboardButton("⚗️ الفيزياء و الكيمياء", callback_data="physics")]
+        [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
     ]
 
     await update.message.reply_text(
-        "📚 اختر المادة:",
+        "اختر المادة:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ================== الدفع ==================
+# ================== PAID ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    pending_users.add(user_id)
+    users.update_one(
+        {"_id": user_id},
+        {"$set": {"pending": True}}
+    )
 
     await context.bot.send_message(
-        chat_id=ADMIN_ID,
-        text=f"💳 طلب اشتراك:\n/approve {user_id}"
+        ADMIN_ID,
+        f"/approve {user_id}"
     )
 
     await update.message.reply_text("⏳ تم الإرسال")
 
-# ================== الموافقة ==================
+# ================== APPROVE ==================
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
 
-    user_id = int(context.args[0])
-    approved_users.add(user_id)
-
-    await update.message.reply_text("✅ تم التفعيل")
-    await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
-
-# ================== إرسال السؤال ==================
-async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    user_id = query.from_user.id
-    chat_id = query.message.chat_id
-
-    if user_id not in user_data:
+    if not context.args:
         return
 
-    subject = user_data[user_id]["subject"]
-    category = user_data[user_id]["category"]
-    index = user_data[user_id]["q_index"]
+    user_id = int(context.args[0])
 
-    q_list = subjects[subject][category]
+    users.update_one(
+        {"_id": user_id},
+        {"$set": {"approved": True, "pending": False}}
+    )
+
+    await context.bot.send_message(user_id, "🎉 تم قبولك")
+    await update.message.reply_text("تم التفعيل")
+
+# ================== BUTTON ==================
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    user_id = query.from_user.id
+    data = query.data
+
+    if data == "bio":
+        users.update_one(
+            {"_id": user_id},
+            {"$set": {"subject": "bio"}}
+        )
+
+        keyboard = [
+            [InlineKeyboardButton("الوحدة 1", callback_data="u1")]
+        ]
+
+        await query.message.reply_text(
+            "اختر الوحدة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    if data == "u1":
+        users.update_one(
+            {"_id": user_id},
+            {"$set": {"unit": "u1"}}
+        )
+
+        keyboard = [
+            [InlineKeyboardButton("تعليل", callback_data="u1_taaleel")],
+            [InlineKeyboardButton("ابدأ", callback_data="start_quiz")]
+        ]
+
+        await query.message.reply_text(
+            "اختر:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    if data == "start_quiz":
+        users.update_one(
+            {"_id": user_id},
+            {"$set": {"category": "u1_taaleel", "q_index": 0}}
+        )
+
+        await send_question(update, context)
+        return
+
+    if data.isdigit():
+        user = get_user(user_id)
+
+        category = user["category"]
+        index = user["q_index"]
+
+        q = subjects["bio"][category][index]
+
+        selected = q["options"][int(data)]
+
+        if selected == q["answer"]:
+            users.update_one({"_id": user_id}, {"$inc": {"score": 10}})
+            text = "✅ صحيح"
+        else:
+            text = f"❌ خطأ: {q['answer']}"
+
+        users.update_one({"_id": user_id}, {"$inc": {"q_index": 1}})
+
+        await query.message.reply_text(text)
+        await asyncio.sleep(1)
+
+        await send_question(update, context)
+
+# ================== QUESTION ==================
+async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    user = get_user(user_id)
+
+    category = user["category"]
+    index = user["q_index"]
+
+    q_list = subjects["bio"][category]
 
     if index >= len(q_list):
-        score = user_data[user_id]["score"]
-
         await context.bot.send_message(
-            chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}"
+            user_id,
+            f"انتهى الاختبار\nالنتيجة: {user['score']}"
         )
         return
 
@@ -764,138 +856,17 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await context.bot.send_message(
-        chat_id=chat_id,
-        text=q["question"],
+        user_id,
+        q["question"],
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ================== الأزرار ==================
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    user_id = query.from_user.id
-    data = query.data
-
-    # ================== اختيار المادة ==================
-    if data == "bio":
-        keyboard = [
-            [InlineKeyboardButton("الوحدة 1: الدعامة والتنسيق", callback_data="bio_u1")],
-            [InlineKeyboardButton("الوحدة 2: وظائف التغذية", callback_data="bio_u2")],
-            [InlineKeyboardButton("الوحدة 3: علم الوراثة والتكاثر", callback_data="bio_u3")],
-            [InlineKeyboardButton("الوحدة 4: النبات والبيئة", callback_data="bio_u4")]
-        ]
-
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="🧬 اختر الوحدة:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
-
-    # ================== اختيار الوحدة ==================
-    if data.startswith("bio_u"):
-        unit = data.split("_")[1]
-
-        user_data[user_id] = {
-            "score": 0,
-            "q_index": 0,
-            "subject": "bio",
-            "unit": unit
-        }
-
-        keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-            [InlineKeyboardButton("📍 أين", callback_data="where")],
-            [InlineKeyboardButton("📊 مستويات", callback_data="level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result")]
-        ]
-
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="اختر نوع الأسئلة:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
-
-    # ================== اختيار نوع الأسئلة ==================
-    if data in ["taaleel", "images", "where", "level", "result"]:
-        unit = user_data[user_id]["unit"]
-        category = f"{unit}_{data}"
-
-        user_data[user_id]["category"] = category
-
-        keyboard = [
-            [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
-            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
-        ]
-
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="📚 يمكنك الآن:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
-
-    # ================== الفيديو ==================
-    if data == "watch_video":
-        await context.bot.send_video(
-            chat_id=query.message.chat_id,
-            video=INTRO_VIDEO,
-            caption="📺 فيديو تعليمي"
-        )
-        return
-
-    # ================== بدء الاختبار ==================
-    if data == "start_quiz":
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="🚀 بدأ الاختبار"
-        )
-        await send_question(update, context)
-        return
-
-    # ================== الإجابة ==================
-    if user_id not in user_data:
-        return
-
-    subject = user_data[user_id]["subject"]
-    category = user_data[user_id]["category"]
-    index = user_data[user_id]["q_index"]
-
-    q = subjects[subject][category][index]
-    selected = q["options"][int(data)]
-
-    if selected == q["answer"]:
-        user_data[user_id]["score"] += 10
-        result = "✅ صحيح"
-    else:
-        result = f"❌ خطأ\nالإجابة: {q['answer']}"
-
-    user_data[user_id]["q_index"] += 1
-
-    await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text=result
-    )
-
-    await asyncio.sleep(1)
-    await send_question(update, context)
-
-# ================== file_id ==================
-async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.video:
-        file_id = update.message.video.file_id
-        await update.message.reply_text(f"📌 VIDEO file_id:\n{file_id}")
-
-# ================== تشغيل البوت ==================
+# ================== BOT ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
-app.add_handler(MessageHandler(filters.VIDEO, get_file_id))
 app.add_handler(CallbackQueryHandler(button))
 
 if __name__ == "__main__":
