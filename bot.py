@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+from pymongo import MongoClient
 from telegram.ext import MessageHandler, filters
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -9,7 +10,11 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes
 )
+MONGO_URL = os.environ.get("MONGO_URL")
 
+client = MongoClient(MONGO_URL)
+db = client["quiz_bot"]
+users = db["users"]
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
