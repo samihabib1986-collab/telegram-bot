@@ -16,6 +16,7 @@ logging.basicConfig(
 )
 
 TOKEN = os.environ.get("TOKEN")
+
 if not TOKEN:
     raise ValueError("TOKEN is missing")
 
@@ -674,7 +675,6 @@ subjects = {
     }
 }
 
-
 # ================== بيانات المستخدم ==================
 user_data = {}
 
@@ -687,18 +687,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
+    await update.message.reply_text("✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
+
     keyboard = [
-        [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
+        [InlineKeyboardButton("📘 رياضيات", callback_data="math")],
+        [InlineKeyboardButton("📖 اللغة العربية", callback_data="arabic")],
+        [InlineKeyboardButton("🧬 علم الأحياء و الأرض", callback_data="bio")],
+        [InlineKeyboardButton("🌍 جغرافية الوطن العربية و سوريا", callback_data="geo")],
+        [InlineKeyboardButton("📜 التاريخ", callback_data="history")],
+        [InlineKeyboardButton("⚗️ الفيزياء و الكيمياء", callback_data="physics")]
     ]
 
     await update.message.reply_text(
-        "✨ أهلاً بك في منصة العلامة الكاملة",
+        "📚 اختر المادة:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
 # ================== الدفع ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
+
     pending_users.add(user_id)
 
     await context.bot.send_message(
@@ -706,7 +714,7 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text=f"💳 طلب اشتراك:\n/approve {user_id}"
     )
 
-    await update.message.reply_text("⏳ تم إرسال طلبك")
+    await update.message.reply_text("⏳ تم الإرسال")
 
 # ================== الموافقة ==================
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -732,13 +740,14 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category = user_data[user_id]["category"]
     index = user_data[user_id]["q_index"]
 
-    q_list = subjects[subject].get(category, [])
+    q_list = subjects[subject][category]
 
     if index >= len(q_list):
         score = user_data[user_id]["score"]
+
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"🎉 انتهيت!\n📊 نتيجتك: {score}"
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}"
         )
         return
 
@@ -751,7 +760,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=chat_id,
-        text=f"📘 {q['question']}",
+        text=q["question"],
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -766,11 +775,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ================== اختيار المادة ==================
     if data == "bio":
         keyboard = [
-            [InlineKeyboardButton("📘 الوحدة 1", callback_data="bio_u1")]
+            [InlineKeyboardButton("الوحدة 1: الدعامة والتنسيق", callback_data="bio_u1")],
+            [InlineKeyboardButton("الوحدة 2: وظائف التغذية", callback_data="bio_u2")],
+            [InlineKeyboardButton("الوحدة 3: علم الوراثة والتكاثر", callback_data="bio_u3")],
+            [InlineKeyboardButton("الوحدة 4: النبات والبيئة", callback_data="bio_u4")]
         ]
 
-        await query.message.reply_text(
-            "🧬 اختر الوحدة:",
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="🧬 اختر الوحدة:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
@@ -783,35 +796,36 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "score": 0,
             "q_index": 0,
             "subject": "bio",
-            "unit": unit
+            "category": f"{unit}_taaleel"
         }
 
         keyboard = [
-            [InlineKeyboardButton("1️⃣ تعاليل", callback_data=f"{unit}_taaleel")],
-            [InlineKeyboardButton("2️⃣ صور", callback_data=f"{unit}_images")],
-            [InlineKeyboardButton("3️⃣ حدد موقع", callback_data=f"{unit}_where")],
-            [InlineKeyboardButton("4️⃣ رتب مراحل", callback_data=f"{unit}_level")],
-            [InlineKeyboardButton("5️⃣ ماذا ينتج", callback_data=f"{unit}_result")],
+            [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
+            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
         ]
 
-        await query.message.reply_text(
-            "🧬 اختر نوع الأسئلة:",
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="📚 يمكنك الآن:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
 
+    # ================== الفيديو ==================
+    if data == "watch_video":
+        await context.bot.send_video(
+            chat_id=query.message.chat_id,
+            video=INTRO_VIDEO,
+            caption="📺 فيديو تعليمي"
+        )
+        return
+
     # ================== بدء الاختبار ==================
-    if data.endswith(("taaleel", "images", "where", "level", "result")):
-
-        if user_id not in user_data:
-            await query.message.reply_text("⚠️ الرجاء اختيار الوحدة أولاً")
-            return
-
-        user_data[user_id]["category"] = data
-        user_data[user_id]["q_index"] = 0
-        user_data[user_id]["score"] = 0
-
-        await query.message.reply_text("🚀 بدأ الاختبار")
+    if data == "start_quiz":
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="🚀 بدأ الاختبار"
+        )
         await send_question(update, context)
         return
 
@@ -827,16 +841,26 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     selected = q["options"][int(data)]
 
     if selected == q["answer"]:
-        user_data[user_id]["score"] += 1
-        text = "✅ صحيح"
+        user_data[user_id]["score"] += 10
+        result = "✅ صحيح"
     else:
-        text = f"❌ خطأ\nالإجابة: {q['answer']}"
+        result = f"❌ خطأ\nالإجابة: {q['answer']}"
 
     user_data[user_id]["q_index"] += 1
 
-    await query.message.reply_text(text)
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text=result
+    )
+
     await asyncio.sleep(1)
     await send_question(update, context)
+
+# ================== file_id ==================
+async def get_file_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.video:
+        file_id = update.message.video.file_id
+        await update.message.reply_text(f"📌 VIDEO file_id:\n{file_id}")
 
 # ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
@@ -844,6 +868,7 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
+app.add_handler(MessageHandler(filters.VIDEO, get_file_id))
 app.add_handler(CallbackQueryHandler(button))
 
 if __name__ == "__main__":
