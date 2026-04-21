@@ -11,7 +11,7 @@ from telegram.ext import (
     MessageHandler,
     filters
 )
-MONGO_URL = os.environ.get("mongodb+srv://samihabib1986_db_user:ExVIyoQhtUDqmMHk@cluster0.bm9w0u0.mongodb.net/?appName=Cluster0")
+MONGO_URL = os.environ.get("MONGO_URL")
 
 if not MONGO_URL:
     raise ValueError("MONGO_URL is missing")
