@@ -24,35 +24,38 @@ if not TOKEN:
 # ================== الأدمن ==================
 ADMIN_ID = 8491023024
 
-# ================== KV ==================
-# سيتم ربطه من Worker
-KV = None
+# ================== ملف الحفظ ==================
+USERS_FILE = "users.json"
 
 approved_users = set()
 pending_users = set()
 
-# ================== تحميل المستخدمين من KV ==================
-async def load_users():
+# ================== تحميل وحفظ المستخدمين ==================
+def load_users():
     global approved_users, pending_users
 
-    data = await KV.get("users")
-
-    if data:
-        obj = json.loads(data)
-        approved_users = set(obj.get("approved_users", []))
-        pending_users = set(obj.get("pending_users", []))
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                approved_users = set(data.get("approved_users", []))
+                pending_users = set(data.get("pending_users", []))
+        except json.JSONDecodeError:
+            approved_users = set()
+            pending_users = set()
     else:
         approved_users = set()
         pending_users = set()
 
-# ================== حفظ المستخدمين في KV ==================
-async def save_users():
+
+def save_users():
     data = {
         "approved_users": list(approved_users),
         "pending_users": list(pending_users)
     }
 
-    await KV.put("users", json.dumps(data))
+    with open(USERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 # ================== الصور ==================
 uploaded_images = {
@@ -90,7 +93,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user_id not in approved_users:
         pending_users.add(user_id)
-        await save_users()
+        save_users()
 
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
@@ -110,7 +113,7 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     pending_users.add(user_id)
-    await save_users()
+    save_users()
 
     await context.bot.send_message(
         chat_id=ADMIN_ID,
@@ -129,7 +132,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     approved_users.add(user_id)
     pending_users.discard(user_id)
 
-    await save_users()
+    save_users()
 
     await update.message.reply_text("✅ تم التفعيل")
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
@@ -226,19 +229,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(1)
     await send_question(update, context)
 
-# ================== تشغيل البوت ==================
+# ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
-
-# 🔥 ربط KV من Worker
-app.bot_data["KV"] = KV_NAMESPACE
-
-# تحميل المستخدمين عند التشغيل
-asyncio.get_event_loop().run_until_complete(load_users())
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
 app.add_handler(CallbackQueryHandler(button))
 
+# 🔥 تحميل البيانات قبل التشغيل
+load_users()
+
 if __name__ == "__main__":
     app.run_polling()
+    
