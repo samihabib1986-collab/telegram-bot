@@ -72,10 +72,10 @@ def create_user(user_id):
         {"_id": user_id},
         {"$setOnInsert": {
             "_id": user_id,
-            "approved": False,
+            "approved": True if user_id == ADMIN_ID else False,
             "score": 0,
-            "current_q": None,
             "used_questions": [],
+            "current_q": None,
             "in_exam": False
         }},
         upsert=True
