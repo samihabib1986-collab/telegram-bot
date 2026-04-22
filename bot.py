@@ -950,7 +950,7 @@ subjects = {
 },
   
         ],
-        "u1_result": [
+        "u1_result1": [
 {
 "question": "1. ماذا ينتج عن غياب الجاذبية لرواد الفضاء؟",
 "options": [" زيادة طولهم من 2 إلى 5 سم"," نقص طولهم بسبب الضغط"," ثبات الطول دون تغيير"],
@@ -1504,7 +1504,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🖼️ صور", callback_data="images")],
             [InlineKeyboardButton("📍 حدد موقع", callback_data="where")],
             [InlineKeyboardButton("📊 رتب مراحل", callback_data="level")],
-            [InlineKeyboardButton("🧠 ماذا ينتج عن", callback_data="result")]
+            [InlineKeyboardButton("🧠 ماذا ينتج عن", callback_data="result1")]
             [InlineKeyboardButton("👍 ماهي وظيفة ", callback_data="function")]
         ]
 
@@ -1516,7 +1516,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # ================== اختيار نوع الأسئلة ==================
-    if data in ["taaleel", "images", "where", "level", "result","function"]:
+    if data in ["taaleel", "images", "where", "level", "result1","function"]:
 
         if user_id not in user_data:
             await context.bot.send_message(
