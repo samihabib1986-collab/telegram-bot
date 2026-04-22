@@ -855,13 +855,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "unit": unit
         }
 
-keyboard = [
-    [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-    [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-    [InlineKeyboardButton("📍 أين", callback_data="where")],
-    [InlineKeyboardButton("📊 مستويات", callback_data="level")],
-    [InlineKeyboardButton("🧠 نتائج", callback_data="result")]
-]
+    keyboard = [
+        [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+        [InlineKeyboardButton("🖼️ صور", callback_data="images")],
+        [InlineKeyboardButton("📍 حدد موقع", callback_data="where")],
+        [InlineKeyboardButton("📊 رتب مراحل", callback_data="level")],
+        [InlineKeyboardButton("🧠 ماذا ينتج عن", callback_data="result")]
+  
+    ]
 
         await context.bot.send_message(
             chat_id=query.message.chat_id,
