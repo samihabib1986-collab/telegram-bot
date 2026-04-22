@@ -1472,6 +1472,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q_list = subjects[subject][category]
 
+    # ================== نهاية الأسئلة ==================
     if index >= len(q_list):
         score = user_data[user_id]["score"]
 
@@ -1491,40 +1492,38 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+    # ================== السؤال الحالي ==================
     q = q_list[index]
 
-q = q_list[index]
+    # 🧠 بناء النص (هنا كان الخطأ عندك)
+    text = q["question"] + "\n\n"
 
-# بناء نص السؤال + الخيارات
-text = q["question"] + "\n\n"
+    for i, opt in enumerate(q["options"]):
+        text += f"{chr(65+i)}- {opt}\n"
 
-for i, opt in enumerate(q["options"]):
-    text += f"{chr(65+i)}- {opt}\n"
-
-# أزرار مختصرة (تحل مشكلة طول النص)
-keyboard = [
-    [
-        InlineKeyboardButton("A", callback_data="0"),
-        InlineKeyboardButton("B", callback_data="1"),
-        InlineKeyboardButton("C", callback_data="2"),
+    # 🎯 أزرار مختصرة (تحل مشكلة طول النص)
+    keyboard = [
+        [
+            InlineKeyboardButton("A", callback_data="0"),
+            InlineKeyboardButton("B", callback_data="1"),
+            InlineKeyboardButton("C", callback_data="2"),
+        ]
     ]
-]
 
-# دعم الصور
-if q.get("type") == "image":
-    await context.bot.send_photo(
-        chat_id=chat_id,
-        photo=uploaded_images[q["image"]],
-        caption=text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-else:
-    await context.bot.send_message(
-        chat_id=chat_id,
-        text=text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
+    # ================== إرسال ==================
+    if q.get("type") == "image":
+        await context.bot.send_photo(
+            chat_id=chat_id,
+            photo=uploaded_images[q["image"]],
+            caption=text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    else:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 # ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
