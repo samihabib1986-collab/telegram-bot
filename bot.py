@@ -1458,37 +1458,65 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
 
 # ================== إرسال السؤال ==================
-q = q_list[index]
+async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    user_id = query.from_user.id
+    chat_id = query.message.chat_id
 
-# عرض السؤال + الخيارات كنص
-text = q["question"] + "\n\n"
+    if user_id not in user_data:
+        return
 
-for i, opt in enumerate(q["options"]):
-    text += f"{chr(65+i)}- {opt}\n"
+    subject = user_data[user_id]["subject"]
+    category = user_data[user_id]["category"]
+    index = user_data[user_id]["q_index"]
 
-# أزرار مختصرة
-keyboard = [
-    [
-        InlineKeyboardButton("A", callback_data="0"),
-        InlineKeyboardButton("B", callback_data="1"),
-        InlineKeyboardButton("C", callback_data="2"),
+    q_list = subjects[subject][category]
+
+    if index >= len(q_list):
+        score = user_data[user_id]["score"]
+
+        users.update_one(
+            {"_id": user_id},
+            {"$set": {"score": score}}
+        )
+
+        keyboard = [
+            [InlineKeyboardButton("🔁 إعادة الاختبار", callback_data="start_quiz")]
+        ]
+
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"🎉 انتهيت!\n📊 نتيجتك: {score} من {len(q_list)*10}",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    q = q_list[index]
+
+    keyboard = [
+        [InlineKeyboardButton(opt, callback_data=str(i))]
+        for i, opt in enumerate(q["options"])
     ]
-]
 
-# دعم الصور
-if q.get("type") == "image":
-    await context.bot.send_photo(
-        chat_id=chat_id,
-        photo=uploaded_images[q["image"]],
-        caption=text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-else:
+    #  دعم الصور
+    if q.get("type") == "image":
+        await context.bot.send_photo(
+            chat_id=chat_id,
+            photo=uploaded_images[q["image"]],
+            caption=q["question"],
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    else:
+        text = q["question"] + "\n\n"
+
+    for i, opt in enumerate(q["options"]):
+        text += f"{chr(65+i)}- {opt}\n"
+
     await context.bot.send_message(
-        chat_id=chat_id,
-        text=text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    chat_id=chat_id,
+    text=q["question"],
+    reply_markup=InlineKeyboardMarkup(keyboard)
+)
 
 
 # ================== الأزرار ==================
