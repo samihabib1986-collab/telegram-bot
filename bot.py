@@ -855,10 +855,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "unit": unit
         }
 
-        keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-        ]
+keyboard = [
+    [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+    [InlineKeyboardButton("🖼️ صور", callback_data="images")],
+    [InlineKeyboardButton("📍 أين", callback_data="where")],
+    [InlineKeyboardButton("📊 مستويات", callback_data="level")],
+    [InlineKeyboardButton("🧠 نتائج", callback_data="result")]
+]
 
         await context.bot.send_message(
             chat_id=query.message.chat_id,
@@ -867,7 +870,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    if data in ["taaleel", "images"]:
+    if data in ["taaleel", "images", "where", "level", "result"]:
         unit = user_data[user_id]["unit"]
         category = f"{unit}_{data}"
 
