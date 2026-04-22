@@ -892,34 +892,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
-
     if data.startswith("bio_u"):
         unit = data.split("_")[1]
 
-        user_data[user_id] = {
-            "score": 0,
-            "q_index": 0,
-            "subject": "bio",
-            "unit": unit
-        }
+    user_data[user_id] = {
+        "score": 0,
+        "q_index": 0,
+        "subject": "bio",
+        "unit": unit
+    }
 
     keyboard = [
-    [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-    [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-    [InlineKeyboardButton("📍 حدد موقع", callback_data="where")],
-    [InlineKeyboardButton("📊 رتب مراحل", callback_data="level")],
-    [InlineKeyboardButton("🧠 ماذا ينتج عن", callback_data="result")]
-]
+        [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+        [InlineKeyboardButton("🖼️ صور", callback_data="images")],
+        [InlineKeyboardButton("📍 حدد موقع", callback_data="where")],
+        [InlineKeyboardButton("📊 رتب مراحل", callback_data="level")],
+        [InlineKeyboardButton("🧠 ماذا ينتج عن", callback_data="result")]
+    ]
 
     await context.bot.send_message(
-    chat_id=query.message.chat_id,
-    text="اختر نوع الأسئلة:",
-    reply_markup=InlineKeyboardMarkup(keyboard)
-)
+        chat_id=query.message.chat_id,
+        text="اختر نوع الأسئلة:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
-    return
-
-    if data in ["taaleel", "images", "where", "level", "result"]:
+    return   # 🔴 مهم جدًا    if data in ["taaleel", "images", "where", "level", "result"]:
         unit = user_data[user_id]["unit"]
         category = f"{unit}_{data}"
 
