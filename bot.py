@@ -1512,7 +1512,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for i, opt in enumerate(q["options"]):
         text += f"{chr(65+i)}- {opt}\n"
 
-await context.bot.send_message(
+    await context.bot.send_message(
     chat_id=chat_id,
     text=q["question"],
     reply_markup=InlineKeyboardMarkup(keyboard)
