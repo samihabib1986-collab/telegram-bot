@@ -903,21 +903,21 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "unit": unit
         }
 
-    keyboard = [
-        [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-        [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-        [InlineKeyboardButton("📍 حدد موقع", callback_data="where")],
-        [InlineKeyboardButton("📊 رتب مراحل", callback_data="level")],
-        [InlineKeyboardButton("🧠 ماذا ينتج عن", callback_data="result")]
-  
-    ]
+keyboard = [
+    [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+    [InlineKeyboardButton("🖼️ صور", callback_data="images")],
+    [InlineKeyboardButton("📍 حدد موقع", callback_data="where")],
+    [InlineKeyboardButton("📊 رتب مراحل", callback_data="level")],
+    [InlineKeyboardButton("🧠 ماذا ينتج عن", callback_data="result")]
+]
 
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="اختر نوع الأسئلة:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
+await context.bot.send_message(
+    chat_id=query.message.chat_id,
+    text="اختر نوع الأسئلة:",
+    reply_markup=InlineKeyboardMarkup(keyboard)
+)
+
+return
 
     if data in ["taaleel", "images", "where", "level", "result"]:
         unit = user_data[user_id]["unit"]
