@@ -1493,30 +1493,37 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q = q_list[index]
 
-    keyboard = [
-        [InlineKeyboardButton(opt, callback_data=str(i))]
-        for i, opt in enumerate(q["options"])
+q = q_list[index]
+
+# بناء نص السؤال + الخيارات
+text = q["question"] + "\n\n"
+
+for i, opt in enumerate(q["options"]):
+    text += f"{chr(65+i)}- {opt}\n"
+
+# أزرار مختصرة (تحل مشكلة طول النص)
+keyboard = [
+    [
+        InlineKeyboardButton("A", callback_data="0"),
+        InlineKeyboardButton("B", callback_data="1"),
+        InlineKeyboardButton("C", callback_data="2"),
     ]
+]
 
-    #  دعم الصور
-    if q.get("type") == "image":
-        await context.bot.send_photo(
-            chat_id=chat_id,
-            photo=uploaded_images[q["image"]],
-            caption=q["question"],
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-    else:
-        text = q["question"] + "\n\n"
-
-    for i, opt in enumerate(q["options"]):
-        text += f"{chr(65+i)}- {opt}\n"
-
+# دعم الصور
+if q.get("type") == "image":
+    await context.bot.send_photo(
+        chat_id=chat_id,
+        photo=uploaded_images[q["image"]],
+        caption=text,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+else:
     await context.bot.send_message(
-    chat_id=chat_id,
-    text=q["question"],
-    reply_markup=InlineKeyboardMarkup(keyboard)
-)
+        chat_id=chat_id,
+        text=text,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 
 # ================== الأزرار ==================
