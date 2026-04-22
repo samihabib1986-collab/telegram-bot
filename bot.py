@@ -1397,7 +1397,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
-    await update.message.reply_text("✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
+    await update.message.reply_text(" /n ✨إشراف الاستاذ :احمد نور الدين  939138720✨✨ برمجة وتصميم المهندس :سامي حبيب  943512782✨/n ✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
 
     keyboard = [
         [InlineKeyboardButton("🧬 علم الأحياء و الأرض", callback_data="bio")]
@@ -1435,7 +1435,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     approve_user(user_id)
 
     await update.message.reply_text(" تم التفعيل")
-    await context.bot.send_message(chat_id=user_id, text="🎉 تم قبولك")
+    await context.bot.send_message(chat_id=user_id, text="اضغط  /start 🎉 تم قبولك")
 
 # ================== إرسال السؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
