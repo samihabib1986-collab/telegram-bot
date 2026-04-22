@@ -918,11 +918,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     return   # 🔴 مهم جدًا
-    # ================== اختيار نوع الأسئلة ==================
-if data in ["taaleel", "images", "where", "level", "result"]:
+# ================== اختيار نوع الأسئلة ==================
+    if data in ["taaleel", "images", "where", "level", "result"]:
 
-    if user_id not in user_data:
-        await context.bot.send_message(
+        if user_id not in user_data:
+            await context.bot.send_message(
             chat_id=query.message.chat_id,
             text="❌ ابدأ من البداية /start"
         )
