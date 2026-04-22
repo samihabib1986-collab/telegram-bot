@@ -1397,7 +1397,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
-    await update.message.reply_text(" /n ✨إشراف الاستاذ :احمد نور الدين  939138720✨✨ برمجة وتصميم المهندس :سامي حبيب  943512782✨/n ✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨")
+    await update.message.reply_text(" ✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨\n✨إشراف الاستاذ :احمد نور الدين  939138720✨\n✨ برمجة وتصميم المهندس :سامي حبيب  943512782✨/")
 
     keyboard = [
         [InlineKeyboardButton("🧬 علم الأحياء و الأرض", callback_data="bio")]
