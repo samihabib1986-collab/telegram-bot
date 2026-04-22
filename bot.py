@@ -892,6 +892,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
+   # ================== اختيار الوحدة ==================
     if data.startswith("bio_u"):
         unit = data.split("_")[1]
 
@@ -916,24 +917,26 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-    return   # 🔴 مهم جدًا    if data in ["taaleel", "images", "where", "level", "result"]:
+    return   # 🔴 مهم جدًا
+    # ================== اختيار نوع الأسئلة ==================
+    if data in ["taaleel", "images", "where", "level", "result"]:
         unit = user_data[user_id]["unit"]
         category = f"{unit}_{data}"
 
         user_data[user_id]["category"] = category
 
         keyboard = [
-            [InlineKeyboardButton("🎬 فيديو", callback_data="watch_video")],
-            [InlineKeyboardButton("▶️ ابدأ", callback_data="start_quiz")]
+            [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
+            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
         ]
 
         await context.bot.send_message(
             chat_id=query.message.chat_id,
-            text="📚 اختر:",
+            text="📚 يمكنك الآن:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
-        return
-
+        return     
+    # ================== الفيديو ==================
     if data == "watch_video":
         await context.bot.send_video(
             chat_id=query.message.chat_id,
