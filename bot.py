@@ -919,23 +919,47 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return   # 🔴 مهم جدًا
     # ================== اختيار نوع الأسئلة ==================
-    if data in ["taaleel", "images", "where", "level", "result"]:
-        unit = user_data[user_id]["unit"]
-        category = f"{unit}_{data}"
+if data in ["taaleel", "images", "where", "level", "result"]:
 
-        user_data[user_id]["category"] = category
-
-        keyboard = [
-            [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
-            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
-        ]
-
+    if user_id not in user_data:
         await context.bot.send_message(
             chat_id=query.message.chat_id,
-            text="📚 يمكنك الآن:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            text="❌ ابدأ من البداية /start"
         )
-        return     
+        return
+
+    unit = user_data[user_id].get("unit")
+
+    if not unit:
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="❌ لم يتم تحديد الوحدة"
+        )
+        return
+
+    category = f"{unit}_{data}"
+
+    if category not in subjects["bio"]:
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text=f"❌ لا يوجد قسم: {category}"
+        )
+        return
+
+    user_data[user_id]["category"] = category
+
+    keyboard = [
+        [InlineKeyboardButton("🎬 مشاهدة الفيديو التعليمي", callback_data="watch_video")],
+        [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
+    ]
+
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text="📚 يمكنك الآن:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+    return   
     # ================== الفيديو ==================
     if data == "watch_video":
         await context.bot.send_video(
