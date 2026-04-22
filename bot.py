@@ -1567,7 +1567,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if data == "start_quiz":
         await send_question(update, context)
-        return    # ================== الإجابة ==================
+        return 
+# ================== الإجابة ==================
     if user_id not in user_data:
         return
 
