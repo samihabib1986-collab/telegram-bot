@@ -52,7 +52,6 @@ uploaded_images = {
 subjects = {
     "bio": {
 
-        # ✅ القسم الدعامي الحركي
         "u1_dam_taaleel": [
             {
                 "question": "لماذا العظام صلبة؟",
@@ -63,7 +62,6 @@ subjects = {
 
         "u1_dam_images": [
             {
-                "type": "image",
                 "image": "الهيكل العظمي",
                 "question": "ما هذا؟",
                 "options": ["الهيكل العظمي", "عضلة", "عصب"],
@@ -141,8 +139,8 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         InlineKeyboardButton("C", callback_data="2"),
     ]]
 
-    # ✅ دعم الصور
-    if q.get("type") == "image":
+    # ✅ حل مشكلة الصور
+    if "image" in q:
         await context.bot.send_photo(
             chat_id=query.message.chat_id,
             photo=uploaded_images[q["image"]],
@@ -230,7 +228,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         unit = user_data[user_id]["unit"]
         section = user_data[user_id]["section"]
 
-        # ✅ التعديل الأساسي هنا
         category = f"{unit}_{section}_{data}"
 
         if category not in subjects["bio"]:
@@ -251,7 +248,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-    # ================== الإجابة ==================
+    # الإجابة
     if user_id not in user_data:
         return
 
@@ -266,7 +263,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_data[user_id]["score"] += 10
         result = "✔️ صحيح"
     else:
-        result = f"❌ خطأ\n{q['answer']}"
+        result = f"❌ خطأ\nالإجابة: {q['answer']}"
 
     user_data[user_id]["q_index"] += 1
 
