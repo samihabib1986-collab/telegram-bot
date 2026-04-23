@@ -10,6 +10,7 @@ from telegram.ext import (
     ContextTypes
 )
 
+
 # ================== MongoDB ==================
 MONGO_URL = os.environ.get("MONGO_URL")
 if not MONGO_URL:
@@ -52,7 +53,23 @@ UNIT1_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgb
 SECTION1_VIDEO = "VIDEO_S1"
 SECTION2_VIDEO = "VIDEO_S2"
 SECTION3_VIDEO = "VIDEO_S3"
-
+# ================== الصور ==================
+uploaded_images = {
+"الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ",
+"عظام الوجه": "AgACAgQAAxkBAAIDgmnjuaxzSVnHSg-Ht5sh8MLSRxgDAAJEDGsb4XYhUyf_4zNepyt6AQADAgADbQADOwQ",
+"مفصل العضد الكتفي": "AgACAgQAAxkBAAIDrGnj2XkC5s_14i-8Zr11ICic-ImxAAJjDGsb4XYhU7x_C70kw-VnAQADAgADbQADOwQ",
+"مفاصل العمود الفقري": "AgACAgQAAxkBAAIDrmnj2cFsc9BTuUF_6SBSJ5AolzFXAAJkDGsb4XYhU52j6bbeUJdeAQADAgADbQADOwQ",
+"عظام الطرف العلوي": "AgACAgQAAxkBAAIDsmnj2gsFww-fBb8XMXywean-d5bSAAJmDGsb4XYhU71hPZ-to5faAQADAgADeAADOwQ",
+"عظام الطرف السفلي": "AgACAgQAAxkBAAIDtGnj2i6b24ki0cgork2CXiRUPyZkAAJnDGsb4XYhU-tRzckix1dGAQADAgADeAADOwQ",
+"عظام الجمجمة": "AgACAgQAAxkBAAIDtmnj2kzpampZCzzZG1R3ukMhOA_LAAJoDGsb4XYhU90RtQhjryIZAQADAgADbQADOwQ",
+"بنية العظم الطويل": "AgACAgQAAxkBAAIDuGnj2qP11IFHNmIsBybhHIJnHnhlAAJpDGsb4XYhU4jukApSAAF2JgEAAwIAA20AAzsE",
+"القناة الفقرية": "AgACAgQAAxkBAAIDumnj2s3d7FdxX6ek83h2ICL058HGAAJqDGsb4XYhU44UTT9-9Q3TAQADAgADbQADOwQ",
+"القفص الصدري": "AgACAgQAAxkBAAIDvGnj2wKHWoZd-Fnq6VTgtbr_26cXAAJrDGsb4XYhU6gEI1EyrwWmAQADAgADbQADOwQ",
+"الفقرة": "AgACAgQAAxkBAAIDvmnj2y7tdQIvOj1m2vpCtZYG73CTAAJsDGsb4XYhUwAB9a5PVNtyWQEAAwIAA20AAzsE",
+"العمود الفقري": "AgACAgQAAxkBAAIDwGnj2098LBlyy3stztvcZro8wYe8AAJtDGsb4XYhU2P4mddgYBUPAQADAgADbQADOwQ",
+"الزنار الحوضي": "AgACAgQAAxkBAAIDwmnj22kphW_UdDwCxYEXZ1QEEvr6AAJuDGsb4XYhU9ARG08G-TgLAQADAgADbQADOwQ",
+"الاربطة والاوتار": "AgACAgQAAxkBAAIDxGnj27EBbQ7NdocwG8BMMx-pXpz0AAJvDGsb4XYhU0SlG3BDNztZAQADAgADbQADOwQ",
+}
 # ================== أسئلة (لكل نوع بنك مستقل) ==================
 
 section1_questions = {
@@ -201,7 +218,10 @@ subjects = {
 
 # ================== User Temp ==================
 user_data = {}
-
+# ================== add ID ==================
+async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    photo = update.message.photo[-1].file_id
+    await update.message.reply_text(photo)
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -240,6 +260,12 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=user_id, text="تم التفعيل /start")
 
 # ================== إرسال سؤال ==================
+    if quiz_type == "images":
+        await context.bot.send_photo(
+        chat_id=query.message.chat_id,
+        photo=q["options"][0],
+        caption=q["question"]
+    )
 async def send_question(update, context):
     query = update.callback_query
     user_id = query.from_user.id
@@ -376,5 +402,5 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
 app.add_handler(CallbackQueryHandler(button))
-
+app.add_handler(MessageHandler(filters.PHOTO, get_id))
 app.run_polling()
