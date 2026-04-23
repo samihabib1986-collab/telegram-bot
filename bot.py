@@ -53,7 +53,7 @@ SECTION1_VIDEO = "VIDEO_S1"
 SECTION2_VIDEO = "VIDEO_S2"
 SECTION3_VIDEO = "VIDEO_S3"
 
-# ================== أسئلة (مثال) ==================
+# ================== أسئلة ==================
 section1_questions = [
     {
         "question": "ما وظيفة الهيكل العظمي؟",
@@ -92,18 +92,7 @@ subjects = {
                     "s1": {
                         "title": "📂 الجهاز الدعامي الحركي",
                         "video": SECTION1_VIDEO,
-                        "questions": {
-                                "taaleel": [
-                                {
-"question": "23. كثرة التلافيف في قشرة المخ:",
-"options": ["لتقليل حجم الدماغ","لزيادة مساحة سطح القشرة المخية (المادة الرمادية)",""],
-"answer": "لزيادة مساحة سطح القشرة المخية (المادة الرمادية)"
-},
-
-                                            ],
-    "images": [...],
-    "where": [...],
-}
+                        "questions": section1_questions
                     },
                     "s2": {
                         "title": "📂 الجهاز العصبي",
@@ -162,24 +151,17 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=user_id, text="تم التفعيل /start")
 
 # ================== إرسال سؤال ==================
-if data.startswith("quiz_"):
-    quiz_type = data.replace("quiz_", "")
-
-    user_data[user_id]["quiz_type"] = quiz_type
-    user_data[user_id]["q_index"] = 0
-
-    await send_question(update, context)
-    return
 async def send_question(update, context):
     query = update.callback_query
     user_id = query.from_user.id
 
     data = user_data[user_id]
-    unit = user_data[user_id]["unit"]
-sec = user_data[user_id]["section"]
-q_type = user_data[user_id].get("quiz_type", "s1")
 
-q_list = subjects["science"]["units"][unit]["sections"][sec]["questions"]["questions"][q_type]
+    unit = user_data[user_id]["unit"]
+    sec = user_data[user_id]["section"]
+    q_type = user_data[user_id].get("quiz_type", "s1")
+
+    q_list = subjects["science"]["units"][unit]["sections"][sec]["questions"]
 
     index = data["q_index"]
 
@@ -266,24 +248,33 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_video(chat_id=query.message.chat_id, video=video)
         return
 
-    # بدء الاختبار
-if data == "start_quiz":
+    # بدء الاختبار → اختيار النوع
+    if data == "start_quiz":
 
-    keyboard = [
-        [InlineKeyboardButton("🧠 تعاليل", callback_data="quiz_taaleel")],
-        [InlineKeyboardButton("🖼 صور", callback_data="quiz_images")],
-        [InlineKeyboardButton("📍 أين", callback_data="quiz_where")],
-        [InlineKeyboardButton("🔁 ترتيب", callback_data="quiz_level")],
-        [InlineKeyboardButton("⚙️ وظيفة", callback_data="quiz_function")],
-        [InlineKeyboardButton("📊 نتائج", callback_data="quiz_result1")]
-    ]
+        keyboard = [
+            [InlineKeyboardButton("🧠 تعاليل", callback_data="quiz_taaleel")],
+            [InlineKeyboardButton("🖼 صور", callback_data="quiz_images")],
+            [InlineKeyboardButton("📍 أين", callback_data="quiz_where")],
+            [InlineKeyboardButton("🔁 ترتيب", callback_data="quiz_level")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="quiz_function")],
+            [InlineKeyboardButton("📊 نتائج", callback_data="quiz_result1")]
+        ]
 
-    await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text="اختر نوع الأسئلة:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-    return
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="اختر نوع الأسئلة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # اختيار نوع الاختبار
+    if data.startswith("quiz_"):
+        quiz_type = data.replace("quiz_", "")
+        user_data[user_id]["quiz_type"] = quiz_type
+        user_data[user_id]["q_index"] = 0
+
+        await send_question(update, context)
+        return
 
     # إجابة
     q_data = user_data[user_id]
