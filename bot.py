@@ -9,7 +9,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes
 )
-
+print("BOT IS RUNNING")
 # ================== إعداد MongoDB ==================
 MONGO_URL = os.environ.get("MONGO_URL")
 
