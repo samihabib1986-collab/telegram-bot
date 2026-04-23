@@ -1003,7 +1003,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "bio_u1":
 
     # 🎬 فيديو الوحدة
-    unit_video = UNIT_INTRO_VIDEOS.get("u1")
+        unit_video = UNIT_INTRO_VIDEOS.get("u1")
 
     if unit_video:
         await context.bot.send_video(
@@ -1024,9 +1024,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return
 
     # ================== الأقسام ==================
-if data in ["sec_u1_dam", "sec_u1_ns"]:
+    if data in ["sec_u1_dam", "sec_u1_ns"]:
 
-    section = "dam" if "dam" in data else "ns"
+        section = "dam" if "dam" in data else "ns"
 
     # 🎬 فيديو القسم
     section_video = SECTION_INTRO_VIDEOS.get(section)
