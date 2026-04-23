@@ -118,7 +118,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
-    await update.message.reply_text("اختر /science")
+    if not get_user(user_id).get("approved"):
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
+
+    keyboard = [
+        [InlineKeyboardButton("📚 كتاب العلوم", callback_data="science")]
+    ]
+
+    await update.message.reply_text(
+        "📌 اختر المادة:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 # ================== إرسال سؤال ==================
 async def send_question(update, context):
