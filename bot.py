@@ -988,12 +988,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video_dam")],
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-            [InlineKeyboardButton("📍 موقع", callback_data="where")],
-            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")]
+            [InlineKeyboardButton("📘 تعليل", callback_data="u1_dam_taaleel")],
+            [InlineKeyboardButton("🖼️ صور", callback_data="u1_dam_images")],
+            [InlineKeyboardButton("📍 موقع", callback_data="u1_dam_where")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="u1_dam_level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="u1_dam_result1")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="u1_dam_function")]
         ]
 
         await query.message.reply_text(
@@ -1023,12 +1023,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video_ns")],
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
-            [InlineKeyboardButton("📍 موقع", callback_data="where")],
-            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")]
+            [InlineKeyboardButton("📘 تعليل", callback_data="u1_ns_taaleel")],
+            [InlineKeyboardButton("🖼️ صور", callback_data="u1_ns_images")],
+            [InlineKeyboardButton("📍 موقع", callback_data="u1_ns_where")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="u1_ns_level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="u1_ns_result1")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="u1_ns_function")]
         ]
 
         await query.message.reply_text(
