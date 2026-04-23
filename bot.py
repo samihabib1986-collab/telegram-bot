@@ -48,8 +48,6 @@ SECTION_VIDEOS = {
 uploaded_images = {
     "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ",
     "عظام الوجه": "AgACAgQAAxkBAAIDgmnjuaxzSVnHSg-Ht5sh8MLSRxgDAAJEDGsb4XYhUyf_4zNepyt6AQADAgADbQADOwQ",
-    "مفصل العضد الكتفي": "AgACAgQAAxkBAAIDrGnj2XkC5s_14i-8Zr11ICic-ImxAAJjDGsb4XYhU7x_C70kw-VnAQADAgADbQADOwQ",
-    "مفاصل العمود الفقري": "AgACAgQAAxkBAAIDrmnj2cFsc9BTuUF_6SBSJ5AolzFXAAJkDGsb4XYhU52j6bbeUJdeAQADAgADbQADOwQ",
     "الاربطة والاوتار": "AgACAgQAAxkBAAIDxGnj27EBbQ7NdocwG8BMMx-pXpz0AAJvDGsb4XYhU0SlG3BDNztZAQADAgADbQADOwQ",
 }
 
@@ -73,7 +71,7 @@ subjects = {
             {
                 "type": "image",
                 "image": "الاربطة والاوتار",
-                "question": "ما هو هذا الشكل؟",
+                "question": "ما هي الصورة؟",
                 "options": ["أوتار", "عضلة", "أربطة"],
                 "answer": "أربطة"
             }
@@ -220,7 +218,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ================== إرسال السؤال (مُصلح للصور) ==================
+# ================== إرسال السؤال ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
@@ -245,24 +243,9 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q = q_list[index]
 
-    # ================== هنا إصلاح الصور ==================
-    if q.get("type") == "image":
-        image_id = uploaded_images.get(q["image"])
-
-        await context.bot.send_photo(
-            chat_id=query.message.chat_id,
-            photo=image_id,
-            caption=q["question"]
-        )
-    else:
-        text = q["question"] + "\n\n"
-        for i, opt in enumerate(q["options"]):
-            text += f"{chr(65+i)} - {opt}\n"
-
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text=text
-        )
+    text = q["question"] + "\n\n"
+    for i, opt in enumerate(q["options"]):
+        text += f"{chr(65+i)} - {opt}\n"
 
     keyboard = [[
         InlineKeyboardButton("A", callback_data="0"),
@@ -272,7 +255,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=query.message.chat_id,
-        text="اختر الإجابة:",
+        text=text,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -298,7 +281,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.reply_text("الوحدة 1:", reply_markup=InlineKeyboardMarkup(keyboard))
         return
 
-    # ================== القسم ==================
+    # ================== اختيار القسم ==================
     if data in ["sec_u1_dam", "sec_u1_ns"]:
 
         section = "dam" if "dam" in data else "ns"
@@ -325,7 +308,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.reply_text("اختر نوع الأسئلة:", reply_markup=InlineKeyboardMarkup(keyboard))
         return
 
-    # ================== اختيار نوع السؤال ==================
+    # ================== تحديد نوع السؤال ==================
     if data in ["taaleel", "images", "where", "level", "result1", "function", "compare"]:
 
         if user_id not in user_data:
