@@ -988,16 +988,16 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video_dam")],
-            [InlineKeyboardButton("📘 تعليل", callback_data="u1_dam_taaleel")],
-            [InlineKeyboardButton("🖼️ صور", callback_data="u1_dam_images")],
-            [InlineKeyboardButton("📍 موقع", callback_data="u1_dam_where")],
-            [InlineKeyboardButton("📊 ترتيب", callback_data="u1_dam_level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="u1_dam_result1")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="u1_dam_function")]
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
+            [InlineKeyboardButton("📍 موقع", callback_data="uwhere")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")]
         ]
 
         await query.message.reply_text(
-            "📚 اختر:",
+            "📚 القسم الاول الدعامة والحركة:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
@@ -1008,6 +1008,30 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=query.message.chat_id,
             video=SECTION_VIDEOS["dam"]
         )
+        return
+        
+        # نوع الأسئلة
+    if data in ["taaleel", "images", "where", "level", "result1", "function"]:
+
+        if user_id not in user_data:
+            return
+
+        unit = user_data[user_id]["unit"]
+        section = user_data[user_id]["section"]
+
+        category = f"{unit}_{section}_{data}"
+
+        if category not in subjects["bio"]:
+            await query.message.reply_text("❌ لا يوجد أسئلة لهذا القسم")
+            return
+
+        user_data[user_id]["category"] = category
+
+        keyboard = [[
+            InlineKeyboardButton("▶️ بدء الاختبار", callback_data="start_quiz")
+        ]]
+
+        await query.message.reply_text("ابدأ 👇", reply_markup=InlineKeyboardMarkup(keyboard))
         return
 
     # ================== القسم الثاني ==================
@@ -1022,17 +1046,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         keyboard = [
-            [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video_ns")],
-            [InlineKeyboardButton("📘 تعليل", callback_data="u1_ns_taaleel")],
-            [InlineKeyboardButton("🖼️ صور", callback_data="u1_ns_images")],
-            [InlineKeyboardButton("📍 موقع", callback_data="u1_ns_where")],
-            [InlineKeyboardButton("📊 ترتيب", callback_data="u1_ns_level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="u1_ns_result1")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="u1_ns_function")]
+            [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video_dam")],
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
+            [InlineKeyboardButton("📍 موقع", callback_data="uwhere")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")]
         ]
 
         await query.message.reply_text(
-            "📚 الجهاز العصبي:",
+            "📚 القسم الثاني الجهاز العصبي",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
@@ -1044,6 +1068,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             video=SECTION_VIDEOS["ns"]
         )
         return
+
+        # نوع الأسئلة
+    if data in ["taaleel", "images", "where", "level", "result1", "function"]:
+
+        if user_id not in user_data:
+            return
+
+        unit = user_data[user_id]["unit"]
+        section = user_data[user_id]["section"]
+
+        category = f"{unit}_{section}_{data}"
+
+        if category not in subjects["bio"]:
+            await query.message.reply_text("❌ لا يوجد أسئلة لهذا القسم")
+            return
+
+        user_data[user_id]["category"] = category
+
+        keyboard = [[
+            InlineKeyboardButton("▶️ بدء الاختبار", callback_data="start_quiz")
+        ]]
+
+        await query.message.reply_text("ابدأ 👇", reply_markup=InlineKeyboardMarkup(keyboard))
+        return
+
 
 # ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
