@@ -874,8 +874,15 @@ async def test_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ================== main ==================
+# ================== التوكن ==================
+TOKEN = os.environ.get("TOKEN")
+if not TOKEN:
+    raise ValueError("TOKEN is missing")
+
+
+
 def main():
-    app = Application.builder().token("YOUR_BOT_TOKEN").build()
+    app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
 
