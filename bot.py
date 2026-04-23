@@ -10,11 +10,18 @@ from telegram.ext import (
     ContextTypes
 )
 
-# ================== MongoDB ==================
+# ================== إعدادات ==================
 MONGO_URL = os.environ.get("MONGO_URL")
+TOKEN = os.environ.get("TOKEN")
+ADMIN_ID = 8491023024
+
 if not MONGO_URL:
     raise ValueError("MONGO_URL is missing")
 
+if not TOKEN:
+    raise ValueError("TOKEN is missing")
+
+# ================== MongoDB ==================
 client = MongoClient(MONGO_URL)
 db = client["quiz_bot"]
 users = db["users"]
@@ -22,17 +29,11 @@ users = db["users"]
 # ================== Logging ==================
 logging.basicConfig(level=logging.INFO)
 
-# ================== Token ==================
-TOKEN = os.environ.get("TOKEN")
-if not TOKEN:
-    raise ValueError("TOKEN is missing")
-
-ADMIN_ID = 8491023024
-
-# ================== صور ==================
+# ================== الصور ==================
 uploaded_images = {
     "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ",
-    "عظام الجمجمة": "AgACAgQAAxkBAAIDtmnj2kzpampZCzzZG1R3ukMhOA_LAAJoDGsb4XYhU90RtQhjryIZAQADAgADbQADOwQ"
+    "عظام الوجه": "AgACAgQAAxkBAAIDgmnjuaxzSVnHSg-Ht5sh8MLSRxgDAAJEDGsb4XYhUyf_4zNepyt6AQADAgADbQADOwQ",
+    "القفص الصدري": "AgACAgQAAxkBAAIDvGnj2wKHWoZd-Fnq6VTgtbr_26cXAAJrDGsb4XYhU6gEI1EyrwWmAQADAgADbQADOwQ",
 }
 
 # ================== DB ==================
@@ -53,7 +54,12 @@ def approve_user(user_id):
         upsert=True
     )
 
+# ================== الفيديوهات ==================
+UNIT1_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
+SECTION1_VIDEO = "VIDEO_S1"
+
 # ================== الأسئلة ==================
+
 section1_questions = {
     "function": [
         {
@@ -62,18 +68,37 @@ section1_questions = {
             "answer": "الحماية"
         }
     ],
+
+    "taaleel": [
+        {
+            "question": "علل: أهمية الهيكل العظمي؟",
+            "options": ["للحماية", "للهضم", "للتنفس"],
+            "answer": "للحماية"
+        }
+    ],
+
     "images": [
         {
-            "question": "ما هي هذه الصورة؟",
-            "image": uploaded_images["الهيكل العظمي"],
-            "options": ["الهيكل العظمي", "القلب", "الرئة"],
-            "answer": "الهيكل العظمي"
-        },
+            "image": "الهيكل العظمي",
+            "question": "اختر الجزء الصحيح",
+            "options": ["العمود الفقري", "الهيكل الطرفي", "القفص الصدري"],
+            "answer": "العمود الفقري"
+        }
+    ],
+
+    "where": [
         {
-            "question": "ما هي هذه الصورة؟",
-            "image": uploaded_images["عظام الجمجمة"],
-            "options": ["عظام الجمجمة", "عظام اليد", "العمود الفقري"],
-            "answer": "عظام الجمجمة"
+            "question": "أين يوجد الهيكل العظمي؟",
+            "options": ["داخل الجسم", "خارج الجسم", "في الدم"],
+            "answer": "داخل الجسم"
+        }
+    ],
+
+    "level": [
+        {
+            "question": "رتب مراحل الحماية",
+            "options": ["عظام → حماية", "دم → حماية", "هواء → حماية"],
+            "answer": "عظام → حماية"
         }
     ]
 }
@@ -81,15 +106,12 @@ section1_questions = {
 # ================== الهيكل ==================
 subjects = {
     "science": {
-        "title": "📚 كتاب العلوم",
         "units": {
             "u1": {
-                "title": "📘 الوحدة الأولى",
-                "video": "UNIT_VIDEO",
+                "video": UNIT1_VIDEO,
                 "sections": {
                     "s1": {
-                        "title": "📂 الجهاز الدعامي",
-                        "video": "SECTION_VIDEO",
+                        "video": SECTION1_VIDEO,
                         "questions": section1_questions
                     }
                 }
@@ -98,7 +120,7 @@ subjects = {
     }
 }
 
-# ================== user data ==================
+# ================== بيانات المستخدم ==================
 user_data = {}
 
 # ================== START ==================
@@ -119,27 +141,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await update.message.reply_text(
-        "📌 اختر المادة:",
+        "اختر الكتاب:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
-
-# ================== paid ==================
-async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    create_user(user_id)
-
-    await context.bot.send_message(chat_id=ADMIN_ID, text=f"/approve {user_id}")
-    await update.message.reply_text("تم إرسال طلبك")
-
-# ================== approve ==================
-async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
-        return
-
-    user_id = int(context.args[0])
-    approve_user(user_id)
-
-    await context.bot.send_message(chat_id=user_id, text="تم التفعيل /start")
 
 # ================== إرسال سؤال ==================
 async def send_question(update, context):
@@ -148,28 +152,22 @@ async def send_question(update, context):
 
     data = user_data[user_id]
 
-    unit = data["unit"]
-    sec = data["section"]
-    quiz_type = data.get("quiz_type", "function")
+    q_list = subjects["science"]["units"]["u1"]["sections"]["s1"]["questions"][data["quiz_type"]]
+    q = q_list[data["q_index"]]
 
-    q_list = subjects["science"]["units"][unit]["sections"][sec]["questions"].get(quiz_type, [])
+    # ================== عرض صورة إن وجدت ==================
+    if "image" in q:
+        img_id = uploaded_images.get(q["image"])
+        if img_id:
+            await context.bot.send_photo(
+                chat_id=query.message.chat_id,
+                photo=img_id
+            )
 
-    index = data["q_index"]
-
-    if index >= len(q_list):
-        await context.bot.send_message(chat_id=query.message.chat_id, text="انتهى الاختبار")
-        return
-
-    q = q_list[index]
-
-    if quiz_type == "images":
-        await context.bot.send_photo(
-            chat_id=query.message.chat_id,
-            photo=q["image"],
-            caption=q["question"]
-        )
-    else:
-        await context.bot.send_message(chat_id=query.message.chat_id, text=q["question"])
+    # ================== نص السؤال ==================
+    text = q["question"] + "\n\n"
+    for i, opt in enumerate(q["options"]):
+        text += f"{chr(65+i)}- {opt}\n"
 
     keyboard = [
         [
@@ -179,17 +177,13 @@ async def send_question(update, context):
         ]
     ]
 
-    text = ""
-    for i, opt in enumerate(q["options"]):
-        text += f"{chr(65+i)}- {opt}\n"
-
     await context.bot.send_message(
         chat_id=query.message.chat_id,
         text=text,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ================== buttons ==================
+# ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -197,78 +191,49 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
+    # اختيار الكتاب
     if data == "science":
-        keyboard = [
-            [InlineKeyboardButton("📘 الوحدة الأولى", callback_data="u1")]
-        ]
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="اختر الوحدة:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
-
-    if data.startswith("u"):
         user_data[user_id] = {
-            "unit": data,
+            "quiz_type": "function",
             "q_index": 0
         }
 
-        keyboard = [
-            [InlineKeyboardButton("📂 الجهاز الدعامي", callback_data="sec_s1")]
-        ]
-
         await context.bot.send_message(
             chat_id=query.message.chat_id,
-            text="اختر القسم:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            text="تم اختيار الكتاب"
         )
-        return
-
-    if data.startswith("sec_"):
-        sec = data.split("_")[1]
-
-        user_data[user_id]["section"] = sec
-        user_data[user_id]["q_index"] = 0
-
-        keyboard = [
-            [InlineKeyboardButton("🧠 أسئلة عادية", callback_data="quiz_function")],
-            [InlineKeyboardButton("🖼 صور", callback_data="quiz_images")]
-        ]
-
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="اختر نوع الأسئلة:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return
-
-    if data.startswith("quiz_"):
-        user_data[user_id]["quiz_type"] = data.replace("quiz_", "")
-        user_data[user_id]["q_index"] = 0
 
         await send_question(update, context)
         return
 
+    # اختيار الإجابة
     q_data = user_data[user_id]
-    q_list = subjects["science"]["units"][q_data["unit"]]["sections"][q_data["section"]]["questions"][q_data["quiz_type"]]
+
+    q_list = subjects["science"]["units"]["u1"]["sections"]["s1"]["questions"][q_data["quiz_type"]]
     q = q_list[q_data["q_index"]]
 
-    if q["options"][int(data)] == q["answer"]:
-        await context.bot.send_message(chat_id=query.message.chat_id, text="✅ صحيح")
-    else:
-        await context.bot.send_message(chat_id=query.message.chat_id, text=f"❌ خطأ\n{q['answer']}")
+    chosen = q["options"][int(data)]
 
+    if chosen == q["answer"]:
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="✅ صحيح"
+        )
+    else:
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text=f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
+        )
+
+    # السؤال التالي
     user_data[user_id]["q_index"] += 1
     await asyncio.sleep(1)
     await send_question(update, context)
 
-# ================== run ==================
+# ================== تشغيل البوت ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("paid", paid))
-app.add_handler(CommandHandler("approve", approve))
 app.add_handler(CallbackQueryHandler(button))
 
 app.run_polling()
