@@ -955,6 +955,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [InlineKeyboardButton("🎬 فيديو الوحدة", callback_data="unit_video")],
             [InlineKeyboardButton("القسم الأول: الدعامي الحركي", callback_data="sec_u1_dam")]
+            [InlineKeyboardButton("القسم الثاني: الجهاز العصبي", callback_data="sec_u1_ns")]
         ]
         await query.message.reply_text("📘 الوحدة 1:", reply_markup=InlineKeyboardMarkup(keyboard))
         return
@@ -967,10 +968,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # القسم
-    if data == "sec_u1_dam":
+# ===== القسم الال ===== 
+        if data == "sec_u1_dam":
 
-        user_data[user_id] = {
+            user_data[user_id] = {
             "subject": "bio",
             "unit": "u1",
             "section": "dam",
@@ -990,12 +991,41 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await query.message.reply_text("📚 اختر:", reply_markup=InlineKeyboardMarkup(keyboard))
         return
+            # فيديو القسم
+        if data == "section_video":
+            await context.bot.send_video(
+            chat_id=query.message.chat_id,
+            video=SECTION_VIDEOS["dam"]
+        )
+        return
+        # ===== القسم الثاني =====
+    if data == "sec_u1_ns":
+        user_data[user_id] = {
+            "subject": "bio",
+            "unit": "u1",
+            "section": "ns",
+            "score": 0,
+            "q_index": 0
+        }
+
+        keyboard = [
+            [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video")],
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+            [InlineKeyboardButton("🖼️ صور", callback_data="images")],
+            [InlineKeyboardButton("📍 موقع", callback_data="where")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")]
+        ]
+
+        await query.message.reply_text("📚 الجهاز العصبي:", reply_markup=InlineKeyboardMarkup(keyboard))
+        return
 
     # فيديو القسم
     if data == "section_video":
         await context.bot.send_video(
             chat_id=query.message.chat_id,
-            video=SECTION_VIDEOS["dam"]
+            video=SECTION_VIDEOS["ns"]
         )
         return
 
