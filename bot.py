@@ -1024,44 +1024,44 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return
 
 # ================== الأقسام ==================
-if data in ["sec_u1_dam", "sec_u1_ns"]:
+    if data in ["sec_u1_dam", "sec_u1_ns"]:
 
-    section = "dam" if "dam" in data else "ns"
+        section = "dam" if "dam" in data else "ns"
 
     # 🎬 فيديو القسم
-    section_video = SECTION_INTRO_VIDEOS.get(section)
+        section_video = SECTION_INTRO_VIDEOS.get(section)
 
-    if section_video:
-        await context.bot.send_video(
-            chat_id=query.message.chat_id,
-            video=section_video,
-            caption="🎬 مقدمة القسم"
+        if section_video:
+            await context.bot.send_video(
+                chat_id=query.message.chat_id,
+                video=section_video,
+                caption="🎬 مقدمة القسم"
+            )
+
+        user_data[user_id] = {
+            "subject": "bio",
+            "unit": "u1",
+            "section": section,
+            "score": 0,
+            "q_index": 0
+        }
+
+        keyboard = [
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+            [InlineKeyboardButton("🖼 صور", callback_data="images")],
+            [InlineKeyboardButton("📍 موقع", callback_data="where")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
+            [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
+        ]
+
+        await query.message.reply_text(
+         "اختر نوع الأسئلة:",
+         reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
-    user_data[user_id] = {
-        "subject": "bio",
-        "unit": "u1",
-        "section": section,
-        "score": 0,
-        "q_index": 0
-    }
-
-    keyboard = [
-        [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-        [InlineKeyboardButton("🖼 صور", callback_data="images")],
-        [InlineKeyboardButton("📍 موقع", callback_data="where")],
-        [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
-        [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
-        [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
-        [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
-    ]
-
-    await query.message.reply_text(
-        "اختر نوع الأسئلة:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
-    return
+        return
     # ================== اختيار نوع السؤال ==================
     if data in ["taaleel", "images", "where", "level", "result1", "function", "compare"]:
 
