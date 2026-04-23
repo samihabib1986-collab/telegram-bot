@@ -1,896 +1,273 @@
 import os
+import logging
+import asyncio
+from pymongo import MongoClient
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes
+)
 
-# ================== البيانات ==================
+# ================== MongoDB ==================
+MONGO_URL = os.environ.get("MONGO_URL")
+if not MONGO_URL:
+    raise ValueError("MONGO_URL is missing")
+
+client = MongoClient(MONGO_URL)
+db = client["quiz_bot"]
+users = db["users"]
+
+# ================== Logging ==================
+logging.basicConfig(level=logging.INFO)
+
+# ================== Token ==================
+TOKEN = os.environ.get("TOKEN")
+if not TOKEN:
+    raise ValueError("TOKEN is missing")
+
+ADMIN_ID = 8491023024
+
+# ================== DB Functions ==================
+def get_user(user_id):
+    return users.find_one({"_id": user_id})
+
+def create_user(user_id):
+    users.update_one(
+        {"_id": user_id},
+        {"$setOnInsert": {"approved": False}},
+        upsert=True
+    )
+
+def approve_user(user_id):
+    users.update_one(
+        {"_id": user_id},
+        {"$set": {"approved": True}},
+        upsert=True
+    )
+
+# ================== فيديوهات ==================
+UNIT1_VIDEO = "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
+SECTION1_VIDEO = "VIDEO_S1"
+SECTION2_VIDEO = "VIDEO_S2"
+SECTION3_VIDEO = "VIDEO_S3"
+
+# ================== أسئلة (مثال) ==================
+section1_questions = [
+    {
+        "question": "ما وظيفة الهيكل العظمي؟",
+        "options": ["الحماية", "الهضم", "التنفس"],
+        "answer": "الحماية"
+    }
+]
+
+section2_questions = [
+    {
+        "question": "ما وظيفة الجهاز العصبي؟",
+        "options": ["الهضم", "التنسيق", "الإخراج"],
+        "answer": "التنسيق"
+    }
+]
+
+section3_questions = [
+    {
+        "question": "ما وظيفة الغدد الصماء؟",
+        "options": ["إفراز هرمونات", "هضم", "تنفس"],
+        "answer": "إفراز هرمونات"
+    }
+]
+
+# ================== الهيكل الجديد ==================
 subjects = {
-    "bio": {
+    "science": {
+        "title": "📚 كتاب العلوم",
+
         "units": {
             "u1": {
-                "name": "الدعامة والتنسيق",
-                "tests": {
-                    "taaleel": [
-                                    {
-"question": "1. لماذا عظم الفك السفلي متحرك؟",
-"options": [" لتسهيل التنفس"," لتسهيل المضغ والنطق "," لحماية الدماغ"],
-"answer": " لتسهيل المضغ والنطق "
-},
-
-
-
-{
-"question": "2. لماذا توجد فتحات عظمية في عظام القحف عند الرضيع؟",
-"options": [" لتخفيف وزن الرأس"," لتسهيل التنفس","لتسمح لدماغ الرضيع بالنمو"],
-"answer": "لتسمح لدماغ الرضيع بالنمو"
-},
-
-
-
-{
-"question": "3. لماذا توجد أقراص غضروفية بين فقرات العمود الفقري؟",
-"options": ["لمنع احتكاك الفقرات مع بعضها البعض"," لزيادة الطول"," لتقوية العضلات"],
-"answer": "لمنع احتكاك الفقرات مع بعضها البعض"
-},
-
-
-
-{
-"question": "4. لماذا يزداد طول رواد الفضاء؟",
-"options": [" بسبب زيادة الكالسيوم"," بسبب غياب الجاذبية\n مما يقلل الضغط على الفقرات "," بسبب التمارين الرياضية"],
-"answer": " بسبب غياب الجاذبية مما يقلل الضغط على الفقرات "
-},
-
-
-
-{
-"question": "5. لماذا سميت الأضلاع السائبة بهذا الاسم؟",
-"options": [" لأنها ضعيفة"," لأنها قصيرة"," لأنها لا تتصل مع عظم القص من الأمام "],
-"answer": " لأنها لا تتصل مع عظم القص من الأمام "
-},
-
-
-
-{
-"question": "6. لماذا لا يمكن ثني الساعد نحو الخلف؟",
-"options": [" بسبب العضلات"," بسبب المفصل","لوجود نتوء مرفقي في نهاية الزند العليا"],
-"answer": "لوجود نتوء مرفقي في نهاية الزند العليا"
-},
-
-
-
-{
-"question": "7. لماذا لا يمكن ثني الساق نحو الأمام؟",
-"options": [" بسبب الأربطة"," لوجود عظم الرضفة في مفصل الركبة "," بسبب العضلات"],
-"answer": " لوجود عظم الرضفة في مفصل الركبة "
-},
-
-
-
-{
-"question": "8. لماذا عدد العظام عند البالغ أقل من الطفل؟",
-"options": [" لأن بعضها يتآكل"," لأن الجسم يفقد عظام"," لأن العديد منها يلتحم خلال النمو "],
-"answer": " لأن العديد منها يلتحم خلال النمو "
-},
-
-
-
-{
-"question": "9. لماذا توجد ثقوب في جسم العظم الطويل؟",
-"options": [" لمرور الأوعية الدموية والأعصاب داخل العظم "," لتخفيف الوزن"," لتخزين الدهون"],
-"answer": " لمرور الأوعية الدموية والأعصاب داخل العظم "
-},
-
-
-
-{
-"question": "10. لماذا للهيكل العظمي دور في تكوين خلايا الدم؟",
-"options": [" لأنه يخزن الدم"," لأنه يولد كريات الدم الحمراء والبيضاء والصفيحات "," لأنه ينقل الدم"],
-"answer": " لأنه يولد كريات الدم الحمراء والبيضاء والصفيحات "
-},
-{
-"question": "11. لماذا تتصف العظام بالصلابة والقساوة؟",
-"options": [" لوجود الروابط الوثيقة بين أملاح الكالسيوم ومادة العظم "," بسبب العضلات"," لاحتوائها على ماء"],
-"answer": " لوجود الروابط الوثيقة بين أملاح الكالسيوم ومادة العظم "
-},
-
-
-
-{
-"question": "12. لماذا عظام القحف غير متحركة؟",
-"options": [" لأنها صغيرة"," لأن المفاصل بينها ثابتة "," لأنها خفيفة"],
-"answer": " لأن المفاصل بينها ثابتة "
-},
-
-
-
-{
-"question": "13. لماذا فقرات العمود الفقري محدودة الحركة؟",
-"options": [" لأنها ضعيفة"," لأن المفاصل بينها نصف متحركة "," لأنها كثيرة"],
-"answer": " لأن المفاصل بينها نصف متحركة "
-},
-
-
-
-{
-"question": "14. لماذا حركة المفصل العضدي الكتفي واسعة؟",
-"options": [" لأنه ثابت"," لأنه مفصل متحرك "," لأنه صغير"],
-"answer": " لأنه مفصل متحرك "
-},
-
-
-
-{
-"question": "15. لماذا يحدث خلع المفصل؟",
-"options": [" بسبب كسر العظم"," بسبب خروج العظم من مكانه الطبيعي "," بسبب ضعف العضلات"],
-"answer": " بسبب خروج العظم من مكانه الطبيعي "
-},
-
-
-
-{
-"question": "16. لماذا للسمحاق دور في جبر الكسور؟",
-"options": [" لأنه يفرز مادة تساعد على وصل العظم المكسور "," لأنه صلب"," لأنه يحمي العظم"],
-"answer": " لأنه يفرز مادة تساعد على وصل العظم المكسور "
-},
-
-
-
-{
-"question": "17. لماذا يتوقف النمو الطولي عند عمر 18 سنة؟",
-"options": [" بسبب نقص الغذاء"," بسبب تعظم غضاريف النمو "," بسبب قلة الحركة"],
-"answer": " بسبب تعظم غضاريف النمو "
-},
-
-
-
-{
-"question": "18. لماذا تسمى العضلات الملساء عضلات حشوية؟",
-"options": [" لأنها قوية"," لوجودها في جدران الأحشاء (المعدة والأمعاء) "," لأنها سريعة"],
-"answer": " لوجودها في جدران الأحشاء (المعدة والأمعاء) "
-},
-
-
-
-{
-"question": "19. لماذا تسمى العضلات المخططة عضلات هيكلية؟",
-"options": [" لأنها كبيرة"," لأنها بطيئة"," لأنها مرتبطة بالعظام في الهيكل العظمي "],
-"answer": " لأنها مرتبطة بالعظام في الهيكل العظمي "
-},
-
-
-
-{
-"question": "20. لماذا تعود العضلة إلى وضعها الطبيعي بعد الشد؟",
-"options": [" لأنها تتمتع بخاصية المرونة "," بسبب الأعصاب"," بسبب الدم"],
-"answer": " لأنها تتمتع بخاصية المرونة "
-},
-
-
-
-{
-"question": "21. لماذا عضلات الرقبة والفك السفلي لا تتعب بسهولة؟",
-"options": ["لأنها تتمتع بخاصية المقوية العضلية (تحافظ على تقلصها)","لأنها صغيرة","لأنها سريعة"],
-"answer": "لأنها تتمتع بخاصية المقوية العضلية (تحافظ على تقلصها)"
-},
-
-
-
-{
-"question": "22. لماذا تبقى الرأس منتصبة أثناء اليقظة؟",
-"options": ["بسبب العظام","بسبب الأعصاب","لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"],
-"answer": "لأن عضلات الرقبة تتمتع بخاصية المقوية العضلية"
-},
-                        ],
-                    "image": [
-                        {
-"type": "image",
-"image": "الهيكل العظمي",
-"question": "7",
-"options": ["العمود الفقري","الهيكل الطرفي","الاضلاع"],
-"answer": "العمود الفقري"
-},
-
-{
-"type": "image",
-"image": "عظام الوجه",
-"question": "2",
-"options": [" الفك السفلي","عظام جوف الحجاج","الفك العلوي"],
-"answer": "عظام جوف الحجاج"
-},
-{
-"type": "image",
-"image": "عظام الوجه",
-"question": "1",
-"options": ["عظام جوف الحجاج","عظام الانف"," الفك السفلي"],
-"answer": "عظام الانف"
-},
-
-{
-"type": "image",
-"image": "مفصل العضد الكتفي",
-"question": "1",
-"options": ["عظم لوح الكتف","عظم العضد","عظم الترقوة"],
-"answer": "عظم لوح الكتف"
-},
-
-{
-"type": "image",
-"image": "مفاصل العمود الفقري",
-"question": "7",
-"options": ["النخاع الشوكي","جسم الفقرة","القرص الغضروفي"],
-"answer": "القرص الغضروفي"
-},
-
-{
-"type": "image",
-"image": "عظام الطرف العلوي",
-"question": "16",
-"options": ["عظم الزند","عظم العضد","عظم الكعبرة"],
-"answer": "عظم الكعبرة"
-},
-
-{
-"type": "image",
-"image": "عظام الطرف العلوي",
-"question": "19",
-"options": ["اليد","الساعد","عظام السلاميات"],
-"answer": "عظام السلاميات"
-},
-
-
-
-
-{
-"type": "image",
-"image": "عظام الطرف العلوي",
-"question": "15",
-"options": ["عظم العضد","عظم الزند","عظم الكعبرة"],
-"answer": "عظم الزند"
-},
-
-{
-"type": "image",
-"image": "عظام الطرف السفلي",
-"question": "4",
-"options": ["عظم الرضفة","عظم الورك","عظم الفخد"],
-"answer": "عظم الرضفة"
-},
-
-{
-"type": "image",
-"image": "عظام الطرف السفلي",
-"question": "5",
-"options": ["عظم الظنبوب","عظم الشظية","عظم الفخد"],
-"answer": "عظم الظنبوب"
-},
-
-{
-"type": "image",
-"image": "عظام الطرف السفلي",
-"question": "10",
-"options": ["القدم","الساق","عظم الورك"],
-"answer": "الساق"
-},
-
-{
-"type": "image",
-"image": "عظام الجمجمة",
-"question": "3",
-"options": ["العظم الصدغي","العظم الجداري","العظم القفوي"],
-"answer": "العظم الصدغي"
-},
-{
-"type": "image",
-"image": "عظام الجمجمة",
-"question": "4",
-"options": ["العظم القفوي","العظم الجداري","العظم الصدغي"],
-"answer": "العظم القفوي"
-},
-
-{
-"type": "image",
-"image": "بنية العظم الطويل",
-"question": "3",
-"options": ["المشاشة","نقي العظم","نسيج عظمي كثيف"],
-"answer": "نقي العظم"
-},
-
-{
-"type": "image",
-"image": "القناة الفقرية",
-"question": "5",
-"options": ["النتوء الجانبي","قرص غضروفي","النتوء الشوكي"],
-"answer": "النتوء الشوكي"
-},
-
-{
-"type": "image",
-"image": "القفص الصدري",
-"question": "5",
-"options": ["الاضلاع","الاضلاع السائبة","العمود الفقري"],
-"answer": "الاضلاع السائبة"
-},
-
-{
-"type": "image",
-"image": "القفص الصدري",
-"question": "2",
-"options": ["عظم القص","الاضلاع","العمود الفقري"],
-"answer": "عظم القص"
-},
-
-{
-"type": "image",
-"image": "الفقرة",
-"question": "5",
-"options": ["سطح مفصلي","نتوء جانبي","ثقب فقري"],
-"answer": "نتوء جانبي"
-},
-
-{
-"type": "image",
-"image": "الفقرة",
-"question": "3",
-"options": ["ثقب فقري","نتوء شوكي","سطح مفصلي"],
-"answer": "سطح مفصلي"
-},
-
-{
-"type": "image",
-"image": "العمود الفقري",
-"question": "5",
-"options": ["الفقرات العصعصية","الفقرات الظهرية","الفقرات القطنية"],
-"answer": "الفقرات العصعصية"
-},
-
-{
-"type": "image",
-"image": "العمود الفقري",
-"question": "4",
-"options": ["الفقرات القطنية","الفقرات العجزية","الفقرات الظهرية"],
-"answer": "الفقرات العجزية"
-},
-
-{
-"type": "image",
-"image": "الزنار الحوضي",
-"question": "6",
-"options": ["العصعص","العظم العاني","العجز"],
-"answer": "العظم العاني"
-},
-
-{
-"type": "image",
-"image": "الاربطة والاوتار",
-"question": "2",
-"options": ["اوتار","عضلة","اربطة"],
-"answer": "اربطة"
-},
-                    ],
-                    "where": [
-                        {
-"question": "1. أين يقع النتوء المرفقي؟",
-"options": ["في عظم الفخذ","في نهاية عظم الزند العليا","في عظم العضد"],
-"answer": "في نهاية عظم الزند العليا"
-},
-
-
-
-{
-"question": "2. أين يوجد عظم الرضفة؟",
-"options": ["في مفصل الكتف","في مفصل الركبة","في الكاحل"],
-"answer": "في مفصل الركبة"
-},
-
-
-
-{
-"question": "3. أين يوجد عظم الكعبرة وعظم الزند؟",
-"options": ["في الساق","في الجمجمة","في الساعد ضمن الطرف العلوي"],
-"answer": "في الساعد ضمن الطرف العلوي"
-},
-
-
-
-{
-"question": "4. أين يوجد عظم الظنبوب وعظم الشظية؟",
-"options": ["في الذراع","في الساق ضمن الطرف السفلي","في الصدر"],
-"answer": "في الساق ضمن الطرف السفلي"
-},
-
-
-
-{
-"question": "5. اين تقع المشاشتان؟",
-"options": ["عضلات","نهايتان منتفختان للعظم الطويل","أربطة"],
-"answer": "نهايتان منتفختان للعظم الطويل"
-},
-
-
-
-{
-"question": "6. أين يقع جسم العظم؟",
-"options": ["في نهايات العظم","بين المشاشتين (القسم المتوسط)","خارج العظم"],
-"answer": "بين المشاشتين (القسم المتوسط)"
-},
-
-
-
-{
-"question": "7. أين توجد النتوءات؟",
-"options": ["على سطح الجلد","داخل العضلات","على جسم العظم"],
-"answer": ""
-},
-
-
-
-{
-"question": "8. أين توجد الثقوب في العظم؟",
-"options": ["في الجلد","في القلب","على جسم العظم"],
-"answer": ""
-},
-
-
-
-{
-"question": "9. أين يوجد السمحاق؟",
-"options": ["داخل العظم","يغطي جسم العظم","داخل العضلات"],
-"answer": "يغطي جسم العظم"
-},
-
-
-
-{
-"question": "10. أين يوجد النسيج العظمي الكثيف؟",
-"options": ["خارج العظم","في الجلد","يلي السمحاق في جسم العظم الطويل"],
-"answer": "يلي السمحاق في جسم العظم الطويل"
-},
-
-
-
-{
-"question": "11. أين توجد القناة المركزية؟",
-"options": ["في الجلد","ضمن النسيج العظمي الكثيف","في العضلات"],
-"answer": "ضمن النسيج العظمي الكثيف"
-},
-
-
-
-{
-"question": "12. أين يوجد نقي العظم؟",
-"options": ["في القلب","في الدم","داخل القناة المركزية والنسيج الإسفنجي"],
-"answer": "داخل القناة المركزية والنسيج الإسفنجي"
-},
-
-
-
-{
-"question": "13. أين يوجد النسيج العظمي الإسفنجي؟",
-"options": ["في المشاشتين","في الجلد","في العضلات"],
-"answer": "في المشاشتين"
-},
-
-
-
-{
-"question": "14. أين يوجد النسيج الغضروفي؟",
-"options": ["يستر المشاشتين","في الجلد","في القلب"],
-"answer": "يستر المشاشتين"
-},
-
-
-
-{
-"question": "15. أين توجد غضاريف النمو (غضاريف الاتصال)؟",
-"options": ["بين جسم العظم والمشاشتين","في العضلات","في الجلد"],
-"answer": "بين جسم العظم والمشاشتين"
-},
-
-
-
-{
-"question": "16. أين توجد العضلات الملساء (الحشوية)؟",
-"options": ["في جدران الأحشاء","في العظام","في الجلد"],
-"answer": "في جدران الأحشاء"
-},
-
-
-
-{
-"question": "17. أين توجد العضلات المخططة (الهيكلية)؟",
-"options": ["في القلب","تستند على الهيكل العظمي","في المعدة"],
-"answer": "تستند على الهيكل العظمي"
-},
-
-                    ],
-                    "level": [
-                        {
-"question": "1. بنية العظم من الخارج للداخل:",
-"options": ["نسيج كثيف⬅️ السمحاق⬅️ قناة مركزية","السمحاق⬅️ نسيج عظمي كثيف⬅️ قناة مركزية","قناة مركزية⬅️ نسيج كثيف⬅️ السمحاق"],
-"answer": "السمحاق⬅️ نسيج عظمي كثيف⬅️ قناة مركزية"
-},
-
-
-{
-"question": "2. أغشية السحايا من الخارج للداخل:",
-"options": ["العنكبوتي⬅️ الجافية⬅️ الحنون","الجافية⬅️ العنكبوتي⬅️ الحنون","الأم الحنون⬅️ العنكبوتي⬅️ الجافية"],
-"answer": "الجافية⬅️ العنكبوتي⬅️ الحنون"
-},
-
-
-{
-"question": "3. انتقال السيالة في العصبون:",
-"options": ["استطالات⬅️ جسم الخلية⬅️ المحور⬅️ الأزرار","المحور⬅️ جسم الخلية⬅️ استطالات⬅️ الأزرار","جسم الخلية⬅️ استطالات⬅️ المحور⬅️ الأزرار"],
-"answer": "استطالات⬅️ جسم الخلية⬅️ المحور⬅️ الأزرار"
-},
-
-
-{
-"question": "4. عناصر القوس الانعكاسية:",
-"options": ["عصب محرك⬅️ مستقبل⬅️ مركز⬅️ عضو","مستقبل⬅️ عصب حسي⬅️ مركز⬅️ عصب محرك⬅️ عضو منفذ","مركز⬅️ مستقبل⬅️ عصب⬅️ عضو"],
-"answer": "مستقبل⬅️ عصب حسي⬅️ مركز⬅️ عصب محرك⬅️ عضو منفذ"
-},
-
-
-{
-"question": "5. فقرات العمود الفقري من الأعلى:",
-"options": ["قطني⬅️ رقبي⬅️ ظهري⬅️ عجزي⬅️ عصعصي","عصعصي⬅️ عجزي⬅️ قطني⬅️ ظهري⬅️ رقبي","رقبي⬅️ ظهري⬅️ قطني⬅️ عجزي⬅️ عصعصي"],
-"answer": "رقبي⬅️ ظهري⬅️ قطني⬅️ عجزي⬅️ عصعصي"
-},
-
-
-{
-"question": "6. بنية العصب من الخارج للداخل:",
-"options": ["غمد العصب⬅️ غلاف الحزمة⬅️ ليف عصبي","غلاف⬅️ ليف⬅️ غمد","ليف⬅️ غمد⬅️ غلاف"],
-"answer": "غمد العصب⬅️ غلاف الحزمة⬅️ ليف عصبي"
-},
-
-
-{
-"question": "7. ترتيب شقوق المخ حسب العمق:",
-"options": ["الأمامي الخلفي⬅️ رولاندو وسيلفيوس","سيلفيوس⬅️ الأمامي","رولاندو⬅️ الأمامي الخلفي"],
-"answer": "الأمامي الخلفي⬅️ رولاندو وسيلفيوس"
-},
-
-
-{
-"question": "8. نمو العظام طولياً:",
-"options": ["تعظم⬅️ انقسام","انقسام خلايا الغضروف⬅️ تعظمها","تعظم فقط"],
-"answer": "انقسام خلايا الغضروف⬅️ تعظمها"
-},
-
-
-{
-"question": "9. عمل الهرمون:",
-"options": ["إفراز⬅️ انتقال⬅️ تأثير","تأثير⬅️ إفراز⬅️ انتقال","انتقال⬅️ إفراز⬅️ تأثير"],
-"answer": "إفراز⬅️ انتقال⬅️ تأثير"
-},
-
-
-{
-"question": "10. ترتيب عظام الطرف العلوي:",
-"options": ["يد⬅️ ساعد⬅️ عضد","عضد⬅️ ساعد⬅️ يد","ساعد⬅️ عضد⬅️ يد"],
-"answer": "عضد⬅️ ساعد⬅️ يد"
-},
-                    ],
-                    "result": [
-                        {
-"question": "1. ماذا ينتج عن غياب الجاذبية لرواد الفضاء؟",
-"options": [" زيادة طولهم من 2 إلى 5 سم"," نقص طولهم بسبب الضغط"," ثبات الطول دون تغيير"],
-"answer": " زيادة طولهم من 2 إلى 5 سم"
-},
-
-
-
-{
-"question": "2. ماذا ينتج عن انقسام خلايا السمحاق؟",
-"options": [" النمو الطولي للعظام"," النمو العرضي للعظام"," توقف نمو العظام"],
-"answer": " النمو العرضي للعظام"
-},
-
-
-
-{
-"question": "3. ماذا ينتج عن انقسام خلايا غضاريف النمو؟",
-"options": [" النمو العرضي للعظام"," النمو الطولي للعظام"," تكلس العظم فقط"],
-"answer": " النمو الطولي للعظام"
-},
-
-
-
-{
-"question": "4. ماذا ينتج عن تعظم غضاريف النمو عند سن 18؟",
-"options": [" استمرار النمو الطولي"," توقف النمو الطولي للإنسان"," زيادة النمو العرضي فقط"],
-"answer": " توقف النمو الطولي للإنسان"
-},
-
-
-
-{
-"question": "5. ماذا ينتج عن تنبيه الليف العصبي بمنبه ما؟",
-"options": [" تشكل السيالة العصبية"," توقف السيالة العصبية"," تحلل الليف العصبي"],
-"answer": " تشكل السيالة العصبية"
-},
-
-
-
-{
-"question": "6. ماذا ينتج عن تكرار المعلومات وحفظها؟",
-"options": [" ضعف الذاكرة"," تنشيط الذاكرة وتجنب النسيان"," فقدان المعلومات"],
-"answer": " تنشيط الذاكرة وتجنب النسيان"
-},
-
-
-
-{
-"question": "7. ماذا ينتج عن استئصال المخيخ عند الطيور؟",
-"options": [" فقدان الإبصار"," فقدان التوازن والتمايل في المشي"," شلل كامل للجسم"],
-"answer": " فقدان التوازن والتمايل في المشي"
-},
-
-
-
-{
-"question": "8. ماذا ينتج عن قطع الجذر الخلفي الحسي للعصب الشوكي؟",
-"options": [" شلل العضلات"," فقدان الإحساس في المنطقة الموافقة"," زيادة الحركة"],
-"answer": " فقدان الإحساس في المنطقة الموافقة"
-},
-
-
-
-{
-"question": "9. ماذا ينتج عن قطع الجذر الأمامي المحرك للعصب الشوكي؟",
-"options": [" فقدان الإحساس"," شلل العضلات المرتبطة به"," زيادة الحساسية"],
-"answer": " شلل العضلات المرتبطة به"
-},
-
-
-
-{
-"question": "10. ماذا ينتج عن تأثير الجملة الودية في حدقة العين؟",
-"options": [" تضيق حدقة العين"," توسع حدقة العين"," ثبات حجم الحدقة"],
-"answer": " توسع حدقة العين"
-},
-
-
-
-{
-"question": "11. ماذا ينتج عن زيادة إفراز هرمون النمو قبل البلوغ؟",
-"options": [" القزامة"," حالة العملقة"," توقف النمو"],
-"answer": " حالة العملقة"
-},
-
-
-
-{
-"question": "12. ماذا ينتج عن نقص إفراز هرمون النمو قبل البلوغ؟",
-"options": [" حالة القزامة"," العملقة"," تضخم العظام"],
-"answer": " حالة القزامة"
-},
-
-
-
-{
-"question": "13. ماذا ينتج عن زيادة إفراز هرمون النمو بعد البلوغ؟",
-"options": [" تضخم غير متناسق لعظام الوجه والأطراف"," توقف النمو"," نقص في حجم العظام"],
-"answer": " تضخم غير متناسق لعظام الوجه والأطراف"
-},
-
-
-
-{
-"question": "14. ماذا ينتج عن نقص إفراز الأنسولين؟",
-"options": [" انخفاض سكر الدم"," ارتفاع سكر الدم والإصابة بالسكري"," ثبات مستوى السكر"],
-"answer": " ارتفاع سكر الدم والإصابة بالسكري"
-},
-
-
-
-{
-"question": "15. ماذا ينتج عن زيادة إفراز التيروكسين؟",
-"options": [" زيادة الوزن"," نقص في الوزن وزيادة في إنتاج الطاقة"," توقف إنتاج الطاقة"],
-"answer": " نقص في الوزن وزيادة في إنتاج الطاقة"
-},
-
-
-
-{
-"question": "16. ماذا ينتج عن نقص إفراز التيروكسين؟",
-"options": [" نقص الوزن"," زيادة الوزن وعدم القدرة على مقاومة البرد"," زيادة الطاقة"],
-"answer": " زيادة الوزن وعدم القدرة على مقاومة البرد"
-},
-
-
-
-{
-"question": "17. ماذا ينتج عن نقص إفراز الكورتيزول؟",
-"options": [" ارتفاع ضغط الدم"," الإصابة بداء أديبسون والوهن العام"," زيادة الطاقة"],
-"answer": " الإصابة بداء أديبسون والوهن العام"
-},
-
-
-
-{
-"question": "18. ماذا ينتج عن زيادة إفراز الباراثورمون؟",
-"options": [" تقوية العظام"," سحب الكالسيوم من العظام وحدوث الهشاشة"," زيادة الكالسيوم في العظام"],
-"answer": " سحب الكالسيوم من العظام وحدوث الهشاشة"
-},
-
-
-
-{
-"question": "19. ماذا ينتج عن إفراز هرمون الميلاتونين؟",
-"options": [" زيادة النشاط العضلي"," تنظيم الساعة البيولوجية للجسم"," رفع ضغط الدم"],
-"answer": " تنظيم الساعة البيولوجية للجسم"
-},
-
-
-
-{
-"question": "20. ماذا ينتج عن تنبيه العضلة من قبل عصبها؟",
-"options": [" ارتخاء العضلة"," تقلص العضلة وقصر طولها وزيادة قطرها"," موت العضلة"],
-"answer": " تقلص العضلة وقصر طولها وزيادة قطرها"
-},
-
-
-
-{
-"question": "21. ماذا ينتج عن اختلاف المادة الرمادية والبيضاء في المخ؟",
-"options": [" الرمادية محيطية والبيضاء مركزية"," الرمادية مركزية والبيضاء محيطية"," كلاهما مركزية"],
-"answer": " الرمادية محيطية والبيضاء مركزية"
-},
-
-
-
-{
-"question": "22. ماذا ينتج عن اختلاف المادة الرمادية والبيضاء في النخاع؟",
-"options": [" الرمادية محيطية والبيضاء مركزية"," الرمادية مركزية والبيضاء محيطية"," لا يوجد فرق"],
-"answer": " الرمادية مركزية والبيضاء محيطية"
-},
-
-
-
-{
-"question": "23. ماذا ينتج عن اختلاف العضلات الملساء والمخططة؟",
-"options": [" الملساء إرادية والمخططة لا إرادية"," الملساء لاإرادية والمخططة إرادية"," كلاهما إرادي"],
-"answer": " الملساء لاإرادية والمخططة إرادية"
-},
-
-
-
-{
-"question": "24. ماذا ينتج عن اختلاف السمحاق وغضاريف النمو؟",
-"options": [" السمحاق للنمو العرضي وغضاريف النمو للطولي"," السمحاق للطولي وغضاريف للنمو العرضي"," كلاهما للنمو الطولي"],
-"answer": " السمحاق للنمو العرضي وغضاريف النمو للطولي"
-},
-
-
-
-{
-"question": "25. ماذا ينتج عن اختلاف وظيفة الأوتار والأربطة؟",
-"options": [" الأوتار تربط عظم بعظم"," الأوتار عضلة بعظم والأربطة عظم بعظم"," الأربطة عضلة بعظم"],
-"answer": " الأوتار عضلة بعظم والأربطة عظم بعظم"
-},
-
-
-
-{
-"question": "26. ماذا ينتج عن اختلاف المفاصل الثابتة والمتحركة؟",
-"options": [" الثابتة.الركبة. والمتحركة.الجمجمة."," الثابتة.الجمجمة. والمتحركة.الركبة."," كلاهما متحرك"],
-"answer": " الثابتة.الجمجمة. والمتحركة.الركبة."
-},
-                    ],
-                    "function": [
-                        {
-"question": "1. ما هي وظيفة عظام القحف؟",
-"options": [" حماية القلب"," حماية الدماغ"," تكوين خلايا الدم"],
-"answer": " حماية الدماغ"
-},
-
-
-
-{
-"question": "2. ما هي وظيفة القفص الصدري؟",
-"options": [" حماية القلب والرئتين"," نقل السيالة العصبية"," حماية الدماغ"],
-"answer": " حماية القلب والرئتين"
-},
-
-
-
-{
-"question": "3. ما هي وظيفة نقي العظم الأحمر؟",
-"options": [" نقل الأكسجين فقط"," دعم العضلات"," تكوين خلايا الدم"],
-"answer": " تكوين خلايا الدم"
-},
-
-
-
-{
-"question": "4. ما هي وظيفة الأوتار؟",
-"options": [" تغذية العصبونات"," تربط العضلات بالعظام وتساعد في تحريكها"," تربط عظم بعظم"],
-"answer": " تربط العضلات بالعظام وتساعد في تحريكها"
-},
-                    ],
+                "title": "📘 الوحدة الأولى: الدعامة والتنسيق",
+                "video": UNIT1_VIDEO,
+
+                "sections": {
+                    "s1": {
+                        "title": "📂 الجهاز الدعامي الحركي",
+                        "video": SECTION1_VIDEO,
+                        "questions": section1_questions
+                    },
+                    "s2": {
+                        "title": "📂 الجهاز العصبي",
+                        "video": SECTION2_VIDEO,
+                        "questions": section2_questions
+                    },
+                    "s3": {
+                        "title": "📂 الغدد الصماء",
+                        "video": SECTION3_VIDEO,
+                        "questions": section3_questions
+                    }
                 }
             }
         }
     }
 }
 
-# ================== /start ==================
+# ================== User Temp ==================
+user_data = {}
+
+# ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    if not get_user(user_id):
+        create_user(user_id)
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
+
+    if not get_user(user_id).get("approved"):
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
+
     keyboard = [
-        [InlineKeyboardButton("📘 الوحدة الأولى", callback_data="u1")]
+        [InlineKeyboardButton("📚 كتاب العلوم", callback_data="science")]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text(
-        "مرحباً 👋 اختر الوحدة:",
-        reply_markup=reply_markup
-    )
+    await update.message.reply_text("اختر الكتاب:", reply_markup=InlineKeyboardMarkup(keyboard))
 
-# ================== اختيار الوحدة ==================
-async def unit_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# ================== Paid ==================
+async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    create_user(user_id)
+
+    await context.bot.send_message(chat_id=ADMIN_ID, text=f"/approve {user_id}")
+    await update.message.reply_text("تم إرسال طلبك")
+
+# ================== Approve ==================
+async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    user_id = int(context.args[0])
+    approve_user(user_id)
+
+    await context.bot.send_message(chat_id=user_id, text="تم التفعيل /start")
+
+# ================== إرسال سؤال ==================
+async def send_question(update, context):
     query = update.callback_query
-    await query.answer()
+    user_id = query.from_user.id
 
-    unit_id = query.data
+    data = user_data[user_id]
+    q_list = subjects["science"]["units"][data["unit"]]["sections"][data["section"]]["questions"]
 
-    keyboard = [
-        [InlineKeyboardButton("🔹 taaleel", callback_data=f"{unit_id}|taaleel")],
-        [InlineKeyboardButton("🖼 image", callback_data=f"{unit_id}|image")],
-        [InlineKeyboardButton("📍 where", callback_data=f"{unit_id}|where")],
-        [InlineKeyboardButton("🔢 level", callback_data=f"{unit_id}|level")],
-        [InlineKeyboardButton("📊 result", callback_data=f"{unit_id}|result")],
-        [InlineKeyboardButton("⚙ function", callback_data=f"{unit_id}|function")],
-    ]
+    index = data["q_index"]
 
-    await query.edit_message_text(
-        "اختر نوع الأسئلة:",
+    if index >= len(q_list):
+        await context.bot.send_message(chat_id=query.message.chat_id, text="انتهى الاختبار")
+        return
+
+    q = q_list[index]
+
+    text = q["question"] + "\n"
+    for i, opt in enumerate(q["options"]):
+        text += f"{chr(65+i)}- {opt}\n"
+
+    keyboard = [[
+        InlineKeyboardButton("A", callback_data="0"),
+        InlineKeyboardButton("B", callback_data="1"),
+        InlineKeyboardButton("C", callback_data="2"),
+    ]]
+
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text=text,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ================== اختيار نوع الأسئلة ==================
-async def test_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# ================== Buttons ==================
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
+    user_id = query.from_user.id
     data = query.data
-    unit_id, test_type = data.split("|")
 
-    questions = subjects["bio"]["units"][unit_id]["tests"][test_type]
+    # كتاب
+    if data == "science":
+        keyboard = [
+            [InlineKeyboardButton("📘 الوحدة الأولى", callback_data="u1")]
+        ]
+        await context.bot.send_message(chat_id=query.message.chat_id, text="اختر الوحدة:", reply_markup=InlineKeyboardMarkup(keyboard))
+        return
 
-    text = f"📚 نوع الاختبار: {test_type}\n\n"
+    # وحدة
+    if data.startswith("u"):
+        user_data[user_id] = {"unit": data, "q_index": 0}
 
-    for i, q in enumerate(questions, start=1):
-        text += f"{i}- {q}\n"
+        unit = subjects["science"]["units"][data]
 
-    keyboard = [
-        [InlineKeyboardButton("🔙 رجوع", callback_data=unit_id)]
-    ]
+        keyboard = [[InlineKeyboardButton("🎬 فيديو الوحدة", callback_data="UNIT1_VIDEO")]]
 
-    await query.edit_message_text(
-        text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+        for key, sec in unit["sections"].items():
+            keyboard.append([InlineKeyboardButton(sec["title"], callback_data=f"sec_{key}")])
 
-# ================== main ==================
-# ================== التوكن ==================
-TOKEN = os.environ.get("TOKEN")
-if not TOKEN:
-    raise ValueError("TOKEN is missing")
+        await context.bot.send_message(chat_id=query.message.chat_id, text=unit["title"], reply_markup=InlineKeyboardMarkup(keyboard))
+        return
 
+    # فيديو الوحدة
+    if data == "UNIT1_VIDEO":
+        unit = user_data[user_id]["unit"]
+        video = subjects["science"]["units"][unit]["video"]
 
+        await context.bot.send_video(chat_id=query.message.chat_id, video=video)
+        return
 
-def main():
-    app = ApplicationBuilder().token(TOKEN).build()
+    # قسم
+    if data.startswith("sec_"):
+        sec = data.split("_")[1]
+        user_data[user_id]["section"] = sec
+        user_data[user_id]["q_index"] = 0
 
-    app.add_handler(CommandHandler("start", start))
+        keyboard = [
+            [InlineKeyboardButton("🎬 فيديو القسم", callback_data="sec_video")],
+            [InlineKeyboardButton("▶️ ابدأ الاختبار", callback_data="start_quiz")]
+        ]
 
-    app.add_handler(CallbackQueryHandler(unit_handler, pattern="^u1$"))
-    app.add_handler(CallbackQueryHandler(test_handler, pattern="^u1\\|"))
+        await context.bot.send_message(chat_id=query.message.chat_id, text="اختر:", reply_markup=InlineKeyboardMarkup(keyboard))
+        return
 
-    app.run_polling()
+    # فيديو القسم
+    if data == "sec_video":
+        unit = user_data[user_id]["unit"]
+        sec = user_data[user_id]["section"]
 
-if __name__ == "__main__":
-    main()
+        video = subjects["science"]["units"][unit]["sections"][sec]["video"]
+
+        await context.bot.send_video(chat_id=query.message.chat_id, video=video)
+        return
+
+    # بدء الاختبار
+    if data == "start_quiz":
+        await send_question(update, context)
+        return
+
+    # إجابة
+    q_data = user_data[user_id]
+    q_list = subjects["science"]["units"][q_data["unit"]]["sections"][q_data["section"]]["questions"]
+    q = q_list[q_data["q_index"]]
+
+    if q["options"][int(data)] == q["answer"]:
+        await context.bot.send_message(chat_id=query.message.chat_id, text="✅ صحيح")
+    else:
+        await context.bot.send_message(chat_id=query.message.chat_id, text=f"❌ خطأ\n{q['answer']}")
+
+    user_data[user_id]["q_index"] += 1
+    await asyncio.sleep(1)
+    await send_question(update, context)
+
+# ================== Run ==================
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("paid", paid))
+app.add_handler(CommandHandler("approve", approve))
+app.add_handler(CallbackQueryHandler(button))
+
+app.run_polling()
