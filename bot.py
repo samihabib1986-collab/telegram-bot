@@ -1005,30 +1005,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 🎬 فيديو الوحدة
         unit_video = UNIT_INTRO_VIDEOS.get("u1")
 
-    if unit_video:
-        await context.bot.send_video(
-            chat_id=query.message.chat_id,
-            video=unit_video,
-            caption="🎬 مقدمة الوحدة 1"
+        if unit_video:
+                await context.bot.send_video(
+                chat_id=query.message.chat_id,
+                video=unit_video,
+                caption="🎬 مقدمة الوحدة 1"
+            )
+
+        keyboard = [
+            [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam")],
+            [InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_ns")]
+        ]
+
+        await query.message.reply_text(
+            "📚 اختر القسم:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
         )
-
-    keyboard = [
-        [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam")],
-        [InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_ns")]
-    ]
-
-    await query.message.reply_text(
-        "📚 اختر القسم:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-    return
+        return
 
 # ================== الأقسام ==================
+    
     if data in ["sec_u1_dam", "sec_u1_ns"]:
 
         section = "dam" if "dam" in data else "ns"
 
-    # 🎬 فيديو القسم
+        # 🎬 فيديو القسم
         section_video = SECTION_INTRO_VIDEOS.get(section)
 
         if section_video:
