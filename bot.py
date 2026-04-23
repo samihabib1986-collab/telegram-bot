@@ -321,6 +321,119 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text="اختر الإجابة:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    user_id = query.from_user.id
+    data = query.data
+
+    # ================== المادة ==================
+    if data == "bio":
+        keyboard = [[InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")]]
+        await query.message.reply_text(
+            "📘 اختر الوحدة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== الوحدة ==================
+    if data == "bio_u1":
+        keyboard = [
+            [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam")],
+            [InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_ns")]
+        ]
+        await query.message.reply_text(
+            "📚 اختر القسم:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== الأقسام ==================
+    if data in ["sec_u1_dam", "sec_u1_ns"]:
+
+        section = "dam" if "dam" in data else "ns"
+
+        user_data[user_id] = {
+            "subject": "bio",
+            "unit": "u1",
+            "section": section,
+            "score": 0,
+            "q_index": 0
+        }
+
+        keyboard = [
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+            [InlineKeyboardButton("🖼 صور", callback_data="images")],
+            [InlineKeyboardButton("📍 موقع", callback_data="where")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
+            [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
+            [InlineKeyboardButton("▶️ بدء الاختبار", callback_data="start_quiz")]
+        ]
+
+        await query.message.reply_text(
+            "اختر نوع الأسئلة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== اختيار نوع السؤال ==================
+    if data in ["taaleel", "images", "where", "level", "result1", "function", "compare"]:
+
+        if user_id not in user_data:
+            return
+
+        unit = user_data[user_id]["unit"]
+        section = user_data[user_id]["section"]
+
+        category = f"{unit}_{section}_{data}"
+
+        if category not in subjects["bio"]:
+            await query.message.reply_text("❌ لا يوجد أسئلة")
+            return
+
+        user_data[user_id]["category"] = category
+        user_data[user_id]["q_index"] = 0
+
+        keyboard = [[InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")]]
+
+        await query.message.reply_text(
+            "ابدأ الاختبار:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+
+    # ================== بدء الاختبار ==================
+    if data == "start_quiz":
+        await send_question(update, context)
+        return
+
+    # ================== الإجابة ==================
+    if data in ["0", "1", "2"]:
+
+        if user_id not in user_data:
+            return
+
+        info = user_data[user_id]
+
+        category = info["category"]
+        q = subjects["bio"][category][info["q_index"]]
+
+        selected = q["options"][int(data)]
+
+        if selected == q["answer"]:
+            info["score"] += 10
+            result = "✔️ صحيح"
+        else:
+            result = f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
+
+        info["q_index"] += 1
+
+        await query.message.reply_text(result)
+        await asyncio.sleep(1)
+        await send_question(update, context)    
 
 # ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
@@ -328,5 +441,4 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
-
 app.run_polling()
