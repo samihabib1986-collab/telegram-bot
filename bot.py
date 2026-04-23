@@ -48,15 +48,22 @@ SECTION_VIDEOS = {
 uploaded_images = {
 "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ",
 "عظام الوجه": "AgACAgQAAxkBAAIDgmnjuaxzSVnHSg-Ht5sh8MLSRxgDAAJEDGsb4XYhUyf_4zNepyt6AQADAgADbQADOwQ",
-
-# صور الجهاز العصبي
-"الدماغ": "PUT_FILE_ID",
-"العصبون": "PUT_FILE_ID"
+"مفصل العضد الكتفي": "AgACAgQAAxkBAAIDrGnj2XkC5s_14i-8Zr11ICic-ImxAAJjDGsb4XYhU7x_C70kw-VnAQADAgADbQADOwQ",
+"مفاصل العمود الفقري": "AgACAgQAAxkBAAIDrmnj2cFsc9BTuUF_6SBSJ5AolzFXAAJkDGsb4XYhU52j6bbeUJdeAQADAgADbQADOwQ",
+"عظام الطرف العلوي": "AgACAgQAAxkBAAIDsmnj2gsFww-fBb8XMXywean-d5bSAAJmDGsb4XYhU71hPZ-to5faAQADAgADeAADOwQ",
+"عظام الطرف السفلي": "AgACAgQAAxkBAAIDtGnj2i6b24ki0cgork2CXiRUPyZkAAJnDGsb4XYhU-tRzckix1dGAQADAgADeAADOwQ",
+"عظام الجمجمة": "AgACAgQAAxkBAAIDtmnj2kzpampZCzzZG1R3ukMhOA_LAAJoDGsb4XYhU90RtQhjryIZAQADAgADbQADOwQ",
+"بنية العظم الطويل": "AgACAgQAAxkBAAIDuGnj2qP11IFHNmIsBybhHIJnHnhlAAJpDGsb4XYhU4jukApSAAF2JgEAAwIAA20AAzsE",
+"القناة الفقرية": "AgACAgQAAxkBAAIDumnj2s3d7FdxX6ek83h2ICL058HGAAJqDGsb4XYhU44UTT9-9Q3TAQADAgADbQADOwQ",
+"القفص الصدري": "AgACAgQAAxkBAAIDvGnj2wKHWoZd-Fnq6VTgtbr_26cXAAJrDGsb4XYhU6gEI1EyrwWmAQADAgADbQADOwQ",
+"الفقرة": "AgACAgQAAxkBAAIDvmnj2y7tdQIvOj1m2vpCtZYG73CTAAJsDGsb4XYhUwAB9a5PVNtyWQEAAwIAA20AAzsE",
+"العمود الفقري": "AgACAgQAAxkBAAIDwGnj2098LBlyy3stztvcZro8wYe8AAJtDGsb4XYhU2P4mddgYBUPAQADAgADbQADOwQ",
+"الزنار الحوضي": "AgACAgQAAxkBAAIDwmnj22kphW_UdDwCxYEXZ1QEEvr6AAJuDGsb4XYhU9ARG08G-TgLAQADAgADbQADOwQ",
+"الاربطة والاوتار": "AgACAgQAAxkBAAIDxGnj27EBbQ7NdocwG8BMMx-pXpz0AAJvDGsb4XYhU0SlG3BDNztZAQADAgADbQADOwQ",
 }
 
 # ================== بنك الأسئلة ==================
 
-# ================== بنك الأسئلة ==================
 subjects = {
     "bio": {
 
@@ -856,6 +863,7 @@ subjects = {
 }
 
 
+
 # ================== بيانات المستخدم ==================
 user_data = {}
 
@@ -874,6 +882,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
+    # 🔥 رجّعت رسالة الترحيب كما كانت
     await update.message.reply_text(
         "✨ نرحب بكم في منصة بوابة العلامة الكاملة ✨\n"
         "✨إشراف الاستاذ :احمد نور الدين  939138720✨\n"
@@ -919,20 +928,11 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         InlineKeyboardButton("C", callback_data="2"),
     ]]
 
-    # ✅ حل مشكلة الصور
-    if "image" in q:
-        await context.bot.send_photo(
-            chat_id=query.message.chat_id,
-            photo=uploaded_images[q["image"]],
-            caption=text,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-    else:
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text=text,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text=text,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 # ================== الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -947,17 +947,24 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")]
         ]
-        await query.message.reply_text("اختر الوحدة:", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.message.reply_text(
+            "اختر الوحدة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
         return
 
     # الوحدة
     if data == "bio_u1":
         keyboard = [
             [InlineKeyboardButton("🎬 فيديو الوحدة", callback_data="unit_video")],
-            [InlineKeyboardButton("القسم الأول: الدعامي الحركي", callback_data="sec_u1_dam")]
+            [InlineKeyboardButton("القسم الأول: الدعامي الحركي", callback_data="sec_u1_dam")],
             [InlineKeyboardButton("القسم الثاني: الجهاز العصبي", callback_data="sec_u1_ns")]
         ]
-        await query.message.reply_text("📘 الوحدة 1:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+        await query.message.reply_text(
+            "📘 الوحدة 1:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
         return
 
     # فيديو الوحدة
@@ -968,10 +975,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-# ===== القسم الال ===== 
-        if data == "sec_u1_dam":
+    # ================== القسم الأول ==================
+    if data == "sec_u1_dam":
 
-            user_data[user_id] = {
+        user_data[user_id] = {
             "subject": "bio",
             "unit": "u1",
             "section": "dam",
@@ -980,7 +987,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         keyboard = [
-            [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video")],
+            [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video_dam")],
             [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
             [InlineKeyboardButton("🖼️ صور", callback_data="images")],
             [InlineKeyboardButton("📍 موقع", callback_data="where")],
@@ -989,17 +996,23 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")]
         ]
 
-        await query.message.reply_text("📚 اختر:", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.message.reply_text(
+            "📚 اختر:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
         return
-            # فيديو القسم
-        if data == "section_video":
-            await context.bot.send_video(
+
+    # فيديو القسم الدعامي
+    if data == "section_video_dam":
+        await context.bot.send_video(
             chat_id=query.message.chat_id,
             video=SECTION_VIDEOS["dam"]
         )
         return
-        # ===== القسم الثاني =====
+
+    # ================== القسم الثاني ==================
     if data == "sec_u1_ns":
+
         user_data[user_id] = {
             "subject": "bio",
             "unit": "u1",
@@ -1009,7 +1022,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         keyboard = [
-            [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video")],
+            [InlineKeyboardButton("🎥 فيديو القسم", callback_data="section_video_ns")],
             [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
             [InlineKeyboardButton("🖼️ صور", callback_data="images")],
             [InlineKeyboardButton("📍 موقع", callback_data="where")],
@@ -1018,68 +1031,19 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")]
         ]
 
-        await query.message.reply_text("📚 الجهاز العصبي:", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.message.reply_text(
+            "📚 الجهاز العصبي:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
         return
 
-    # فيديو القسم
-    if data == "section_video":
+    # فيديو القسم العصبي
+    if data == "section_video_ns":
         await context.bot.send_video(
             chat_id=query.message.chat_id,
             video=SECTION_VIDEOS["ns"]
         )
         return
-
-    # نوع الأسئلة
-    if data in ["taaleel", "images", "where", "level", "result1", "function"]:
-
-        if user_id not in user_data:
-            return
-
-        unit = user_data[user_id]["unit"]
-        section = user_data[user_id]["section"]
-
-        category = f"{unit}_{section}_{data}"
-
-        if category not in subjects["bio"]:
-            await query.message.reply_text("❌ لا يوجد أسئلة لهذا القسم")
-            return
-
-        user_data[user_id]["category"] = category
-
-        keyboard = [[
-            InlineKeyboardButton("▶️ بدء الاختبار", callback_data="start_quiz")
-        ]]
-
-        await query.message.reply_text("ابدأ 👇", reply_markup=InlineKeyboardMarkup(keyboard))
-        return
-
-    # بدء الاختبار
-    if data == "start_quiz":
-        await send_question(update, context)
-        return
-
-    # الإجابة
-    if user_id not in user_data:
-        return
-
-    subject = user_data[user_id]["subject"]
-    category = user_data[user_id]["category"]
-    index = user_data[user_id]["q_index"]
-
-    q = subjects[subject][category][index]
-    selected = q["options"][int(data)]
-
-    if selected == q["answer"]:
-        user_data[user_id]["score"] += 10
-        result = "✔️ صحيح"
-    else:
-        result = f"❌ خطأ\nالإجابة: {q['answer']}"
-
-    user_data[user_id]["q_index"] += 1
-
-    await query.message.reply_text(result)
-    await asyncio.sleep(1)
-    await send_question(update, context)
 
 # ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
