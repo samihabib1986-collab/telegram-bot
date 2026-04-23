@@ -1029,7 +1029,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         section = "dam" if "dam" in data else "ns"
 
     # 🎬 فيديو القسم
-    section_video = SECTION_INTRO_VIDEOS.get(section)
+        section_video = SECTION_INTRO_VIDEOS.get(section)
 
     if section_video:
         await context.bot.send_video(
