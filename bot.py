@@ -706,6 +706,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="🎉 انتهيت!"
         )
         return
+        
 
     q = q_list[index]
 
