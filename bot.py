@@ -53,41 +53,130 @@ SECTION1_VIDEO = "VIDEO_S1"
 SECTION2_VIDEO = "VIDEO_S2"
 SECTION3_VIDEO = "VIDEO_S3"
 
-# ================== أسئلة ==================
-section1_questions = [
-    {
-        "question": "ما وظيفة الهيكل العظمي؟",
-        "options": ["الحماية", "الهضم", "التنفس"],
-        "answer": "الحماية"
-    }
-]
+# ================== أسئلة (لكل نوع بنك مستقل) ==================
 
-section2_questions = [
-    {
-        "question": "ما وظيفة الجهاز العصبي؟",
-        "options": ["الهضم", "التنسيق", "الإخراج"],
-        "answer": "التنسيق"
-    }
-]
+section1_questions = {
+    "function": [
+        {
+            "question": "ما وظيفة الهيكل العظمي؟",
+            "options": ["الحماية", "الهضم", "التنفس"],
+            "answer": "الحماية"
+        }
+    ],
+    "taaleel": [
+        {
+            "question": "علل: أهمية الهيكل العظمي؟",
+            "options": ["للحماية", "للهضم", "للتنفس"],
+            "answer": "للحماية"
+        }
+    ],
+    "images": [
+        {
+            "question": "أي صورة تمثل الهيكل العظمي؟",
+            "options": ["صورة عظام", "صورة قلب", "صورة معدة"],
+            "answer": "صورة عظام"
+        }
+    ],
+    "where": [
+        {
+            "question": "أين يوجد الهيكل العظمي؟",
+            "options": ["داخل الجسم", "خارج الجسم", "في الدم"],
+            "answer": "داخل الجسم"
+        }
+    ],
+    "level": [
+        {
+            "question": "رتب مراحل حماية الجسم",
+            "options": ["عظام → حماية", "دم → حماية", "هواء → حماية"],
+            "answer": "عظام → حماية"
+        }
+    ]
+}
 
-section3_questions = [
-    {
-        "question": "ما وظيفة الغدد الصماء؟",
-        "options": ["إفراز هرمونات", "هضم", "تنفس"],
-        "answer": "إفراز هرمونات"
-    }
-]
+section2_questions = {
+    "function": [
+        {
+            "question": "ما وظيفة الجهاز العصبي؟",
+            "options": ["التنسيق", "الهضم", "الإخراج"],
+            "answer": "التنسيق"
+        }
+    ],
+    "taaleel": [
+        {
+            "question": "علل: أهمية الجهاز العصبي؟",
+            "options": ["للتنسيق", "للهضم", "للتنفس"],
+            "answer": "للتنسيق"
+        }
+    ],
+    "images": [
+        {
+            "question": "أي صورة تمثل الجهاز العصبي؟",
+            "options": ["دماغ", "قلب", "رئة"],
+            "answer": "دماغ"
+        }
+    ],
+    "where": [
+        {
+            "question": "أين يوجد الجهاز العصبي؟",
+            "options": ["في الجسم", "في الجلد", "في الدم"],
+            "answer": "في الجسم"
+        }
+    ],
+    "level": [
+        {
+            "question": "رتب انتقال الإشارات",
+            "options": ["دماغ → أعصاب", "أعصاب → دم", "قلب → دماغ"],
+            "answer": "دماغ → أعصاب"
+        }
+    ]
+}
+
+section3_questions = {
+    "function": [
+        {
+            "question": "ما وظيفة الغدد الصماء؟",
+            "options": ["إفراز هرمونات", "الهضم", "التنفس"],
+            "answer": "إفراز هرمونات"
+        }
+    ],
+    "taaleel": [
+        {
+            "question": "علل: أهمية الغدد الصماء؟",
+            "options": ["تنظيم الجسم", "الهضم", "التنفس"],
+            "answer": "تنظيم الجسم"
+        }
+    ],
+    "images": [
+        {
+            "question": "أي صورة تمثل الغدد الصماء؟",
+            "options": ["غدة", "قلب", "عظام"],
+            "answer": "غدة"
+        }
+    ],
+    "where": [
+        {
+            "question": "أين توجد الغدد الصماء؟",
+            "options": ["في الجسم", "في الدم", "في الجلد"],
+            "answer": "في الجسم"
+        }
+    ],
+    "level": [
+        {
+            "question": "رتب تأثير الهرمونات",
+            "options": ["غدة → دم → جسم", "دم → غدة → جسم", "جسم → دم → غدة"],
+            "answer": "غدة → دم → جسم"
+        }
+    ]
+}
 
 # ================== الهيكل الجديد ==================
 subjects = {
     "science": {
         "title": "📚 كتاب العلوم",
-
         "units": {
             "u1": {
                 "title": "📘 الوحدة الأولى: الدعامة والتنسيق",
                 "video": UNIT1_VIDEO,
-
                 "sections": {
                     "s1": {
                         "title": "📂 الجهاز الدعامي الحركي",
@@ -157,11 +246,11 @@ async def send_question(update, context):
 
     data = user_data[user_id]
 
-    unit = user_data[user_id]["unit"]
-    sec = user_data[user_id]["section"]
-    q_type = user_data[user_id].get("quiz_type", "s1")
+    unit = data["unit"]
+    sec = data["section"]
+    quiz_type = data.get("quiz_type", "function")
 
-    q_list = subjects["science"]["units"][unit]["sections"][sec]["questions"]
+    q_list = subjects["science"]["units"][unit]["sections"][sec]["questions"].get(quiz_type, [])
 
     index = data["q_index"]
 
@@ -194,7 +283,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # كتاب
     if data == "science":
         keyboard = [
             [InlineKeyboardButton("📘 الوحدة الأولى", callback_data="u1")]
@@ -202,7 +290,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=query.message.chat_id, text="اختر الوحدة:", reply_markup=InlineKeyboardMarkup(keyboard))
         return
 
-    # وحدة
     if data.startswith("u"):
         user_data[user_id] = {"unit": data, "q_index": 0}
 
@@ -216,7 +303,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=query.message.chat_id, text=unit["title"], reply_markup=InlineKeyboardMarkup(keyboard))
         return
 
-    # فيديو الوحدة
     if data == "UNIT1_VIDEO":
         unit = user_data[user_id]["unit"]
         video = subjects["science"]["units"][unit]["video"]
@@ -224,7 +310,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_video(chat_id=query.message.chat_id, video=video)
         return
 
-    # قسم
     if data.startswith("sec_"):
         sec = data.split("_")[1]
         user_data[user_id]["section"] = sec
@@ -238,7 +323,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=query.message.chat_id, text="اختر:", reply_markup=InlineKeyboardMarkup(keyboard))
         return
 
-    # فيديو القسم
     if data == "sec_video":
         unit = user_data[user_id]["unit"]
         sec = user_data[user_id]["section"]
@@ -248,16 +332,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_video(chat_id=query.message.chat_id, video=video)
         return
 
-    # بدء الاختبار → اختيار النوع
     if data == "start_quiz":
-
         keyboard = [
             [InlineKeyboardButton("🧠 تعاليل", callback_data="quiz_taaleel")],
             [InlineKeyboardButton("🖼 صور", callback_data="quiz_images")],
             [InlineKeyboardButton("📍 أين", callback_data="quiz_where")],
             [InlineKeyboardButton("🔁 ترتيب", callback_data="quiz_level")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="quiz_function")],
-            [InlineKeyboardButton("📊 نتائج", callback_data="quiz_result1")]
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="quiz_function")]
         ]
 
         await context.bot.send_message(
@@ -267,7 +348,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # اختيار نوع الاختبار
     if data.startswith("quiz_"):
         quiz_type = data.replace("quiz_", "")
         user_data[user_id]["quiz_type"] = quiz_type
@@ -276,9 +356,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
 
-    # إجابة
     q_data = user_data[user_id]
-    q_list = subjects["science"]["units"][q_data["unit"]]["sections"][q_data["section"]]["questions"]
+    q_list = subjects["science"]["units"][q_data["unit"]]["sections"][q_data["section"]]["questions"].get(q_data.get("quiz_type", "function"), [])
     q = q_list[q_data["q_index"]]
 
     if q["options"][int(data)] == q["answer"]:
