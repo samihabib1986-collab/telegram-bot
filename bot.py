@@ -37,11 +37,11 @@ if not TOKEN:
 # ================== الأدمن ==================
 ADMIN_ID = 8491023024
 # ================== فيديوهات ==================
-UNIT_VIDEOS = {
+UNIT_INTRO_VIDEOS = {
     "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
 }
 
-SECTION_VIDEOS = {
+SECTION_INTRO_VIDEOS = {
     "dam": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",
     "ns": "PUT_YOUR_VIDEO_FILE_ID_HERE"
 }
@@ -1001,46 +1001,66 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== الوحدة ==================
     if data == "bio_u1":
-        keyboard = [
-            [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam")],
-            [InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_ns")]
-        ]
-        await query.message.reply_text(
-            "📚 اختر القسم:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+
+    # 🎬 فيديو الوحدة
+    unit_video = UNIT_INTRO_VIDEOS.get("u1")
+
+    if unit_video:
+        await context.bot.send_video(
+            chat_id=query.message.chat_id,
+            video=unit_video,
+            caption="🎬 مقدمة الوحدة 1"
         )
-        return
+
+    keyboard = [
+        [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam")],
+        [InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_ns")]
+    ]
+
+    await query.message.reply_text(
+        "📚 اختر القسم:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+    return
 
     # ================== الأقسام ==================
-    if data in ["sec_u1_dam", "sec_u1_ns"]:
+if data in ["sec_u1_dam", "sec_u1_ns"]:
 
-        section = "dam" if "dam" in data else "ns"
+    section = "dam" if "dam" in data else "ns"
 
-        user_data[user_id] = {
-            "subject": "bio",
-            "unit": "u1",
-            "section": section,
-            "score": 0,
-            "q_index": 0
-        }
+    # 🎬 فيديو القسم
+    section_video = SECTION_INTRO_VIDEOS.get(section)
 
-        keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼 صور", callback_data="images")],
-            [InlineKeyboardButton("📍 موقع", callback_data="where")],
-            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
-            [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
-            [InlineKeyboardButton("▶️ بدء الاختبار", callback_data="start_quiz")]
-        ]
-
-        await query.message.reply_text(
-            "اختر نوع الأسئلة:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+    if section_video:
+        await context.bot.send_video(
+            chat_id=query.message.chat_id,
+            video=section_video,
+            caption="🎬 مقدمة القسم"
         )
-        return
 
+    user_data[user_id] = {
+        "subject": "bio",
+        "unit": "u1",
+        "section": section,
+        "score": 0,
+        "q_index": 0
+    }
+
+    keyboard = [
+        [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+        [InlineKeyboardButton("🖼 صور", callback_data="images")],
+        [InlineKeyboardButton("📍 موقع", callback_data="where")],
+        [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+        [InlineKeyboardButton("🧠 نتائج", callback_data="result1")],
+        [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
+        [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
+    ]
+
+    await query.message.reply_text(
+        "اختر نوع الأسئلة:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+    return
     # ================== اختيار نوع السؤال ==================
     if data in ["taaleel", "images", "where", "level", "result1", "function", "compare"]:
 
