@@ -1033,7 +1033,33 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await query.message.reply_text("ابدأ 👇", reply_markup=InlineKeyboardMarkup(keyboard))
         return
+# بدء الاختبار
+    if data == "start_quiz":
+        await send_question(update, context)
+        return
 
+    # الإجابة
+    if user_id not in user_data:
+        return
+
+    subject = user_data[user_id]["subject"]
+    category = user_data[user_id]["category"]
+    index = user_data[user_id]["q_index"]
+
+    q = subjects[subject][category][index]
+    selected = q["options"][int(data)]
+
+    if selected == q["answer"]:
+        user_data[user_id]["score"] += 10
+        result = "✔️ صحيح"
+    else:
+        result = f"❌ خطأ\nالإجابة: {q['answer']}"
+
+    user_data[user_id]["q_index"] += 1
+
+    await query.message.reply_text(result)
+    await asyncio.sleep(1)
+    await send_question(update, context)
     # ================== القسم الثاني ==================
     if data == "sec_u1_ns":
 
@@ -1093,7 +1119,33 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.reply_text("ابدأ 👇", reply_markup=InlineKeyboardMarkup(keyboard))
         return
 
+# بدء الاختبار
+    if data == "start_quiz":
+        await send_question(update, context)
+        return
 
+    # الإجابة
+    if user_id not in user_data:
+        return
+
+    subject = user_data[user_id]["subject"]
+    category = user_data[user_id]["category"]
+    index = user_data[user_id]["q_index"]
+
+    q = subjects[subject][category][index]
+    selected = q["options"][int(data)]
+
+    if selected == q["answer"]:
+        user_data[user_id]["score"] += 10
+        result = "✔️ صحيح"
+    else:
+        result = f"❌ خطأ\nالإجابة: {q['answer']}"
+
+    user_data[user_id]["q_index"] += 1
+
+    await query.message.reply_text(result)
+    await asyncio.sleep(1)
+    await send_question(update, context)
 # ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
 
