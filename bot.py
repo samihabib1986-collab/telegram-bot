@@ -62,7 +62,11 @@ uploaded_images = {
 "اقسام الدماغ": "AgACAgQAAxkBAAISHWnrWZ0TjtMrtyyHULvYMAOVE7_yAAJRDGsb74lYUz3jfvxGXFnhAQADAgADbQADOwQ",
 "مقطع عرضي للنخاع الشوكي": "AgACAgQAAxkBAAISH2nrWgsqG3H5N8Prs_qxXiRduvWRAAJUDGsb74lYUx31zFbWCOKoAQADAgADbQADOwQ",
 "البنكرياس": "AgACAgQAAxkBAAISKWnroaq_3YSRyrHZsbvx8rJ_fg_ZAAKXDGsb74lYU-srhC9ChcJ_AQADAgADeQADOwQ",
-"الغدد الصم": "AgACAgQAAxkBAAISK2nrov53uU1iaKiBKo3UPOUQKjlFAAKYDGsb74lYU1TWZ694bWrdAQADAgADeQADOwQ"
+"الغدد الصم": "AgACAgQAAxkBAAISK2nrov53uU1iaKiBKo3UPOUQKjlFAAKYDGsb74lYU1TWZ694bWrdAQADAgADeQADOwQ",
+    "بنية الجلد": "AgACAgQAAxkBAAITeGnr3TZBzmxqfuIDKzZCGa090OI6AALMDGsb74lYUx8pO043oYS0AQADAgADeAADOwQ",
+    "مقطع طولي في الانف": "AgACAgQAAxkBAAITemnr3dpEKisFEONqV0S65708LxWcAALODGsb74lYU_mOipPesqbFAQADAgADeAADOwQ",
+    "اقسام الاذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
+    "كرة العين": "AgACAgQAAxkBAAITf2nr3hBZxdkfGMNiLk2bFeYpd7ETAALQDGsb74lYUxk-ui92CqcHAQADAgADeAADOwQ"
 }
 
 # ================== بنك الأسئلة ==================
