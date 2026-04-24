@@ -37,7 +37,7 @@ UNIT_INTRO_VIDEOS = {
 SECTION_INTRO_VIDEOS = {
     "dam": "BAACAgQAAxkBAAIRvGnrQ2MKxeiZFuVJ3v16gEqefHA8AAKXHQAC74lYU-Qly3e3uLQTOwQ",
     "ns": "BAACAgQAAxkBAAIROmnqiPKGP-YaRotjs-gcLld1YROxAAIPHgAD51BTVg5QB-v3elM7BA",
-    "sum": "BAACAgQAAxkBAAISXWnrqRG-Ino_MV1BUS4PqeBeBgviAAIjHgAC74lYUxVywvZpsig4OwQ"
+    "sum":"BAACAgQAAxkBAAISXWnrqRG-Ino_MV1BUS4PqeBeBgviAAIjHgAC74lYUxVywvZpsig4OwQ"
 }
 
 # ================== الصور ==================
@@ -1275,8 +1275,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "📚 اختبر نفسك وارتقِ بمستواك\n"
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
-        "👨‍🏫 إشراف: أحمد نور الدين\n"
-        "💻 برمجة: سامي حبيب"
+        "👨‍🏫 إشراف المدرس: أحمد نور الدين\n"
+        "💻 برمجة المهنس: سامي حبيب"
     )
 
     keyboard = [
