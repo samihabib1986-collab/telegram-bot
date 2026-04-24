@@ -37,7 +37,7 @@ UNIT_INTRO_VIDEOS = {
 SECTION_INTRO_VIDEOS = {
     "dam": "BAACAgQAAxkBAAIRvGnrQ2MKxeiZFuVJ3v16gEqefHA8AAKXHQAC74lYU-Qly3e3uLQTOwQ",
     "ns": "BAACAgQAAxkBAAIROmnqiPKGP-YaRotjs-gcLld1YROxAAIPHgAD51BTVg5QB-v3elM7BA",
-    "sum": "BAACAgQAAxkBAAIROmnqiPKGP-YaRotjs-gcLld1YROxAAIPHgAD51BTVg5QB-v3elM7BA"
+    "sum": "BAACAgQAAxkBAAISXWnrqRG-Ino_MV1BUS4PqeBeBgviAAIjHgAC74lYUxVywvZpsig4OwQ"
 }
 
 # ================== الصور ==================
