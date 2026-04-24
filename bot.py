@@ -1439,7 +1439,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼 صور", callback_data="images")],
+            [InlineKeyboardButton("🖼 صور", callback_data="image")],
             [InlineKeyboardButton("📍 موقع", callback_data="where")],
             [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
             [InlineKeyboardButton("🧠 نتائج", callback_data="result")],
