@@ -125,125 +125,125 @@ subjects = {
 
         "u1_dam_images": [
             {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "1",
 "options": ["الجمجمة (عظام الوجه + عظام القحف)","الهيكل المحوري","القص"],
 "answer": "الهيكل المحوري"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "3",
 "options": ["الجمجمة (عظام الوجه + عظام القحف)","القص","هيكل الجذع"],
 "answer": "الجمجمة (عظام الوجه + عظام القحف)"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "5",
 "options": ["هيكل الجذع","القص","الزنار الكتفي"],
 "answer": "القص"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "8",
 "options": ["الزنار الكتفي","الطرف العلوي","هيكل الجذع"],
 "answer": "هيكل الجذع"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "4",
 "options": ["الزنار الكتفي","الطرف العلوي","هيكل الجذع"],
 "answer": "الزنار الكتفي"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "9",
 "options": ["الزنار الكتفي","الهيكل الطرفي","الطرف العلوي"],
 "answer": "الطرف العلوي"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "10",
 "options": ["الطرف السفلي","الزنار الحوضي","الهيكل الطرفي"],
 "answer": "الزنار الحوضي"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "11",
 "options": ["الهيكل الطرفي","الطرف السفلي","الزنار الحوضي"],
 "answer": "الطرف السفلي"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "2",
 "options": ["الزنار الحوضي","الطرف السفلي","الهيكل الطرفي"],
 "answer": "الهيكل الطرفي"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "6",
 "options": ["العمود الفقري","الاضلاع","الهيكل الطرفي"],
 "answer": "الاضلاع"
 },
 {
-"type": "images",
-"images": "الهيكل العظمي",
+"type": "image",
+"image": "الهيكل العظمي",
 "question": "7",
 "options": ["العمود الفقري","الهيكل الطرفي","الاضلاع"],
 "answer": "العمود الفقري"
 },
 
 {
-"type": "images",
-"images": "عظام الوجه",
+"type": "image",
+"image": "عظام الوجه",
 "question": "2",
 "options": [" الفك السفلي","عظام جوف الحجاج","الفك العلوي"],
 "answer": "عظام جوف الحجاج"
 },
 {
-"type": "images",
-"images": "عظام الوجه",
+"type": "image",
+"image": "عظام الوجه",
 "question": "1",
 "options": ["عظام جوف الحجاج","عظام الانف"," الفك السفلي"],
 "answer": "عظام الانف"
 },
 
 {
-"type": "images",
-"images": "مفصل العضد الكتفي",
+"type": "image",
+"image": "مفصل العضد الكتفي",
 "question": "1",
 "options": ["عظم لوح الكتف","عظم العضد","عظم الترقوة"],
 "answer": "عظم لوح الكتف"
 },
 
 {
-"type": "images",
-"images": "مفاصل العمود الفقري",
+"type": "image",
+"image": "مفاصل العمود الفقري",
 "question": "7",
 "options": ["النخاع الشوكي","جسم الفقرة","القرص الغضروفي"],
 "answer": "القرص الغضروفي"
 },
 
 {
-"type": "images",
-"images": "عظام الطرف العلوي",
+"type": "image",
+"image": "عظام الطرف العلوي",
 "question": "16",
 "options": ["عظم الزند","عظم العضد","عظم الكعبرة"],
 "answer": "عظم الكعبرة"
 },
 
 {
-"type": "images",
-"images": "عظام الطرف العلوي",
+"type": "image",
+"image": "عظام الطرف العلوي",
 "question": "19",
 "options": ["اليد","الساعد","عظام السلاميات"],
 "answer": "عظام السلاميات"
@@ -253,127 +253,127 @@ subjects = {
 
 
 {
-"type": "images",
-"images": "عظام الطرف العلوي",
+"type": "image",
+"image": "عظام الطرف العلوي",
 "question": "15",
 "options": ["عظم العضد","عظم الزند","عظم الكعبرة"],
 "answer": "عظم الزند"
 },
 
 {
-"type": "images",
-"images": "عظام الطرف السفلي",
+"type": "image",
+"image": "عظام الطرف السفلي",
 "question": "4",
 "options": ["عظم الرضفة","عظم الورك","عظم الفخد"],
 "answer": "عظم الرضفة"
 },
 
 {
-"type": "images",
-"images": "عظام الطرف السفلي",
+"type": "image",
+"image": "عظام الطرف السفلي",
 "question": "5",
 "options": ["عظم الظنبوب","عظم الشظية","عظم الفخد"],
 "answer": "عظم الظنبوب"
 },
 
 {
-"type": "images",
-"images": "عظام الطرف السفلي",
+"type": "image",
+"image": "عظام الطرف السفلي",
 "question": "10",
 "options": ["القدم","الساق","عظم الورك"],
 "answer": "الساق"
 },
 
 {
-"type": "images",
-"images": "عظام الجمجمة",
+"type": "image",
+"image": "عظام الجمجمة",
 "question": "3",
 "options": ["العظم الصدغي","العظم الجداري","العظم القفوي"],
 "answer": "العظم الصدغي"
 },
 {
-"type": "images",
-"images": "عظام الجمجمة",
+"type": "image",
+"image": "عظام الجمجمة",
 "question": "4",
 "options": ["العظم القفوي","العظم الجداري","العظم الصدغي"],
 "answer": "العظم القفوي"
 },
 
 {
-"type": "images",
-"images": "بنية العظم الطويل",
+"type": "image",
+"image": "بنية العظم الطويل",
 "question": "3",
 "options": ["المشاشة","نقي العظم","نسيج عظمي كثيف"],
 "answer": "نقي العظم"
 },
 
 {
-"type": "images",
-"images": "القناة الفقرية",
+"type": "image",
+"image": "القناة الفقرية",
 "question": "5",
 "options": ["النتوء الجانبي","قرص غضروفي","النتوء الشوكي"],
 "answer": "النتوء الشوكي"
 },
 
 {
-"type": "images",
-"images": "القفص الصدري",
+"type": "image",
+"image": "القفص الصدري",
 "question": "5",
 "options": ["الاضلاع","الاضلاع السائبة","العمود الفقري"],
 "answer": "الاضلاع السائبة"
 },
 
 {
-"type": "images",
-"images": "القفص الصدري",
+"type": "image",
+"image": "القفص الصدري",
 "question": "2",
 "options": ["عظم القص","الاضلاع","العمود الفقري"],
 "answer": "عظم القص"
 },
 
 {
-"type": "images",
-"images": "الفقرة",
+"type": "image",
+"image": "الفقرة",
 "question": "5",
 "options": ["سطح مفصلي","نتوء جانبي","ثقب فقري"],
 "answer": "نتوء جانبي"
 },
 
 {
-"type": "images",
-"images": "الفقرة",
+"type": "image",
+"image": "الفقرة",
 "question": "3",
 "options": ["ثقب فقري","نتوء شوكي","سطح مفصلي"],
 "answer": "سطح مفصلي"
 },
 
 {
-"type": "images",
-"images": "العمود الفقري",
+"type": "image",
+"image": "العمود الفقري",
 "question": "5",
 "options": ["الفقرات العصعصية","الفقرات الظهرية","الفقرات القطنية"],
 "answer": "الفقرات العصعصية"
 },
 
 {
-"type": "images",
-"images": "العمود الفقري",
+"type": "image",
+"image": "العمود الفقري",
 "question": "4",
 "options": ["الفقرات القطنية","الفقرات العجزية","الفقرات الظهرية"],
 "answer": "الفقرات العجزية"
 },
 
 {
-"type": "images",
-"images": "الزنار الحوضي",
+"type": "image",
+"image": "الزنار الحوضي",
 "question": "6",
 "options": ["العصعص","العظم العاني","العجز"],
 "answer": "العظم العاني"
 },
 
 {
-"type": "images",
-"images": "الاربطة والاوتار",
+"type": "image",
+"image": "الاربطة والاوتار",
 "question": "2",
 "options": ["اوتار","عضلة","اربطة"],
 "answer": "اربطة"
@@ -703,73 +703,73 @@ subjects = {
 "answer": "لأنه ينقل السيالة من المركز العصبي إلى عضلة اللسان"
 }
 ],
-"u1_ns_images": [
+"u1_ns_image": [
 {
-"type": "images",
-"images": "اقسام الدماغ",
+"type": "image",
+"image": "اقسام الدماغ",
 "question": "1",
 "options": ["الفص الجداري", "المخيخ", "البصلة السيسائية"],
 "answer": "الفص الجداري"
 },
 {
-"type": "images",
-"images": "اقسام الدماغ",
+"type": "image",
+"image": "اقسام الدماغ",
 "question": "2",
 "options": ["شق سيلفيوس", "شق رونالدو", "شق خلفي"],
 "answer": "شق رونالدو"
 },
 {
-"type": "images",
-"images": "اقسام الدماغ",
+"type": "image",
+"image": "اقسام الدماغ",
 "question": "10",
 "options": ["قناة السيساء", "المخ", "البصلة السيسائية"],
 "answer": "البصلة السيسائية"
 },
 {
-"type": "images",
-"images": "الوجه السفلي للدماغ",
+"type": "image",
+"image": "الوجه السفلي للدماغ",
 "question": "1",
 "options": ["الفصان الشميان", "الحدبة الحلقية", "تصالب العصبين البصريين"],
 "answer": "الفصان الشميان"
 },
 {
-"type": "images",
-"images": "الوجه السفلي للدماغ",
+"type": "image",
+"image": "الوجه السفلي للدماغ",
 "question": "2",
 "options": ["السويقتان المخيتان", "تصالب العصبين البصريين", "البصلة السيسائية"],
 "answer": "تصالب العصبين البصريين"
 },
 {
-"type": "images",
-"images": "الوجه السفلي للدماغ",
+"type": "image",
+"image": "الوجه السفلي للدماغ",
 "question": "4",
 "options": ["الحدبة الحلقية", "الفص الصدغي", "المخيخ"],
 "answer": "الحدبة الحلقية"
 },
 {
-"type": "images",
-"images": "الوجه السفلي للدماغ",
+"type": "image",
+"image": "الوجه السفلي للدماغ",
 "question": "5",
 "options": ["السويقتان المخيتان", "المخ", "البصلة السيسائية"],
 "answer": "البصلة السيسائية"
 },
 {
-"type": "images",
-"images": "مقطع عرضي للنخاع الشوكي",
+"type": "image",
+"image": "مقطع عرضي للنخاع الشوكي",
 "question": "5",
 "options": ["المادة البيضاء", "المادة الرمادية", "غشاء الأم الجافية"],
 "answer": "المادة الرمادية"
 },
 {
-"type": "images",
-"images": "مقطع عرضي للنخاع الشوكي",
+"type": "image",
+"image": "مقطع عرضي للنخاع الشوكي",
 "question": "1",
 "options": ["قناة السيساء", "البطين الرابع", "الثقب الفقري"],
 "answer": "قناة السيساء"
 },
 {
-"type": "images",
-"images": "الجهاز العصبي",
+"type": "image",
+"image": "الجهاز العصبي",
 "question": "المربع الذي يضم (الدماغ والنخاع الشوكي) في المخطط",
 "options": ["اعصاب", "البصلة السيسيائية", "النخاع الشوكي"],
 "answer": "النخاع الشوكي"
@@ -1073,39 +1073,39 @@ subjects = {
 "answer": "لأن الحاثات تنتقل عبر الدم الذي يتميز بسرعة جريان منخفضة مقارنة بالسيالة"
 }
 ],
-"u1_sum_images": [ 
+"u1_sum_image": [ 
 {
-"type": "images",
-"images": "البنكرياس",
+"type": "image",
+"image": "البنكرياس",
 "question": "4",
 "options": ["قنوات دقيقة", "جزر لانغرهانس", "خلايا غدية هاضمة"],
 "answer": "جزر لانغرهانس"
 },
 {
-"type": "images",
-"images": "البنكرياس",
+"type": "image",
+"image": "البنكرياس",
 "question": "3",
 "options": ["قنوات دقيقة", "جزر لانغرهانس", "خلايا غدية هاضمة"],
 "answer": "قنوات دقيقة"
 },
 {
-"type": "images",
-"images": "الغدد الصم",
+"type": "image",
+"image": "الغدد الصم",
 "question": "4",
 "options": ["الغدة التيموسية", "الغدة الصنوبرية", "الغدة الدرقية"],
 "answer": "الغدة التيموسية"
 },
 {
-"type": "images",
-"images": "الغدد الصم",
+"type": "image",
+"image": "الغدد الصم",
 "question": "3",
 "options": ["الغدة الكظرية", "الغدة الدرقية", "الغدة الصنوبرية"],
 "answer": "الغدة الدرقية"
 },      
       
 {
-"type": "images",
-"images": "الجهاز العصبي",
+"type": "image",
+"image": "الجهاز العصبي",
 "question": "المربع الذي يضم (الدماغ والنخاع الشوكي) في المخطط",
 "options": ["الجهاز العصبي المحيطي", "الجهاز العصبي الذاتي", "الجهاز العصبي المركزي"],
 "answer": "الجهاز العصبي المركزي"
@@ -1344,16 +1344,15 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q = q_list[index]
 
-    if q.get("type") == "images":
-        image_id = uploaded_images.get(q["images"])
+    if q.get("type") == "image":
+        image_id = uploaded_images.get(q["image"])
 
         await context.bot.send_photo(
             chat_id=query.message.chat_id,
             photo=image_id,
-            caption=q["question"],
-            text = q["question"] + "\n\n"
-        for i, opt in enumerate(q["options"]):
-            text += f"{chr(65+i)} - {opt}\n"
+            caption=q["question"]
+            
+            
         )
     else:
         text = q["question"] + "\n\n"
