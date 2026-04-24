@@ -123,7 +123,7 @@ subjects = {
 }
         ],
 
-        "u1_dam_images": [
+        "u1_dam_image": [
             {
 "type": "image",
 "image": "الهيكل العظمي",
@@ -1454,7 +1454,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
     # ================== اختيار نوع السؤال ==================
-    if data in ["taaleel", "images", "where", "level", "result", "function", "compare"]:
+    if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
 
         if user_id not in user_data:
             return
