@@ -1346,11 +1346,13 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if q.get("type") == "image":
         image_id = uploaded_images.get(q["image"])
-
+        caption = q["question"] + "\n\n"
+        for i, opt in enumerate(q["options"]):
+            caption += f"{chr(65+i)} - {opt}\n"
         await context.bot.send_photo(
             chat_id=query.message.chat_id,
             photo=image_id,
-            caption=q["question"]
+            caption=caption
             
             
         )
