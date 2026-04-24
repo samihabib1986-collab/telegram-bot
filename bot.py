@@ -1349,7 +1349,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_photo(
             chat_id=query.message.chat_id,
-            photo=image_id,
+            photo=images_id,
             caption=q["question"]
         )
     else:
