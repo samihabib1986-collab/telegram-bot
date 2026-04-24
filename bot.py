@@ -1345,7 +1345,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = q_list[index]
 
     if q.get("type") == "images":
-        image_id = uploaded_images.get(q["image"])
+        image_id = uploaded_images.get(q["images"])
 
         await context.bot.send_photo(
             chat_id=query.message.chat_id,
