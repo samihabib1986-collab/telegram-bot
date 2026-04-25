@@ -36,7 +36,7 @@ UNIT_INTRO_VIDEOS = {
 
 SECTION_INTRO_VIDEOS = {
     "dam": "BAACAgQAAxkBAAIRvGnrQ2MKxeiZFuVJ3v16gEqefHA8AAKXHQAC74lYU-Qly3e3uLQTOwQ",
-    "ns": "BAACAgQAAxkBAAIROmnqiPKGP-YaRotjs-gcLld1YROxAAIPHgAD51BTVg5QB-v3elM7BA",
+    "nervus": "BAACAgQAAxkBAAIROmnqiPKGP-YaRotjs-gcLld1YROxAAIPHgAD51BTVg5QB-v3elM7BA",
     "sum":"BAACAgQAAxkBAAISXWnrqRG-Ino_MV1BUS4PqeBeBgviAAIjHgAC74lYUxVywvZpsig4OwQ",
     "sens":"BAACAgQAAxkBAAISXWnrqRG-Ino_MV1BUS4PqeBeBgviAAIjHgAC74lYUxVywvZpsig4OwQ"
     
@@ -651,7 +651,7 @@ subjects = {
         ],
         # ===== القسم الثاني =====
 
-"u1_ns_taaleel": [
+"u1_nervus_taaleel": [
 
 {
 "question": "1. لماذا تعمل تلافيف المخ على زيادة القدرات الذهنية؟",
@@ -709,7 +709,7 @@ subjects = {
 "answer": "لأنه ينقل السيالة من المركز العصبي إلى عضلة اللسان"
 }
 ],
-"u1_ns_image": [
+"u1_nervus_image": [
 {
 "type": "image",
 "image": "اقسام الدماغ",
@@ -783,7 +783,7 @@ subjects = {
 ],
 
 
-"u1_ns_where": [
+"u1_nervus_where": [
 
 {
 "question": "1. حدد موقع المخيخ بالنسبة للمخ:",
@@ -837,7 +837,7 @@ subjects = {
 }
 ],
 
-"u1_ns_result": [
+"u1_nervus_result": [
 
 {
 "question": "1. ماذا ينتج عن استئصال المخيخ لدى طائر الحمام؟",
@@ -891,7 +891,7 @@ subjects = {
 }
 ],
 
-"u1_ns_compare": [
+"u1_nervus_compare": [
 
 {
 "question": "1. قارن بين توضع المادة الرمادية في المخ وفي النخاع الشوكي:",
@@ -944,7 +944,7 @@ subjects = {
 "answer": "الحسي من أعضاء الحس للمراكز والمحرك من المراكز للأعضاء"
 }
 ],
-"u1_ns_level": [
+"u1_nervus_level": [
 {
 "question": "1. رتب أغشية السحايا المحيطة بالمراكز العصبية من الخارج نحو الداخل:",
 "options": ["الأم الحنون ⬅️ الغشاء العنكبوتي ⬅️ الأم الجافية", "الأم الجافية ⬅️ الغشاء العنكبوتي ⬅️ الأم الحنون", "الغشاء العنكبوتي ⬅️ الأم الجافية ⬅️ الأم الحنون"],
@@ -997,7 +997,7 @@ subjects = {
 }
 ],
 
-"u1_ns_function": [
+"u1_nervus_function": [
 
 {
 "question": "1. ماهي وظيفة غمد النخاعين المحيط بالمحور؟",
@@ -1824,13 +1824,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📚 اختر القسم:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
+    
         return
 
 # ================== الأقسام ==================
     
-    if data in ["sec_u1_dam", "sec_u1_ns", "sec_u1_sum", "sec_u1_sens"]:
+    if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens"]:
 
-        section = "dam" if "dam" in data else "ns" if "ns" in data else "sum"if "sum" in data else "sens"
+        section = "dam" if "dam" in data else "nervus" if "nervus" in data else "sum"if "sum" in data else "sens"
 
         # 🎬 فيديو القسم
         section_video = SECTION_INTRO_VIDEOS.get(section)
