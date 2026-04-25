@@ -31,7 +31,8 @@ if not TOKEN:
 ADMIN_ID = 8491023024
 # ================== فيديوهات ==================
 UNIT_INTRO_VIDEOS = {
-    "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
+    "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",
+    "u2": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ"
 }
 
 SECTION_INTRO_VIDEOS = {
