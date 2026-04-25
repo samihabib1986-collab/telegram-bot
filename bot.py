@@ -1897,7 +1897,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q_list = subjects[subject][category]
 
     if index >= len(q_list):
-        await context.bot.send_message(chat_id=query.message.chat_id, text="🎉 انتهيت!\n نتيجتك هي [score]")
+        await context.bot.send_message(chat_id=query.message.chat_id, text="🎉 انتهيت!\n نتيجتك هي \{info['score']}")
         return
 
     q = q_list[index]
