@@ -1705,7 +1705,7 @@ subjects = {
 }
 ],
 
-"u1_heal_levle":
+"u1_heal_function":
 
 [
 {
@@ -1920,7 +1920,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== الأقسام ==================
     
-    if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens"]:
+    if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal"]:
 
         section = "dam" if "dam" in data else "nervus" if "nervus" in data else "sum"if "sum" in data else "sens"if "sens" in data else "heal"
 
