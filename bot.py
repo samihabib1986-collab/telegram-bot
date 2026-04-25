@@ -1829,6 +1829,8 @@ subjects = {
 }
 
 
+
+
 # ================== بيانات المستخدم ==================
 user_data = {}
 
@@ -1840,12 +1842,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not user:
         users.insert_one({"_id": user_id, "approved": False})
-        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-        return
 
-    if not user.get("approved"):
-        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-        return
+        if not user.get("approved"):
+            await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+            return
 
     await update.message.reply_text(
         "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 🌟✨\n\n"
@@ -1853,7 +1853,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
         "👨‍🏫 إشراف المدرس: أحمد نور الدين\n"
-        "💻 برمجة المهندس: سامي حبيب"
+        "💻 برمجة المهندس: سامي حبيب\n"
+        "🎁 قسم مجاني: الدعامي الحركي\n💰 باقي الأقسام مدفوعة"
     )
 
     keyboard = [
@@ -1996,10 +1997,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
 # ================== الأقسام ==================
-    
     if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal"]:
 
-        section = "dam" if "dam" in data else "nervus" if "nervus" in data else "sum"if "sum" in data else "sens"if "sens" in data else "heal"
+        # تحديد القسم بشكل دقيق
+        section_map = {
+            "sec_u1_dam": "dam",
+            "sec_u1_nervus": "nervus",
+            "sec_u1_sum": "sum",
+            "sec_u1_sens": "sens",
+            "sec_u1_heal": "heal",
+        }
+
+        section = section_map.get(data)
+
+        user = users.find_one({"_id": user_id})
+
+        # 🔥 السماح فقط للدعامي مجاناً
+        if section != "dam":
+            if not user or not user.get("approved", False):
+                await query.message.reply_text(
+                    "💰 هذا القسم مدفوع\n"
+                    "🎁 المتاح مجاناً فقط: الدعامي الحركي\n\n"
+                    "📩 اكتب /paid للاشتراك"
+                )
+                return
+    
 
         # 🎬 فيديو القسم
         section_video = SECTION_INTRO_VIDEOS.get(section)
