@@ -991,9 +991,9 @@ subjects = {
 "answer": "محور ⬅️ غمد نخاعين ⬅️ غمد شوان"
 },
 {
-"question": "6. رتب مراحل حدوث الفعل المنعكس الشوكي زمنياً:",
-"options": ["تنبيه ⬅️ سيالة حسية ⬅️ معالجة في النخاع الشوكي ⬅️ سيالة محركة ⬅️ استجابة", "استجابة ⬅️ تنبيه ⬅️ سيالة محركة ⬅️ معالجة في المركز", "سيالة حسية ⬅️ تنبيه ⬅️ استجابة ⬅️ معالجة في المركز"],
-"answer": "تنبيه ⬅️ سيالة حسية ⬅️ معالجة في النخاع الشوكي ⬅️ سيالة محركة ⬅️ استجابة"
+"question": "6. رتب مسار السيالة عبر جذور العصب الشوكي في الفعل المنعكس:",
+"options": ["جذر أمامي محرك⬅️المادة الرمادية⬅️جذر خلفي حسي", "جذر خلفي حسي⬅️المادة الرمادية للنخاع الشوكي⬅️جذر أمامي محرك", "المادة الرمادية⬅️ جذر خلفي⬅️جذر أمامي"],
+"answer": "جذر خلفي حسي⬅️المادة الرمادية للنخاع الشوكي⬅️جذر أمامي محرك"
 },
 {
 "question": "7. رتب أقسام الدماغ الرئيسية من الأعلى نحو الأسفل:",
@@ -1010,11 +1010,7 @@ subjects = {
 "options": ["مادة رمادية ⬅️ مادة بيضاء ⬅️ قناة السيساء", "قناة السيساء ⬅️ مادة رمادية ⬅️ مادة بيضاء", "مادة بيضاء ⬅️ مادة رمادية ⬅️ قناة السيساء"],
 "answer": "مادة بيضاء ⬅️ مادة رمادية ⬅️ قناة السيساء"
 },
-{
-"question": "10. رتب مسار السيالة عبر جذور العصب الشوكي في الفعل المنعكس:",
-"options": ["جذر أمامي محرك ⬅️ المادة الرمادية ⬅️ جذر خلفي حسي", "جذر خلفي حسي ⬅️ المادة الرمادية للنخاع الشوكي ⬅️ جذر أمامي محرك", "المادة الرمادية ⬅️ جذر خلفي ⬅️ جذر أمامي"],
-"answer": "جذر خلفي حسي ⬅️ المادة الرمادية للنخاع الشوكي ⬅️ جذر أمامي محرك"
-}
+
 ],
 
 "u1_nervus_function": [
@@ -1821,12 +1817,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not user:
         users.insert_one({"_id": user_id, "approved": False})
-        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-        return
 
-    if not user.get("approved"):
-        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-        return
+        if not user.get("approved"):
+            await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+            return
 
     await update.message.reply_text(
         "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 🌟✨\n\n"
@@ -1834,7 +1828,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
         "👨‍🏫 إشراف المدرس: أحمد نور الدين\n"
-        "💻 برمجة المهندس: سامي حبيب"
+        "💻 برمجة المهندس: سامي حبيب\n"
+        "🎁 قسم مجاني: الدعامي الحركي\n💰 باقي الأقسام مدفوعة"
     )
 
     keyboard = [
@@ -1977,8 +1972,22 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
 # ================== الأقسام ==================
-    
-    if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal"]:
+        if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal"]:
+
+            section = "dam" if "dam" in data else "nervus" if "nervus" in data else "sum" if "sum" in data else "sens" if "sens" in data else "heal"
+
+        # ✅ جلب حالة المستخدم
+        user = users.find_one({"_id": user_id})
+
+        # ✅ السماح فقط بالقسم الدعامي مجاناً
+        if section != "dam" and not user.get("approved", False):
+            await query.message.reply_text(
+                "💰 هذا القسم مدفوع\n"
+                "✅ المتاح مجاناً: القسم الدعامي الحركي فقط\n\n"
+                "📩 اكتب /paid للاشتراك"
+            )
+            return
+        
 
         section = "dam" if "dam" in data else "nervus" if "nervus" in data else "sum"if "sum" in data else "sens"if "sens" in data else "heal"
 
