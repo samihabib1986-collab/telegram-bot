@@ -1881,50 +1881,70 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     data = query.data
 
-    # ================== المادة ==================
+
+# ================== المادة ==================
+
     if data == "bio":
-        keyboard = [[InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")]]
+
+        keyboard = [
+            [InlineKeyboardButton("📘 الوحدة 1", callback_data="bio_u1")],
+            [InlineKeyboardButton("📘 الوحدة 2", callback_data="bio_u2")]
+        ]
+
         await query.message.reply_text(
             "📘 اختر الوحدة:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
 
-    # ================== الوحدة ==================
-    if data == "bio_u1":
 
-    # 🎬 فيديو الوحدة
-        unit_video = UNIT_INTRO_VIDEOS.get("u1")
+    # ================== الوحدات والأقسام ==================
 
-        if unit_video:
-                await context.bot.send_video(
-                chat_id=query.message.chat_id,
-                video=unit_video,
-                caption="🎬 مقدمة الوحدة 1"
-            )
+    UNITS = {
+        "u1": {
+            "sections": [
+                "dam",
+                "nervus",
+                "sum",
+                "sens",
+                "heal"
+            ]
+        },
 
-        keyboard = [
-            [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam")],
-            [InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_ns")],
-            [InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum")],
-            [InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens")],
-            [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")]
-        ]
+        # الوحدة الثانية: وظائف التغذية
+        "u2": {
+            "sections": [
+                "الهضم لدى الإنسان",
+                "الدوران لدى الإنسان",
+                "التنفس لدى الإنسان",
+                "الإطراح عند الإنسان",
+                "صحة وظائف التغذية"
+            ]
+        }
+    }
 
-        await query.message.reply_text(
-            "📚 اختر القسم:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-    
-        return
 
-# ================== الأقسام ==================
-    
-    if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal"]:
+    # ================== معالجة الأقسام ==================
 
-        section = "dam" if "dam" in data else "nervus" if "nervus" in data else "sum"if "sum" in data else "sens"if "sens" in data else "heal"
+    if data.startswith("sec_"):
 
-        # 🎬 فيديو القسم
+        try:
+            parts = data.split("_")
+            prefix = parts[0]
+            unit = parts[1]
+            section = "_".join(parts[2:])  # مهم لدعم الجمل العربية
+        except Exception:
+            return
+
+        if unit not in UNITS:
+            return
+
+        if section not in UNITS[unit]["sections"]:
+            return
+
+
+        # ================== فيديو القسم ==================
+
         section_video = SECTION_INTRO_VIDEOS.get(section)
 
         if section_video:
@@ -1934,13 +1954,19 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 caption="🎬 مقدمة القسم"
             )
 
+
+        # ================== حفظ بيانات المستخدم ==================
+
         user_data[user_id] = {
             "subject": "bio",
-            "unit": "u1",
+            "unit": unit,
             "section": section,
             "score": 0,
             "q_index": 0
         }
+
+
+        # ================== لوحة الاختيارات ==================
 
         keyboard = [
             [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
@@ -1953,12 +1979,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
 
         await query.message.reply_text(
-         "اختر نوع الأسئلة:",
-         reply_markup=InlineKeyboardMarkup(keyboard)
+            "اختر نوع الأسئلة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
         return
+
+
     # ================== اختيار نوع السؤال ==================
+
     if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
 
         if user_id not in user_data:
@@ -1969,26 +1998,30 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         category = f"{unit}_{section}_{data}"
 
-        if category not in subjects["bio"]:
+        if "bio" not in subjects or category not in subjects["bio"]:
             await query.message.reply_text("❌ لا يوجد أسئلة")
             return
 
         user_data[user_id]["category"] = category
         user_data[user_id]["q_index"] = 0
 
-        keyboard = [[InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")]]
+        keyboard = [
+            [InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")]
+        ]
 
         await query.message.reply_text(
             "ابدأ الاختبار:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
+
         return
 
+
     # ================== بدء الاختبار ==================
+
     if data == "start_quiz":
         await send_question(update, context)
         return
-
     # ================== الإجابة ==================
     if data in ["0", "1", "2"]:
 
