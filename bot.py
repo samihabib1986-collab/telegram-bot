@@ -55,7 +55,6 @@ SECTION_INTRO_VIDEOS = {
 
 # ================== الصور ==================
 uploaded_images = {
-"teacher_image_id": "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ",
 "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ",
 "عظام الوجه": "AgACAgQAAxkBAAIDgmnjuaxzSVnHSg-Ht5sh8MLSRxgDAAJEDGsb4XYhUyf_4zNepyt6AQADAgADbQADOwQ",
 "مفصل العضد الكتفي": "AgACAgQAAxkBAAIDrGnj2XkC5s_14i-8Zr11ICic-ImxAAJjDGsb4XYhU7x_C70kw-VnAQADAgADbQADOwQ",
@@ -980,7 +979,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ================== المادة ==================
     if data == "bio":
 
-        teacher_image_id = "PUT_TEACHER_IMAGE_ID_HERE"
+        teacher_image_id = "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ"
 
     caption = (
         "👨‍🏫 الأستاذ: أحمد نور الدين\n\n"
