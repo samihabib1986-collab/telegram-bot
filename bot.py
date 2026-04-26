@@ -1585,7 +1585,7 @@ subjects = {
 {
 "question": "5. رتب طبقات جدار كرة العين من الخارج نحو الداخل:",
 "options": ["المشيمية ⬅️ الصلبة ⬅️ الشبكية", "الصلبة ⬅️ المشيمية ⬅️ الشبكية", "الشبكية ⬅️ المشيمية ⬅️ الصلبة"],
-"answer": "الصلبة ⬅️ المشيمية ⬅️ الشبكية"
+"answer": "الشبكية ⬅️ المشيمية ⬅️ الصلبة"
 },
 {
 "question": "6. رتب مراحل عملية المطابقة عند تقريب جسم من العين:",
@@ -1834,6 +1834,38 @@ subjects = {
 # ================== بيانات المستخدم ==================
 user_data = {}
 
+
+
+# ================== الدفع ==================
+async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    await context.bot.send_message(
+        chat_id=ADMIN_ID,
+        text=f"💳 طلب اشتراك:\n/approve {user_id}"
+    )
+
+    await update.message.reply_text("⏳ تم إرسال طلب الاشتراك")
+
+# ================== الموافقة ==================
+async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    user_id = int(context.args[0])
+
+    users.update_one(
+        {"_id": user_id},
+        {"$set": {"approved": True}},
+        upsert=True
+    )
+
+    await update.message.reply_text("✅ تم التفعيل")
+
+    await context.bot.send_message(
+        chat_id=user_id,
+        text="🎉 تم قبول اشتراكك"
+    )
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -1900,6 +1932,11 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+
+
+
+
+
 # ================== إرسال السؤال (يدعم الصور) ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -1917,7 +1954,19 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q_list = subjects[subject][category]
 
     if index >= len(q_list):
-        await context.bot.send_message(chat_id=query.message.chat_id, text="🎉 انتهيت!\n نتيجتك هي \{info['score']}")
+
+        text = f"🎉 انتهيت!\n\n🏆 نتيجتك: {info['score']}"
+
+        keyboard = [
+            [InlineKeyboardButton("🔄 إعادة الاختبار", callback_data="restart_quiz")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data="back_to_types")]
+        ]
+
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text=text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
         return
 
     q = q_list[index]
@@ -1996,6 +2045,28 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
         return
 
+
+    # 🔙 الرجوع إلى أنواع الأسئلة
+    if data == "back_to_types":
+
+        if user_id not in user_data:
+            return
+
+        keyboard = [
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
+            [InlineKeyboardButton("🖼 صور", callback_data="image")],
+            [InlineKeyboardButton("📍 موقع", callback_data="where")],
+            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result")],
+            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
+            [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
+        ]
+
+        await query.message.reply_text(
+            "اختر نوع الأسئلة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
 # ================== الأقسام ==================
     if data in ["sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal"]:
 
