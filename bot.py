@@ -1001,10 +1001,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await query.message.reply_text(
-        "📚 اختر الوحدة:",
+        chat_id=query.message.chat_id,
+        text="📚 اختر الوحدة:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
-    return
+    return  
     # ================== 1الوحدة ==================
     if data == "bio_u1":
 
