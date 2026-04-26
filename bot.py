@@ -2182,6 +2182,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("paid", paid))
+app.add_handler(CommandHandler("approve", approve))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
