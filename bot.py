@@ -1,4 +1,4 @@
-from email.mime import image
+from email.mime import image, text
 import os
 import logging
 import asyncio
@@ -35,9 +35,6 @@ UNIT_INTRO_VIDEOS = {
     "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",
     "u2": "BAACAgQAAxkBAAIarWnuYDZ8o-UdC47sqMr0kxoHjzhUAAL-HAACoG9wU3XlGC00flPjOwQ"  # 🎬 فيديو الوحدة الثانية
 }
-UNIT_INTRO_bicture = {
-    "bio": "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ",
-}
 
 SECTION_INTRO_VIDEOS = {
     "dam": "BAACAgQAAxkBAAIRvGnrQ2MKxeiZFuVJ3v16gEqefHA8AAKXHQAC74lYU-Qly3e3uLQTOwQ",
@@ -46,11 +43,11 @@ SECTION_INTRO_VIDEOS = {
     "sens":"BAACAgQAAxkBAAIT2WnskRk5P6AlybxMghy56RqihQ6wAALvGgAC74lgU35l37gtm2KPOwQ",
     "heal":"BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
     # ===== الوحدة 2 =====
-    "digest": "PUT_VIDEO_ID",
-    "circulation": "PUT_VIDEO_ID",
-    "respiration": "PUT_VIDEO_ID",
-    "excretion": "PUT_VIDEO_ID",
-    "nutrition_health": "PUT_VIDEO_ID"
+    "digest": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
+    "circulation": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
+    "respiration": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
+    "excretion": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
+    "nutrition_health": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ    "
 }
 
 # ================== الصور ==================
