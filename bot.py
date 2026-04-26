@@ -975,8 +975,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== المادة ==================
     if data == "bio":
+        await query.answer()  # مهم جداً
 
-        teacher_image_id = "PUT_TEACHER_IMAGE_ID_HERE"
+        teacher_image_id = "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ"
 
         caption = (
             "👨‍🏫 الأستاذ: أحمد نور الدين\n\n"
@@ -990,7 +991,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             photo=teacher_image_id,
             caption=caption
         )
-        await query.answer()  # مهم جداً
+        await query.answer() 
         keyboard = [
             [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
             [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
