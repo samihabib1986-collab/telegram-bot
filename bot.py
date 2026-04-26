@@ -1955,7 +1955,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if index >= len(q_list):
 
-        text = f"🎉 انتهيت!\n\n🏆 نتيجتك: {info['score']}"
+        text = f"🎉 انتهيت!\n\n🏆 نتيجتك: {info['score'] } من {len(q_list)*10}"
 
         keyboard = [
             [InlineKeyboardButton("🔄 إعادة الاختبار", callback_data="restart_quiz")],
@@ -2063,7 +2063,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
 
         await query.message.reply_text(
-            "اختر نوع الأسئلة:",
+            "اختر نوع الأسئلة: \data",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
