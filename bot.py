@@ -32,8 +32,11 @@ if not TOKEN:
 ADMIN_ID = 8491023024
 # ================== فيديوهات ==================
 UNIT_INTRO_VIDEOS = {
-    "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",# 🎬 فيديو الوحدة الأولى
+    "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",
     "u2": "BAACAgQAAxkBAAIarWnuYDZ8o-UdC47sqMr0kxoHjzhUAAL-HAACoG9wU3XlGC00flPjOwQ"  # 🎬 فيديو الوحدة الثانية
+}
+UNIT_INTRO_bicture = {
+    "bio": "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ",
 }
 
 SECTION_INTRO_VIDEOS = {
@@ -975,6 +978,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== المادة ==================
     if data == "bio":
+        image_id = "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ",
+        caption = "الاستاذ نور الدين الشرح الكامل لمادة علم الأحياء والأرض لطلاب الصف الثالث الاعدادي "
+        
         keyboard = [
             [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
             [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
