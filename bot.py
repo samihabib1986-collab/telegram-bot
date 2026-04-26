@@ -975,34 +975,33 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== المادة ==================
     if data == "bio":
+        await query.answer()  # مهم جداً
 
-        teacher_image_id = "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ"
+        teacher_image_id = "PUT_TEACHER_IMAGE_ID_HERE"
 
-    caption = (
-        "👨‍🏫 الأستاذ: أحمد نور الدين\n\n"
-        "📘 مدرس مادة علم الأحياء\n"
-        "🎯 يهدف إلى تبسيط المفاهيم العلمية\n"
-        "🚀 ويساعد الطلاب على تحقيق أعلى الدرجات\n\n"
-        "✨ أهلاً بك في رحلتك التعليمية!"
-    )
+        caption = (
+            "👨‍🏫 الأستاذ: أحمد نور الدين\n\n"
+            "📘 مدرس مادة علم الأحياء\n"
+            "🎯 يهدف إلى تبسيط المفاهيم العلمية\n"
+            "🚀 ويساعد الطلاب على تحقيق أعلى الدرجات\n\n"
+            "✨ أهلاً بك في رحلتك التعليمية!"
+        )
+        await context.bot.send_photo(
+            chat_id=query.message.chat_id,
+            photo=teacher_image_id,
+            caption=caption
+        )
+        keyboard = [
+            [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
+            [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
+        ]
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="📚 اختر الوحدة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
-    await context.bot.send_photo(
-        chat_id=query.message.chat_id,
-        photo=teacher_image_id,
-        caption=caption
-    )
-
-    keyboard = [
-        [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
-        [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
-    ]
-
-    await query.message.reply_text(
-        chat_id=query.message.chat_id,
-        text="📚 اختر الوحدة:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-    return  
+        return
     # ================== 1الوحدة ==================
     if data == "bio_u1":
 
