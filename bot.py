@@ -1825,6 +1825,8 @@
     }
     # ================== بيانات المستخدم ==================
     user_data = {}
+    approved_users = set()
+    pending_users = set()
 
 
 
