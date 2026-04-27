@@ -1214,18 +1214,26 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if selected_index == correct_index:
             info["score"] += 10
 
-            # 🎉 احتفال
-            await context.bot.send_message(
-                chat_id=query.message.chat_id,
-                text="🎉🎉 إجابة صحيحة!",
-                message_effect_id="5104841245755180586"
-            )
+            try:
+                await context.bot.send_message(
+                    chat_id=query.message.chat_id,
+                    text="🎉🎉 إجابة صحيحة!",
+                    message_effect_id="5104841245755180586"
+                )
+            except Exception as e:
+                print("Effect not supported:", e)
+
+                # fallback عادي
+                await context.bot.send_message(
+                    chat_id=query.message.chat_id,
+                    text="🎉 إجابة صحيحة!"
+                )
         else:
             await query.message.reply_text(
                 f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
             )
 
-        # ⏭️ الانتقال للسؤال التالي (مهم يكون خارج if/else)
+        # ⏭️ مهم جداً (خارج if)
         info["q_index"] += 1
 
         await asyncio.sleep(1)
