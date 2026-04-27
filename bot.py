@@ -1177,8 +1177,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "start_quiz":
         await send_question(update, context)
         return
-
-    # ================== الإجابة ==================
+# ================== الإجابة ==================
     if data in ["0", "1", "2"]:
 
         if user_id not in user_data:
@@ -1191,7 +1190,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         selected_index = int(data)
         correct_index = q["options"].index(q["answer"])
 
-        # 🔒 إنشاء أزرار مقفلة مع توضيح الصح والخطأ
+        # 🔒 إنشاء أزرار مقفلة
         buttons = []
         row = []
 
@@ -1203,39 +1202,33 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 text = f"{chr(65+i)}"
 
-            # callback_data مختلفة (مقفلة)
             row.append(InlineKeyboardButton(text, callback_data="locked"))
 
         buttons.append(row)
 
-        # 🔁 تعديل الأزرار الحالية
         await query.edit_message_reply_markup(
             reply_markup=InlineKeyboardMarkup(buttons)
         )
 
-        # 📊 حساب النتيجة
+        # 🎯 التقييم
         if selected_index == correct_index:
             info["score"] += 10
-            result = "✔️ صحيح"
-        else:
-            result = f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
 
+            # 🎉 احتفال
+            await context.bot.send_message(
+                chat_id=query.message.chat_id,
+                text="🎉🎉 إجابة صحيحة!",
+                message_effect_id="5104841245755180586"
+            )
+        else:
+            await query.message.reply_text(
+                f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
+            )
+
+        # ⏭️ الانتقال للسؤال التالي (مهم يكون خارج if/else)
         info["q_index"] += 1
 
-    if selected_index == correct_index:
-        info["score"] += 10
-
-        await context.bot.send_message(
-            chat_id=query.message.chat_id,
-            text="🎉🎉 إجابة صحيحة!",
-            message_effect_id="5104841245755180586"  # 🎆 تأثير احتفال
-        )
-    else:
-        await query.message.reply_text(
-            f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
-        )
         await asyncio.sleep(1)
-
         await send_question(update, context)
 # ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
