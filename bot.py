@@ -1215,10 +1215,10 @@
                 info["score"] += 10
 
                 # 🎉 احتفال
-                await context.bot.send_animation(
+                await context.bot.send_message(
                     chat_id=query.message.chat_id,
-                    animation="PUT_FIREWORKS_GIF_ID",
-                    caption="🎉 إجابة صحيحة!"
+                    text="🎉🎉 إجابة صحيحة!",
+                    
                 )
             else:
                 await query.message.reply_text(
