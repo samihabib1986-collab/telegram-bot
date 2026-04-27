@@ -854,7 +854,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         users.insert_one({"_id": user_id, "approved": False})
         user = {"approved": False}
 
-    if not user.get("approved", False):
+    if not user.get("approved"):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
@@ -972,14 +972,6 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     asyncio.create_task(
         delete_later(context.bot, query.message.chat_id, msg.message_id)
     )
-
-    # حذف بعد 30 ثانية
-    async def delete_later(bot, chat_id, message_id):
-        await asyncio.sleep(30)
-        try:
-            await bot.delete_message(chat_id, message_id)
-        except:
-            pass
     keyboard = [[
         InlineKeyboardButton("A", callback_data="0"),
         InlineKeyboardButton("B", callback_data="1"),
@@ -994,7 +986,6 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()
 
     user_id = query.from_user.id
     data = query.data
@@ -1006,9 +997,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if time.time() - user_data[user_id]["last_time"] < 2:
                         await query.answer("⏳ انتظر قليلاً...", show_alert=False)
                         return
-                        user_data[user_id]["last_time"] = time.time()
-                    else:
-                        user_data[user_id] = {"last_time": time.time()}
+
+                user_data[user_id]["last_time"] = time.time()
+            else:
+                user_data[user_id] = {"last_time": time.time()}
 
     # ================== المادة ==================
     if data == "bio":
