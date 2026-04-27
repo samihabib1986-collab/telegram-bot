@@ -1,10 +1,17 @@
 from email.mime import image, text
+import time
 import os
 import logging
 import asyncio
 from pymongo import MongoClient
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters)
+async def delete_later(bot, chat_id, message_id, delay=30):
+    await asyncio.sleep(delay)
+    try:
+        await bot.delete_message(chat_id=chat_id, message_id=message_id)
+    except:
+        pass
 
 # ================== إعداد MongoDB ==================
 MONGO_URL = os.environ.get("MONGO_URL")
@@ -835,20 +842,21 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=user_id,
-        text="🎉 تم قبول اشتراكك"
+        text="🎉 تم قبول اشتراكك",
+        protect_content=True
     )
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-
     user = users.find_one({"_id": user_id})
 
     if not user:
         users.insert_one({"_id": user_id, "approved": False})
+        user = {"approved": False}
 
-        if not user.get("approved"):
-            await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-            return
+    if not user.get("approved"):
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
 
     await update.message.reply_text(
         "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 🌟✨\n\n"
@@ -920,7 +928,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if index >= len(q_list):
 
-        text = f"🎉 انتهيت!\n\n🏆 نتيجتك: {info['score'] } من {len(q_list)*10}"
+        text = f"👤 ID: {user_id}\n\n" + f"🎉 انتهيت!\n\n🏆 نتيجتك: {info['score'] } من {len(q_list)*10}"
 
         keyboard = [
             [InlineKeyboardButton("🔄 إعادة الاختبار", callback_data="restart_quiz")],
@@ -930,31 +938,40 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=query.message.chat_id,
             text=text,
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            protect_content=True
         )
         return
 
     q = q_list[index]
+
+    text = None
 
     if q.get("type") == "image":
         image_id = uploaded_images.get(q["image"])
         caption = q["question"] + "\n\n"
         for i, opt in enumerate(q["options"]):
             caption += f"{chr(65+i)} - {opt}\n"
+
         await context.bot.send_photo(
             chat_id=query.message.chat_id,
             photo=image_id,
-            caption=caption
-            
-            
+            caption=caption,
+            protect_content=True
         )
+        return
+
     else:
-        text = q["question"] + "\n\n"
+        text = f"👤 ID: {user_id}\n\n{q['question']}\n\n"
         for i, opt in enumerate(q["options"]):
             text += f"{chr(65+i)} - {opt}\n"
 
-        await context.bot.send_message(chat_id=query.message.chat_id, text=text)
 
+    msg = await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text=text,
+        protect_content=True
+    )
     keyboard = [[
         InlineKeyboardButton("A", callback_data="0"),
         InlineKeyboardButton("B", callback_data="1"),
@@ -964,14 +981,15 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=query.message.chat_id,
         text="اختر الإجابة:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        protect_content=True
     )
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()
 
     user_id = query.from_user.id
     data = query.data
+
 
     # ================== المادة ==================
     if data == "bio":
@@ -986,11 +1004,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🚀 ويساعد الطلاب على تحقيق أعلى الدرجات\n\n"
             "✨ أهلاً بك في رحلتك التعليمية!"
         )
-        await context.bot.send_photo(
+        msg =   await context.bot.send_photo(
             chat_id=query.message.chat_id,
             photo=teacher_image_id,
-            caption=caption
+            caption=f"👤 {user_id}\n\n" +caption,
+            protect_content=True
         )
+
+        await asyncio.sleep(30)
         await query.answer() 
         keyboard = [
             [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
@@ -999,7 +1020,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=query.message.chat_id,
             text="📚 اختر الوحدة:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            protect_content=True
         )
 
         return
@@ -1109,7 +1131,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "sec_u2_nutrition_health": ("u2", "nutrition_health"),
         }
 
-        unit, section = section_map.get(data)
+        mapped = section_map.get(data)
+
+        if not mapped:
+            return
+
+        unit, section = mapped
 
         user = users.find_one({"_id": user_id})
 
@@ -1227,7 +1254,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_message(
                     chat_id=query.message.chat_id,
                     text="🎉🎉 إجابة صحيحة!",
-                    message_effect_id="5104841245755180586"
+                    message_effect_id="5104841245755180586",
+                    protect_content=True
                 )
             except Exception as e:
                 print("Effect not supported:", e)
@@ -1235,18 +1263,18 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # fallback عادي
                 await context.bot.send_message(
                     chat_id=query.message.chat_id,
-                    text="🎉 إجابة صحيحة!"
+                    text="🎉 إجابة صحيحة!",
+                    protect_content=True
                 )
         else:
             await query.message.reply_text(
                 f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
             )
-
-        # ⏭️ مهم جداً (خارج if)
         info["q_index"] += 1
 
         await asyncio.sleep(1)
         await send_question(update, context)
+        
 # ================== تشغيل ==================
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("paid", paid))
