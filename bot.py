@@ -1031,7 +1031,16 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
         return
 
+    if data == "restart_quiz":
 
+        if user_id not in user_data:
+            return
+
+        user_data[user_id]["q_index"] = 0
+        user_data[user_id]["score"] = 0
+
+        await send_question(update, context)
+        return
     # 🔙 الرجوع إلى أنواع الأسئلة
     if data == "back_to_types":
 
