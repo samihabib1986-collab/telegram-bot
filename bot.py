@@ -945,21 +945,24 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     q = q_list[index]
 
+    text = None
+
     if q.get("type") == "image":
         image_id = uploaded_images.get(q["image"])
         caption = q["question"] + "\n\n"
         for i, opt in enumerate(q["options"]):
             caption += f"{chr(65+i)} - {opt}\n"
+
         await context.bot.send_photo(
             chat_id=query.message.chat_id,
             photo=image_id,
-            caption= caption,
+            caption=caption,
             protect_content=True
-            
-            
         )
+        return
+
     else:
-        text = f"👤 ID: {user_id}\n\n" +q["question"] + "\n\n"
+        text = f"👤 ID: {user_id}\n\n{q['question']}\n\n"
         for i, opt in enumerate(q["options"]):
             text += f"{chr(65+i)} - {opt}\n"
 
@@ -986,14 +989,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = query.from_user.id
     data = query.data
-        # 🚫 منع الضغط السريع (سبام)
-    if user_id in user_data:
-        last = user_data[user_id].get("last_time", 0)
-        if time.time() - last < 2:
-            await query.answer("⏳ انتظر قليلاً...", show_alert=False)
-            return
 
-    user_data.setdefault(user_id, {})["last_time"] = time.time()
 
     # ================== المادة ==================
     if data == "bio":
