@@ -6,6 +6,12 @@ import asyncio
 from pymongo import MongoClient
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters)
+async def delete_later(bot, chat_id, message_id, delay=30):
+    await asyncio.sleep(delay)
+    try:
+        await bot.delete_message(chat_id=chat_id, message_id=message_id)
+    except:
+        pass
 
 # ================== إعداد MongoDB ==================
 MONGO_URL = os.environ.get("MONGO_URL")
@@ -842,15 +848,15 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-
     user = users.find_one({"_id": user_id})
 
     if not user:
         users.insert_one({"_id": user_id, "approved": False})
+        user = {"approved": False}
 
-        if not user.get("approved"):
-            await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-            return
+    if not user.get("approved", False):
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
 
     await update.message.reply_text(
         "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 🌟✨\n\n"
@@ -963,13 +969,17 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text=text,
         protect_content=True
     )
+    asyncio.create_task(
+        delete_later(context.bot, query.message.chat_id, msg.message_id)
+    )
 
     # حذف بعد 30 ثانية
-    await asyncio.sleep(30)
-    await context.bot.delete_message(
-        chat_id=query.message.chat_id,
-        message_id=msg.message_id
-    )
+    async def delete_later(bot, chat_id, message_id):
+        await asyncio.sleep(30)
+        try:
+            await bot.delete_message(chat_id, message_id)
+        except:
+            pass
     keyboard = [[
         InlineKeyboardButton("A", callback_data="0"),
         InlineKeyboardButton("B", callback_data="1"),
@@ -991,13 +1001,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 🚫 منع الضغط السريع (سبام)
     if user_id in user_data:
         if "last_time" in user_data[user_id]:
-            if time.time() - user_data[user_id]["last_time"] < 2:
-                await query.answer("⏳ انتظر قليلاً...", show_alert=False)
-            return
-
-        user_data[user_id]["last_time"] = time.time()
-    else:
-        user_data[user_id] = {"last_time": time.time()}
+            if user_id in user_data:
+                if "last_time" in user_data[user_id]:
+                    if time.time() - user_data[user_id]["last_time"] < 2:
+                        await query.answer("⏳ انتظر قليلاً...", show_alert=False)
+                        return
+                        user_data[user_id]["last_time"] = time.time()
+                    else:
+                        user_data[user_id] = {"last_time": time.time()}
 
     # ================== المادة ==================
     if data == "bio":
@@ -1018,6 +1029,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             caption=f"👤 {user_id}\n\n" +caption,
             protect_content=True
         )
+
         await asyncio.sleep(30)
         await context.bot.delete_message(
         chat_id=query.message.chat_id,
@@ -1142,7 +1154,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "sec_u2_nutrition_health": ("u2", "nutrition_health"),
         }
 
-        unit, section = section_map.get(data)
+        mapped = section_map.get(data)
+
+        if not mapped:
+            return
+
+        unit, section = mapped
 
         user = users.find_one({"_id": user_id})
 
