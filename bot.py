@@ -969,9 +969,6 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text=text,
         protect_content=True
     )
-    asyncio.create_task(
-        delete_later(context.bot, query.message.chat_id, msg.message_id)
-    )
     keyboard = [[
         InlineKeyboardButton("A", callback_data="0"),
         InlineKeyboardButton("B", callback_data="1"),
@@ -991,16 +988,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
         # 🚫 منع الضغط السريع (سبام)
     if user_id in user_data:
-        if "last_time" in user_data[user_id]:
-            if user_id in user_data:
-                if "last_time" in user_data[user_id]:
-                    if time.time() - user_data[user_id]["last_time"] < 2:
-                        await query.answer("⏳ انتظر قليلاً...", show_alert=False)
-                        return
+        last = user_data[user_id].get("last_time", 0)
+        if time.time() - last < 2:
+            await query.answer("⏳ انتظر قليلاً...", show_alert=False)
+            return
 
-                user_data[user_id]["last_time"] = time.time()
-            else:
-                user_data[user_id] = {"last_time": time.time()}
+    user_data.setdefault(user_id, {})["last_time"] = time.time()
 
     # ================== المادة ==================
     if data == "bio":
