@@ -1,11 +1,26 @@
-
 import time
 import os
 import logging
 import asyncio
+import random
 from pymongo import MongoClient
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters)
+import random  # تأكد تضيفها إذا ما كانت موجودة
+
+# ================== رسائل التشجيع ==================
+positive = [
+    "🎉 ممتاز! إجابة صحيحة",
+    "💪 أحسنت! استمر",
+    "🔥 رائع جداً!",
+    "🌟 إجابة قوية!"
+]
+
+negative = [
+    "😅 لا بأس، حاول مرة أخرى",
+    "💡 الإجابة الصحيحة تساعدك تتعلم",
+    "📘 ركز أكثر في هذه النقطة"
+]
 async def delete_later(bot, chat_id, message_id, delay=30):
     await asyncio.sleep(delay)
     try:
@@ -89,6 +104,13 @@ uploaded_images = {
 "اقسام الاذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
 "كرة العين": "AgACAgQAAxkBAAITf2nr3hBZxdkfGMNiLk2bFeYpd7ETAALQDGsb74lYUxk-ui92CqcHAQADAgADeAADOwQ",
 "مقارنة العظام":"AgACAgQAAxkBAAIVgGnsxaQYniAmfOJp99AHUnk1debqAAK1DGsb74lgU1oxFWFedrt3AQADAgADeQADOwQ",
+"الدم": "AgACAgQAAxkBAAIdbmnvTFKzzZPHsYsH9VsekXHJZyPDAAKODGsbHtd5U0d_OGcsHt3pAQADAgADeQADOwQ",
+"الجهاز البلغمي": "AgACAgQAAxkBAAIdcGnvTFiUowq7kyrfcPiJsOfzyb19AAKPDGsbHtd5Uzr8TcrilreGAQADAgADeQADOwQ",
+"أقسام جهاز التنفس": "AgACAgQAAxkBAAIdcmnvTF2UFUFvUIIaNOI0AurRvH7BAAKQDGsbHtd5UzOW8dKjt4tZAQADAgADeQADOwQ",
+"مقطع طولي في الحنجرة": "AgACAgQAAxkBAAIddGnvTGJdM5G3poPXQFozvL3kcpZvAAKRDGsbHtd5U2yI62uPS3QdAQADAgADeQADOwQ",
+"مقطع عرضي للقلب": "AgACAgQAAxkBAAIddmnvTGcXVLcj77UjoL2CowyAwRt4AAKSDGsbHtd5U3hsHtT-KuT2AQADAgADeQADOwQ",
+"دورتا الدم": "AgACAgQAAxkBAAIdeGnvTGqeVkcUHjuH1qqX9hq2O9iWAAKTDGsbHtd5U0ZVaQtT1_pTAQADAgADeQADOwQ",
+"السدم": "AgACAgQAAxkBAAIVgGnsxaQYniAmfOJp99AHUnk1debqAAK1DGsb74lgU1oxFWFedrt3AQADAgADeQADOwQ",
 
 }
 
@@ -483,7 +505,8 @@ subjects = {
 {"question": "3. رتب خطوات العناية بالعظام من حيث التغذية والنشاط:","options": ["ممارسة الرياضة ⬅️ تناول غذاء غني بالكالسيوم وفيتامين D ⬅️ التعرض لأشعة الشمس ⬅️ عظام قوية وسليمة", "عظام سليمة ⬅️ نقص الكالسيوم ⬅️ ممارسة الرياضة", "التعرض للشمس ⬅️ عظام هشة ⬅️ إهمال الغذاء"],"answer": "ممارسة الرياضة ⬅️ تناول غذاء غني بالكالسيوم وفيتامين D ⬅️ التعرض لأشعة الشمس ⬅️ عظام قوية وسليمة"}],
 "u1_sens_image":
 [
-{"type": "image","image": "مقارنة العظام","question": "8","options": ["السمحاق", "عظم كثيف", "عظم اسفنجي"],"answer": "عظم اسفنجي"},],"u2_digest_taaleel": 
+{"type": "image","image": "مقارنة العظام","question": "8","options": ["السمحاق", "عظم كثيف", "عظم اسفنجي"],"answer": "عظم اسفنجي"},],
+"u2_digest_taaleel": 
 [
 {"question": "1. لماذا يعتبر الهضم في الفم هضماً جزئياً (كيميائياً)؟", "options": ["لأن الأنزيم اللعابي لا يحول النشاء المطبوخ بالكامل لسكر ثنائي", "لأن الأسنان لا تقطع الطعام جيداً", "بسبب سرعة انتقال اللقمة إلى البلعوم"], "answer": "لأن الأنزيم اللعابي لا يحول النشاء المطبوخ بالكامل لسكر ثنائي"},
 {"question": "2. لماذا لا يعاني رواد الفضاء من مشكلة وصول الطعام للمعدة رغم انعدام الجاذبية؟", "options": ["بسبب وجود عصارات قوية تسحب الطعام", "بسبب التقلصات الموجية للعضلات الطولية والدائرية في المريء", "لأن البلعوم يدفع الطعام بقوة هائلة"], "answer": "بسبب التقلصات الموجية للعضلات الطولية والدائرية في المريء"},
@@ -644,15 +667,15 @@ subjects = {
 ],
 "u2_circulation_image": 
 [
-{"type": "image", "image": "مقطع طولي في عضلة القلب", "question": "التجويف العضلي الذي يضخ الدم للأبهر (رقم 3)", "options": ["البطين الأيسر", "الأذينة اليمنى", "البطين الأيمن"], "answer": "البطين الأيسر"},
-{"type": "image", "image": "مقطع طولي في عضلة القلب", "question": "أضخم شريان في الجسم يصدر من البطين الأيسر (رقم 1)", "options": ["الشريان الرئوي", "الشريان الأبهر", "الوريد الأجوف"], "answer": "الشريان الأبهر"},
-{"type": "image", "image": "عينة دموية تحت المجهر", "question": "الخلايا الأكثر عدداً والقرصية الشكل التي تنقل الغازات", "options": ["الكريات البيضاء", "الكريات الحمراء", "الصفيحات الدموية"], "answer": "الكريات الحمراء"},
-{"type": "image", "image": "عينة دموية تحت المجهر", "question": "الخلايا التي تحتوي على نواة ولها دور دفاعي", "options": ["الكريات البيضاء", "الكريات الحمراء", "أرومات الليف"], "answer": "الكريات البيضاء"},
+{"type": "image", "image": "ممقطع عرضي للقلب", "question": "التجويف العضلي الذي يضخ الدم للأبهر (رقم 3)", "options": ["البطين الأيسر", "الأذينة اليمنى", "البطين الأيمن"], "answer": "البطين الأيسر"},
+{"type": "image", "image": "ممقطع عرضي للقلب", "question": "أضخم شريان في الجسم يصدر من البطين الأيسر (رقم 1)", "options": ["الشريان الرئوي", "الشريان الأبهر", "الوريد الأجوف"], "answer": "الشريان الأبهر"},
+{"type": "image", "image": "الدم", "question": "الخلايا الأكثر عدداً والقرصية الشكل التي تنقل الغازات", "options": ["الكريات البيضاء", "الكريات الحمراء", "الصفيحات الدموية"], "answer": "الكريات الحمراء"},
+{"type": "image", "image": "الدم", "question": "الخلايا التي تحتوي على نواة ولها دور دفاعي", "options": ["الكريات البيضاء", "الكريات الحمراء", "أرومات الليف"], "answer": "الكريات البيضاء"},
 {"type": "image", "image": "الجهاز البلغمي", "question": "العقد الصغيرة المنتشرة في أنحاء الجسم لتنقية البلغم", "options": ["العقد البلغمية", "الحويصلات الرئوية", "الخلايا الكبدية"], "answer": "العقد البلغمية"},
 {"type": "image", "image": "دورتا الدم", "question": "الدورة التي يخرج فيها الدم من البطين الأيمن للرئتين", "options": ["الدورة الكبرى", "الدورة الصغرى", "الدورة البابية"], "answer": "الدورة الصغرى"},
-{"type": "image", "image": "مقطع طولي في عضلة القلب", "question": "الغشاء الرقيق الذي يغلف القلب من الخارج", "options": ["غشاء التامور", "غشاء الجنب", "الأم الحنون"], "answer": "غشاء التامور"},
-{"type": "image", "image": "مقطع طولي في عضلة القلب", "question": "الحاجز العضلي الذي يقسم القلب إلى نصفين (أيمن وأيسر)", "options": ["الحاجز القلبي", "اللهاة", "السيماء"], "answer": "الحاجز القلبي"},
-{"type": "image", "image": "عينة دموية تحت المجهر", "question": "الأجزاء الخلوية الصغيرة جداً المسؤولة عن التخثر", "options": ["الصفيحات الدموية", "الخلايا القاعدية", "الأضداد"], "answer": "الصفيحات الدموية"},
+{"type": "image", "image": "ممقطع عرضي للقلب", "question": "الغشاء الرقيق الذي يغلف القلب من الخارج", "options": ["غشاء التامور", "غشاء الجنب", "الأم الحنون"], "answer": "غشاء التامور"},
+{"type": "image", "image": "ممقطع عرضي للقلب", "question": "الحاجز العضلي الذي يقسم القلب إلى نصفين (أيمن وأيسر)", "options": ["الحاجز القلبي", "اللهاة", "السيماء"], "answer": "الحاجز القلبي"},
+{"type": "image", "image": "الدم", "question": "الأجزاء الخلوية الصغيرة جداً المسؤولة عن التخثر", "options": ["الصفيحات الدموية", "الخلايا القاعدية", "الأضداد"], "answer": "الصفيحات الدموية"},
 {"type": "image", "image": "الجهاز البلغمي", "question": "العضو البلغمي الذي يقع خلف عظمة القص ويضمر عند البالغين", "options": ["الطحال", "الغدة التيموسية (الصدرية)", "اللوزتان"], "answer": "الغدة التيموسية (الصدرية)"}
 ],
 "u2_respiration_taaleel": 
@@ -1077,10 +1100,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
         ]
 
-        await query.message.reply_text(
-            "اختر نوع الأسئلة: \n"  ,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        await query.message.reply_text (
+           "📚✨ اختر نوع الأسئلة التي تريد حلها:\n\n"
+           "🔹 كل سؤال يقربك للنجاح 💪\n"
+            )
+        reply_markup=InlineKeyboardMarkup(keyboard)
+       
         return
         # ================== الوحدة 2 ==================
     if data == "bio_u2":
@@ -1202,7 +1227,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [[InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")]]
 
         await query.message.reply_text(
-            "ابدأ الاختبار:",
+             "👋 أهلاً بك في بوت الأحياء الذكي!\n\n"
+            "📘 هنا ستتعلم بطريقة ممتعة وسهلة\n"
+            "🎯 حل الأسئلة واجمع النقاط\n"
+            "🚀 واصِل التقدم لتصبح الأفضل!",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
@@ -1245,14 +1273,25 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         # 🎯 التقييم
+
         if selected_index == correct_index:
             info["score"] += 10
+
+            text = random.choice(positive)
 
             try:
                 await context.bot.send_message(
                     chat_id=query.message.chat_id,
-                    text="🎉🎉 إجابة صحيحة!",
+                    text=text + " 🎉",
                     message_effect_id="5104841245755180586",
+                    protect_content=True
+                )
+            except Exception as e:
+                print("Effect not supported:", e)
+
+                await context.bot.send_message(
+                    chat_id=query.message.chat_id,
+                    text=text,
                     protect_content=True
                 )
             except Exception as e:
@@ -1266,7 +1305,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
         else:
             await query.message.reply_text(
-                f"❌ خطأ\nالإجابة الصحيحة: {q['answer']}"
+                random.choice(negative) + f"\n\n📌 الإجابة الصحيحة: {q['answer']}"
             )
         info["q_index"] += 1
 
