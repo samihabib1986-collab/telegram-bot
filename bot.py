@@ -1011,8 +1011,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             caption=f"👤 {user_id}\n\n" +caption,
             protect_content=True
         )
-
-        await asyncio.sleep(30)
         keyboard = [
             [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
             [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
