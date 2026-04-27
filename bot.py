@@ -1,4 +1,3 @@
-from email.mime import image, text
 import os
 import logging
 import asyncio
