@@ -990,6 +990,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if q.get("type") == "image":
         image_id = uploaded_images.get(q["image"])
+
         caption = q["questions"] + "\n\n"
         for i, opt in enumerate(q["options"]):
             caption += f"{chr(65+i)} - {opt}\n"
@@ -1000,8 +1001,22 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
             caption=caption,
             protect_content=True
         )
-        return
 
+        # 👇 إضافة الأزرار
+        keyboard = [[
+            InlineKeyboardButton("A", callback_data="0"),
+            InlineKeyboardButton("B", callback_data="1"),
+            InlineKeyboardButton("C", callback_data="2"),
+        ]]
+
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="اختر الإجابة:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            protect_content=True
+        )
+
+        return
     else:
         text = f"👤 ID: {user_id}\n\n{q['question']}\n\n"
         for i, opt in enumerate(q["options"]):
