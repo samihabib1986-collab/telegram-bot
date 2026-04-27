@@ -54,7 +54,7 @@ SECTION_INTRO_VIDEOS = {
     "circulation": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
     "respiration": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
     "excretion": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
-    "nutrition_health": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ    "
+    "nutrition_health": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ"
 }
 
 # ================== الصور ==================
@@ -1012,7 +1012,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         await asyncio.sleep(30)
-        await query.answer() 
         keyboard = [
             [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
             [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
@@ -1276,6 +1275,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         
 # ================== تشغيل ==================
+print("BOT IS RUNNING")
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
