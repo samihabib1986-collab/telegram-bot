@@ -142,16 +142,16 @@ subjects = {
 {"type": "image", "image": "عظام الطرف العلوي", "questions": "16", "options": ["عظم الزند","عظم العضد","عظم الكعبرة"], "answer": "عظم الكعبرة"},
 {"type": "image", "image": "عظام الطرف العلوي", "questions":"19","options":["اليد","الساعد","عظام السلاميات"],"answer":"عظام السلاميات"},
 {"type": "image", "image":"عظام الطرف العلوي","questions":"15","options":["عظم العضد","عظم الزند","عظم الكعبرة"],"answer":"عظم الزند"},
-{"type": "image","image":"عظام الطرف السفلي","questions":"4","options":["عظم الرضفة","عظم الورك","عظم الفخد"],"answer":"عظم الرضفة"},
-{"type": "image","image": "عظام الطرف السفلي","questions":"5","options": ["عظم الظنبوب","عظم الشظية","عظم الفخد"],"answer": "عظيم الظنبوب"},
-{"type": "image","image": "القفص الصدري","questions": "5","options": ["الاضلاع","الاضلاع السائبة","العمود الفقري"],"answer": "الاضلاع السائبة"},
-{"type": "image","image": "القفص الصدري","questions": "2","options": ["عظم القص","الاضلاع","العمود الفقري"],"answer": "عظم القص"},
-{"type": "image","image": "الفقرة","questions": "5","options": ["سطح مفصلي","نتوء جانبي","ثقب فقري"],"answer": "نتوء جانبي"},
-{"type": "image","image": "الفقرة","questions": "3","options": ["ثقب فقري","نتوء شوكي","سطح مفصلي"],"answer": "سطح مفصلي"},
-{"type": "image","image": "العمود الفقري","questions": "5","options": ["الفقرات العصعصية","الفقرات الظهرية","الفقرات القطنية"],"answer": "الفقرات العصعصية"},
-{"type": "image","image": "العمود الفقري","questions": "4","options": ["الفقرات القطنية","الفقرات العجزية","الفقرات الظهرية"],"answer": "الفقرات العجزية"},
-{"type": "image","image": "الزنار الحوضي","questions": "6","options": ["العصعص","العظم العاني","العجز"],"answer": "العظم العاني"},
-{"type": "image","image": "الاربطة والاوتار","questions": "2","options": ["اوتار","عضلة","اربطة"],"answer": "اربطة"},
+{"type": "image", "image":"عظام الطرف السفلي","questions":"4","options":["عظم الرضفة","عظم الورك","عظم الفخد"],"answer":"عظم الرضفة"},
+{"type": "image", "image": "عظام الطرف السفلي","questions":"5","options": ["عظم الظنبوب","عظم الشظية","عظم الفخد"],"answer": "عظم الظنبوب"},
+{"type": "image", "image": "القفص الصدري","questions": "5","options": ["الاضلاع","الاضلاع السائبة","العمود الفقري"],"answer": "الاضلاع السائبة"},
+{"type": "image", "image": "القفص الصدري","questions": "2","options": ["عظم القص","الاضلاع","العمود الفقري"],"answer": "عظم القص"},
+{"type": "image", "image": "الفقرة","questions": "5","options": ["سطح مفصلي","نتوء جانبي","ثقب فقري"],"answer": "نتوء جانبي"},
+{"type": "image", "image": "الفقرة","questions": "3","options": ["ثقب فقري","نتوء شوكي","سطح مفصلي"],"answer": "سطح مفصلي"},
+{"type": "image", "image": "العمود الفقري","questions": "5","options": ["الفقرات العصعصية","الفقرات الظهرية","الفقرات القطنية"],"answer": "الفقرات العصعصية"},
+{"type": "image", "image": "العمود الفقري","questions": "4","options": ["الفقرات القطنية","الفقرات العجزية","الفقرات الظهرية"],"answer": "الفقرات العجزية"},
+{"type": "image", "image": "الزنار الحوضي","questions": "6","options": ["العصعص","العظم العاني","العجز"],"answer": "العظم العاني"},
+{"type": "image", "image": "الاربطة والاوتار","questions": "2","options": ["اوتار","عضلة","اربطة"],"answer": "اربطة"},
 ],
 "u1_dam_where":
 [
@@ -990,7 +990,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if q.get("type") == "image":
         image_id = uploaded_images.get(q["image"])
-        caption = q["question"] + "\n\n"
+        caption = q["questions"] + "\n\n"
         for i, opt in enumerate(q["options"]):
             caption += f"{chr(65+i)} - {opt}\n"
 
