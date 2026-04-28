@@ -80,15 +80,16 @@ SECTION_INTRO_VIDEOS = {
     "sens":"BAACAgQAAxkBAAIT2WnskRk5P6AlybxMghy56RqihQ6wAALvGgAC74lgU35l37gtm2KPOwQ",
     "heal":"BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
     # ===== الوحدة 2 =====
-    "digest": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
-    "circulation": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
-    "respiration": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
-    "excretion": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ",
-    "nutrition_health": "BAACAgQAAxkBAAIVX2nswtCvfBXgSON9mnemgijzHOoPAAIXGwAC74lgU5GqlwUBoSZ5OwQ"
+    "digest": "BAACAgQAAxkBAAIhcGnwjlUM5UgRTfU9NXNHZmH9lA38AALDHwACHteBU0eE5P_9WF48OwQ",
+    "circulation": "BAACAgQAAxkBAAIhcmnwjqzCORR-yKu0ZCU9XIVxzoKEAALEHwACHteBU65OOMsDUH5qOwQ",
+    "respiration": "BAACAgQAAxkBAAIhYWnwjE8KcZXHCVrqS-vGDapiwfZ1AAK8HwACHteBU24DZ_8EjIreOwQ",
+    "excretion": "BAACAgQAAxkBAAIhX2nwivY6gErtv3fKd1aofjOYBkTgAAKnHwACHteBU4rYXIZHtO4pOwQ",
+    "nutrition_health": "BAACAgQAAxkBAAIhZmnwjXwhy0WIPfE_bEndEzZdds5HAAK-HwACHteBU2sUu35aggUROwQ"
 }
 
 # ================== الصور ==================
 uploaded_images = {
+    # ===== الوحدة 1 =====
 "الهيكل العظمي": "AgACAgQAAxkBAAIC7mnjrd4qryTOyoW_z_xsNkEvFM7iAAIwDGsb4XYhU1NT2bwGdzhNAQADAgADbQADOwQ",
 "عظام الوجه": "AgACAgQAAxkBAAIDgmnjuaxzSVnHSg-Ht5sh8MLSRxgDAAJEDGsb4XYhUyf_4zNepyt6AQADAgADbQADOwQ",
 "مفصل العضد الكتفي": "AgACAgQAAxkBAAIDrGnj2XkC5s_14i-8Zr11ICic-ImxAAJjDGsb4XYhU7x_C70kw-VnAQADAgADbQADOwQ",
@@ -118,6 +119,7 @@ uploaded_images = {
 "اقسام الاذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
 "كرة العين": "AgACAgQAAxkBAAITf2nr3hBZxdkfGMNiLk2bFeYpd7ETAALQDGsb74lYUxk-ui92CqcHAQADAgADeAADOwQ",
 "مقارنة العظام":"AgACAgQAAxkBAAIVgGnsxaQYniAmfOJp99AHUnk1debqAAK1DGsb74lgU1oxFWFedrt3AQADAgADeQADOwQ",
+# ===== الوحدة 2 =====
 "الدم": "AgACAgQAAxkBAAIdbmnvTFKzzZPHsYsH9VsekXHJZyPDAAKODGsbHtd5U0d_OGcsHt3pAQADAgADeQADOwQ",
 "الجهاز البلغمي": "AgACAgQAAxkBAAIdcGnvTFiUowq7kyrfcPiJsOfzyb19AAKPDGsbHtd5Uzr8TcrilreGAQADAgADeQADOwQ",
 "أقسام جهاز التنفس": "AgACAgQAAxkBAAIdcmnvTF2UFUFvUIIaNOI0AurRvH7BAAKQDGsbHtd5UzOW8dKjt4tZAQADAgADeQADOwQ",
@@ -1320,9 +1322,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         category = f"{unit}_{section}_{data}"
 
-        if category not in subjects["bio"]:
-            await query.message.reply_text("❌ لا يوجد أسئلة")
+        bio_subjects = subjects.get("bio", {})
+
+        if category not in bio_subjects:
+            await query.message.reply_text("❌ لا يوجد أسئلة لهذا النوع في هذا القسم")
             return
+
 
         user_data[user_id]["category"] = category
         user_data[user_id]["q_index"] = 0
