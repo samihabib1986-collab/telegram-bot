@@ -124,8 +124,9 @@ uploaded_images = {
 "مقطع طولي في الحنجرة": "AgACAgQAAxkBAAIddGnvTGJdM5G3poPXQFozvL3kcpZvAAKRDGsbHtd5U2yI62uPS3QdAQADAgADeQADOwQ",
 "مقطع عرضي للقلب": "AgACAgQAAxkBAAIddmnvTGcXVLcj77UjoL2CowyAwRt4AAKSDGsbHtd5U3hsHtT-KuT2AQADAgADeQADOwQ",
 "دورتا الدم": "AgACAgQAAxkBAAIdeGnvTGqeVkcUHjuH1qqX9hq2O9iWAAKTDGsbHtd5U0ZVaQtT1_pTAQADAgADeQADOwQ",
-"السدم": "AgACAgQAAxkBAAIVgGnsxaQYniAmfOJp99AHUnk1debqAAK1DGsb74lgU1oxFWFedrt3AQADAgADeQADOwQ",
-
+"مقطع طولي في الكلية": "AgACAgQAAxkBAAIhSWnwiLrHp_3AjRPcIHHjR5lgjkcjAAI6DGsbHteBU8QDiIWihJrAAQADAgADeQADOwQ",
+"الجهاز البولي ّ لدى اإلنسان": "AgACAgQAAxkBAAIhTWnwiSdVxbquKkWYP9R-ls9827BlAAI7DGsbHteBU0_l0Sb0dDYeAQADAgADeQADOwQ",
+"السدم": "AgACAgQAAxkBAAIhSWnwiLrHp_3AjRPcIHHjR5lgjkcjAAI6DGsbHteBU8QDiIWihJrAAQADAgADeQADOwQ",
 }
 
 # ================== بنك الأسئلة ==================
