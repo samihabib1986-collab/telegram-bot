@@ -1126,13 +1126,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     # 🔙 الرجوع إلى أنواع الأسئلة
     if data == "back_to_types":
-        user_data[user_id] = {
-            "subject": "bio",
-            "unit": unit,
-            "section": section,
-            "score": 0,
-            "q_index": 0
-        }
         if user_id not in user_data:
             return
         keyboard = [
@@ -1153,9 +1146,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await query.message.reply_text (
            "📚✨ اختر نوع الأسئلة التي تريد حلها:\n\n"
-           "🔹 كل سؤال يقربك للنجاح 💪\n"
+            + random.choice(welcome_messages),
+            reply_markup=InlineKeyboardMarkup(keyboard)
             )
-        reply_markup=InlineKeyboardMarkup(keyboard)
+
        
         return
         # ================== الوحدة 2 ==================
