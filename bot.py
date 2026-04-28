@@ -3,6 +3,7 @@ import os
 import logging
 import asyncio
 import random
+from turtle import update
 from pymongo import MongoClient
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters)
@@ -890,6 +891,11 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text="🎉 تم قبول اشتراكك",
         protect_content=True
     )
+user = update.effective_user if update.message else update.callback_query.from_user
+
+user_id = user.id
+username = user.username if user.username else user.first_name
+mention = f"<a href='tg://user?id={user.id}'>{username}</a>"
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -904,13 +910,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 🌟✨\n\n"
+        "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة {mention}🌟✨\n\n"
         "📚 اختبر نفسك وارتقِ بمستواك\n"
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
         "👨‍🏫 إشراف المدرس: أحمد نور الدين\n"
         "💻 برمجة المهندس: سامي حبيب\n"
-        "🎁 قسم مجاني: الدعامي الحركي\n💰 باقي الأقسام مدفوعة"
+        "🎁 قسم مجاني: الدعامي الحركي\n💰 باقي الأقسام مدفوعة",
+        parse_mode="HTML"
     )
 
     keyboard = [
