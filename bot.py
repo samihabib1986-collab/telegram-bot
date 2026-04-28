@@ -127,7 +127,11 @@ uploaded_images = {
 "مقطع عرضي للقلب": "AgACAgQAAxkBAAIddmnvTGcXVLcj77UjoL2CowyAwRt4AAKSDGsbHtd5U3hsHtT-KuT2AQADAgADeQADOwQ",
 "دورتا الدم": "AgACAgQAAxkBAAIdeGnvTGqeVkcUHjuH1qqX9hq2O9iWAAKTDGsbHtd5U0ZVaQtT1_pTAQADAgADeQADOwQ",
 "مقطع طولي في الكلية": "AgACAgQAAxkBAAIhSWnwiLrHp_3AjRPcIHHjR5lgjkcjAAI6DGsbHteBU8QDiIWihJrAAQADAgADeQADOwQ",
-"الجهاز البولي ّ لدى اإلنسان": "AgACAgQAAxkBAAIhTWnwiSdVxbquKkWYP9R-ls9827BlAAI7DGsbHteBU0_l0Sb0dDYeAQADAgADeQADOwQ",
+"الجهاز البولي لدى الإنسان": "AgACAgQAAxkBAAIhTWnwiSdVxbquKkWYP9R-ls9827BlAAI7DGsbHteBU0_l0Sb0dDYeAQADAgADeQADOwQ",
+"الجهاز الهضمي": "AgACAgQAAxkBAAIlF2nxCSQ0LomdvP4_x2dOx-xp7UuhAAITDWsbvS2JU0gelPBi2C9pAQADAgADeAADOwQ",
+"مقطع طولي في السن":"AgACAgQAAxkBAAIlOGnxCrausbn1nu8_xP53QB_jsEUTAAIUDWsbvS2JU9M6RxiZTsMnAQADAgADeAADOwQ",
+"المعي الدقيق والمعي الغليظ":"AgACAgQAAxkBAAIlOmnxDChuz3AvUuVSpVu7I0V5l9PzAAIaDWsbvS2JUyeneVd33_4qAQADAgADeAADOwQ",
+"الغدة العرقية":"AgACAgQAAxkBAAIlbGnxEW_XFhLkOhPnWXIZI5i1gvyqAAIbDWsbvS2JU9N2Nheq_aUlAQADAgADeAADOwQ",
 "السدم": "AgACAgQAAxkBAAIhSWnwiLrHp_3AjRPcIHHjR5lgjkcjAAI6DGsbHteBU8QDiIWihJrAAQADAgADeQADOwQ",
 }
 
@@ -282,7 +286,7 @@ subjects = {
 {"question": "11. حدد موقع السحايا:","options": ["تفصل المراكز العصبية عن الجدران العظمية المحيطة", "بين المخ والمخيخ", "بين الحدبة الحلقة في الأعلى والنخاع الشوكي في الاسفل"],"answer": "تفصل المراكز العصبية عن الجدران العظمية المحيطة"},
 {"question": "12. حدد موقع الام الحنون:","options": ["تلتصق بقوة وعمق على المراكز العصبية", "بين  الجدران العظمية والمراكز العصبية", "بين العصب والغمد العصبي"],"answer": "تلتصق بقوة وعمق على المراكز العصبية"},
 {"question": "13. حدد موقع الغشاء العنكبوتي:","options": ["بين الأم الجافية والام الحنون", "محيطية تحيط بالمادة الرمادية", "داخل قناة السيساء"],"answer": "بين الأم الجافية والام الحنون"},
-{"question": "14. حدد موقع الام الجافية:","options": ["بين العمود الفقري والنخاع الشوكي", "تلتصق على الوجه الداخلي للتجاويف العظمية الفقرية والقحفية", "تلتصق بقوة وعمق على المراكز العصبية"],"answer": "تلتصق بقوة وعمق على المراكز العصبية"},
+{"question": "14. حدد موقع الام الجافية:","options": ["بين العمود الفقري والنخاع الشوكي", "تلتصق على الوجه الداخلي للتجاويف العظمية الفقرية والقحفية", "تلتصق بقوة وعمق على المراكز العصبية"],"answer": "تلتصق على الوجه الداخلي للتجاويف العظمية الفقرية والقحفية"},
 ],
 "u1_nervus_result":
 [
@@ -609,16 +613,16 @@ subjects = {
 ],
 "u2_digest_image": 
 [
-{"type": "image", "image": "الجهاز الهضمي عند الإنسان", "question": "الغدد الثلاث الموجودة في منطقة الفم (رقم 1 في الرسم)", "options": ["الغدد اللعابية", "الغدد المعدية", "البنكرياس"], "answer": "الغدد اللعابية"},
-{"type": "image", "image": "الجهاز الهضمي عند الإنسان", "question": "العضو الذي يقع أعلى اليمين ويفرز الصفراء (رقم 3)", "options": ["المعدة", "الكبد", "الطحال"], "answer": "الكبد"},
-{"type": "image", "image": "الجهاز الهضمي عند الإنسان", "question": "الغدة العنقودية التي تقع خلف المعدة وتصب في الاثني عشر (رقم 4)", "options": ["الكبد", "البنكرياس", "الغدة النخامية"], "answer": "البنكرياس"},
-{"type": "image", "image": "مقطع طولي في السن", "question": "الطبقة القاسية جداً واللامعة التي تكسو تاج السن (رقم 3)", "options": ["العاج", "المينا", "الملاط"], "answer": "المينا"},
-{"type": "image", "image": "مقطع طولي في السن", "question": "الجزء من السن الذي يبرز خارج اللثة (رقم 1)", "options": ["جذر السن", "تاج السن", "عنق السن"], "answer": "تاج السن"},
-{"type": "image", "image": "المعي الدقيق والمعي الغليظ", "question": "الأنبوب الطويل الملتف الذي يحدث فيه الهضم النهائي والامتصاص (رقم 5)", "options": ["المعي الدقيق", "المعي الغليظ", "المريء"], "answer": "المعي الدقيق"},
-{"type": "image", "image": "المعي الدقيق والمعي الغليظ", "question": "الزوائد الإصبعية الموجودة في جدار المعي الدقيق (رسم الزغابة)", "options": ["خلايا كبدية", "الزغابات المعوية", "أهداب شمية"], "answer": "الزغابات المعوية"},
-{"type": "image", "image": "مقطع طولي في السن", "question": "المنطقة التي تضم الأعصاب والأوعية الدموية في السن (رقم 4)", "options": ["العاج", "لب السن", "قناة الجذر"], "answer": "لب السن"},
-{"type": "image", "image": "المعي الدقيق والمعي الغليظ", "question": "عضو يشبه الإصبع يقع عند اتصال المعي الدقيق بالغليظ له دور مناعي (رقم 6)", "options": ["الزائدة الدودية", "القولون النازل", "المستقيم"], "answer": "الزائدة الدودية"},
-{"type": "image", "image": "الجهاز الهضمي عند الإنسان", "question": "القناة العضلية التي تصل الفم بالمعدة (رقم 2)", "options": ["الرغامى", "المريء", "الحالب"], "answer": "المريء"}
+{"type": "image", "image": "الجهاز الهضمي", "question": "(رقم 1 )", "options": ["الغدد اللعابية", "الفم", "البنكرياس"], "answer": "الفم"},
+{"type": "image", "image": "الجهاز الهضمي", "question": "العضو الذي يقع أعلى اليمين ويفرز الصفراء (رقم 9)", "options": ["المعدة", "الكبد", "الطحال"], "answer": "الكبد"},
+{"type": "image", "image": "الجهاز الهضمي", "question": "(رقم 10)", "options": ["الكبد", "البنكرياس", "الغدة النخامية"], "answer": "البنكرياس"},
+{"type": "image", "image": "مقطع طولي في السن", "question": "(رقم 3)", "options": ["العاج", "الجذر", "الملاط"], "answer": "الجذر"},
+{"type": "image", "image": "مقطع طولي في السن", "question": "(رقم 1)", "options": ["جذر السن", "تاج السن", "عنق السن"], "answer": "تاج السن"},
+{"type": "image", "image": "المعي الدقيق والمعي الغليظ", "question": "(رقم 4)", "options": ["المعي الدقيق", "المعي الغليظ", "المريء"], "answer": "المعي الدقيق"},
+{"type": "image", "image": "المعي الدقيق والمعي الغليظ", "question": "(رقم 2)", "options": ["خلايا كبدية", "الزغابات المعوية", "الاثني عشر"], "answer": "الاثني عشر"},
+{"type": "image", "image": "مقطع طولي في السن", "question": "(رقم 6)", "options": ["العاج", "لب السن", "قناة الجذر"], "answer": "لب السن"},
+{"type": "image", "image": "المعي الدقيق والمعي الغليظ", "question": " (رقم 6)", "options": ["الزائدة الدودية", "القولون النازل", "المستقيم"], "answer": "الزائدة الدودية"},
+{"type": "image", "image": "الجهاز الهضمي", "question": "(رقم 32)", "options": ["الرغامى", "المريء", "الحالب"], "answer": "المريء"}
 ],
 "u2_circulation_taaleel": 
 [
@@ -762,11 +766,11 @@ subjects = {
 ],
 "u2_respiration_image": 
 [
-{"type": "image", "image": "أقسام جهاز التنفس", "question": "الممر المشترك للجهازين الهضمي والتنفسي", "options": ["الحنجرة", "البلعوم", "المريء"], "answer": "البلعوم"},
-{"type": "image", "image": "أقسام جهاز التنفس", "question": "الأنبوب الغضروفي الذي يلي الحنجرة ويؤدي للرئتين", "options": ["الرغامى", "القصيبة", "البلعوم"], "answer": "الرغامى"},
-{"type": "image", "image": "مقطع طولي في الحنجرة", "question": "الحبال التي تهتز لإصدار الصوت", "options": ["الحبال الصوتية", "الأوتار العضلية", "الغضاريف المزمارية"], "answer": "الحبال الصوتية"},
-{"type": "image", "image": "الحويصلات الرئوية", "question": "المكان الذي يتم فيه التبادل الغازي الحقيقي مع الدم", "options": ["الرغامى", "الأسناخ (الحويصلات الرئوية)", "الأنف"], "answer": "الأسناخ (الحويصلات الرئوية)"},
-{"type": "image", "image": "أقسام جهاز التنفس", "question": "العضلة التي تفصل التجويف الصدري عن البطني وتساعد في التنفس", "options": ["عضلة القلب", "الحجاب الحاجز", "العضلة الماصغة"], "answer": "الحجاب الحاجز"}
+{"type": "image", "image": "أقسام جهاز التنفس", "question": "(الرقم 1))", "options": ["الحنجرة", "البلعوم", "المريء"], "answer": "الحنجرة"},
+{"type": "image", "image": "أقسام جهاز التنفس", "question": "(الرقم 2)", "options": ["الرغامى", "القصيبة", "البلعوم"], "answer": "الرغامى"},
+{"type": "image", "image": "مقطع طولي في الحنجرة", "question": "(الرقم 3)", "options": ["الحبال الصوتية", "الأوتار العضلية", "الغضاريف المزمارية"], "answer": "الحبال الصوتية"},
+{"type": "image", "image": "الحويصلات الرئوية", "question": "(الرقم 6)", "options": ["الرغامى", "الحويصلات الرئوية", "الأنف"], "answer": "الحويصلات الرئوية"},
+{"type": "image", "image": "أقسام جهاز التنفس", "question": "(الرقم 9)", "options": ["عضلة القلب", "الحجاب الحاجز", "العضلة الماصغة"], "answer": "الحجاب الحاجز"}
 ],
 "u2_excretion_taaleel": 
 [
@@ -818,11 +822,11 @@ subjects = {
 ],
 "u2_excretion_image": 
 [
-{"type": "image", "image": "الجهاز البولي لدى الإنسان", "question": "العضو الذي يشبه حبة الفاصولياء ويصفي الدم", "options": ["الكلية", "الكبد", "المعدة"], "answer": "الكلية"},
-{"type": "image", "image": "الجهاز البولي لدى الإنسان", "question": "الأنبوب الذي ينقل البول للمثانة", "options": ["الحالب", "المريء", "الإحليل"], "answer": "الحالب"},
-{"type": "image", "image": "مقطع طولي في الكلية", "question": "الكتل الهرمية الحمراء الموجودة في المنطقة اللبية", "options": ["أهرامات مالبيكي", "الزغابات", "النفرونات"], "answer": "أهرامات مالبيكي"},
-{"type": "image", "image": "الغدة العرقية", "question": "الأنبوب الملتف في الأدمة الذي يفرز العرق", "options": ["الغدة العرقية", "بصيلة الشعرة", "النهاية العصبية"], "answer": "الغدة العرقية"},
-{"type": "image", "image": "مقطع طولي في الكلية", "question": "المنطقة البيضاء المركزية التي يتجمع فيها البول", "options": ["الحويضة", "القشرة", "اللب"], "answer": "الحويضة"}
+{"type": "image", "image": "الجهاز البولي لدى الإنسان", "question": "(الرقم 4)", "options": ["الكلية", "الكبد", "المعدة"], "answer": "الكلية"},
+{"type": "image", "image": "الجهاز البولي لدى الإنسان", "question": "(الرقم 5)", "options": ["الحالب", "المريء", "الإحليل"], "answer": "الحالب"},
+{"type": "image", "image": "مقطع طولي في الكلية", "question": "(الرقم 4)", "options": ["أهرامات مالبيكي", "الزغابات", "النفرونات"], "answer": "أهرامات مالبيكي"},
+{"type": "image", "image": "الغدة العرقية", "question": "(الرقم 2)", "options": ["القناة العرقية", "بصيلة الشعرة", "النهاية العصبية"], "answer": "القناة العرقية"},
+{"type": "image", "image": "مقطع طولي في الكلية", "question": "(الرقم 5)", "options": ["الحويضة", "القشرة", "اللب"], "answer": "الحويضة"}
 ],
 "u2_nutrition_health_taaleel": 
 [
@@ -1439,22 +1443,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text=text,
                     protect_content=True
                 )
-            try:
-                    await context.bot.send_message(
-                        chat_id=query.message.chat_id,
-                        text="🎉 إجابة صحيحة!",
-                        message_effect_id="5104841245755180586",
-                        protect_content=True
-                    )
-            except Exception as e:
-                print("Effect not supported:", e)
 
-                # fallback عادي
-                await context.bot.send_message(
-                    chat_id=query.message.chat_id,
-                    text="🎉 إجابة صحيحة!",
-                    protect_content=True
-                )
         else:
             await query.message.reply_text(
                 random.choice(negative) + f"\n\n📌 الإجابة الصحيحة: {q['answer']}"
@@ -1473,3 +1462,4 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 app.run_polling()
+
