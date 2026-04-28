@@ -960,8 +960,8 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
-    username = user.username
-    first_name = user.first_name
+    #username = user.username
+    #first_name = user.first_name
     if user_id not in user_data:
         return
 
