@@ -22,9 +22,9 @@ positive = [
 negative = [
     "😅 لا بأس، حاول مرة أخرى",
     "💡 الإجابة الصحيحة تساعدك تتعلم",
-    "📘 ركز أكثر في هذه النقطة"
-    "🔍 الإجابة غير صحيحة، راجع المادة مرة أخرى"
-    "❌ إجابة خاطئة، لا تيأس، التعلم يحتاج وقت"
+    "📘 ركز أكثر في هذه النقطة",
+    "🔍 الإجابة غير صحيحة، راجع المادة مرة أخرى",
+    "❌ إجابة خاطئة، لا تيأس، التعلم يحتاج وقت",
 ]
 async def delete_later(bot, chat_id, message_id, delay=30):
     await asyncio.sleep(delay)
@@ -891,11 +891,11 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text="🎉 تم قبول اشتراكك",
         protect_content=True
     )
-user = update.effective_user if update.message else update.callback_query.from_user
+    user = update.effective_user if update.message else update.callback_query.from_user
 
-user_id = user.id
-username = user.username if user.username else user.first_name
-mention = f"<a href='tg://user?id={user.id}'>{username}</a>"
+    user_id = user.id
+    username = user.username if user.username else user.first_name
+    mention = f"<a href='tg://user?id={user.id}'>{username}</a>"
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
