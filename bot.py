@@ -1248,7 +1248,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         unit, section = mapped
-
+        user_data[user_id]["unit"] = unit
+        user_data[user_id]["section"] = section
         user = users.find_one({"_id": user_id})
 
         # نفس نظام الدفع
@@ -1427,7 +1428,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         
 # ================== تشغيل ==================
-print("BOT IS RUNNING")
+
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
