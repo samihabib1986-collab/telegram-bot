@@ -1274,7 +1274,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "section": section,
             "score": 0,
             "q_index": 0,
-            "category": category,
+            "history": []
         }
 
         keyboard = [
