@@ -910,8 +910,14 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user if update.message else update.callback_query.from_user
 
     user_id = user.id
-    username = user.username if user.username else user.first_name
-    mention = f"<a href='tg://user?id={user.id}'>{username}</a>"
+    user = update.effective_user if update.message else update.callback_query.from_user
+
+    first_name = user.first_name or ""
+    last_name = user.last_name or ""
+
+    full_name = f"{first_name} {last_name}".strip()
+
+    mention = f"<a href='tg://user?id={user.id}'>{full_name}</a>"
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
