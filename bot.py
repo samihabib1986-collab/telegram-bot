@@ -33,6 +33,15 @@ async def delete_later(bot, chat_id, message_id, delay=30):
     except:
         pass
 
+welcome_messages = [
+        "🎉 رائع! اختر نوع الأسئلة التي تريد حلها:",
+        "✨ ممتاز! حان وقت اختبار معلوماتك:",
+        "🚀 ممتاز! اختر نوع الأسئلة لبدء التحدي:",
+        "👋 أهلاً بك في بوت الأحياء الذكي!",
+        "📘 هنا ستتعلم بطريقة ممتعة وسهلة",
+        "🎯 حل الأسئلة واجمع النقاط",
+        "🚀 واصِل التقدم لتصبح الأفضل!"
+    ]
 # ================== إعداد MongoDB ==================
 MONGO_URL = os.environ.get("MONGO_URL")
 
@@ -1004,7 +1013,8 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if q.get("type") == "image":
         image_id = uploaded_images.get(q["image"])
-
+        if not image_id:
+            return
         caption = q["question"] + "\n\n"
         for i, opt in enumerate(q["options"]):
             caption += f"{chr(65+i)} - {opt}\n"
@@ -1142,7 +1152,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         history = user_data[user_id].get("history", [])
 
         if not history:
-            await query.message.reply_text("🔙 لا يوجد شيء للرجوع إليه")
+            await query.message("🔙 لا يوجد شيء للرجوع إليه")
             return
 
         last = history.pop()
@@ -1263,7 +1273,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "unit": unit,
             "section": section,
             "score": 0,
-            "q_index": 0
+            "q_index": 0,
+            "category": category,
         }
 
         keyboard = [
@@ -1288,20 +1299,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         return
-    welcome_messages = [
-        "🎉 رائع! اختر نوع الأسئلة التي تريد حلها:",
-        "✨ ممتاز! حان وقت اختبار معلوماتك:",
-        "🚀 ممتاز! اختر نوع الأسئلة لبدء التحدي:",
-        "👋 أهلاً بك في بوت الأحياء الذكي!",
-        "📘 هنا ستتعلم بطريقة ممتعة وسهلة",
-        "🎯 حل الأسئلة واجمع النقاط",
-        "🚀 واصِل التقدم لتصبح الأفضل!"
-    ]
+
     # ================== اختيار نوع السؤال ==================
     if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
 
         if user_id not in user_data:
             return
+        if "history" not in user_data[user_id]:
+            user_data[user_id]["history"] = []
         user_data[user_id]["history"].append({
             "type": "types_menu",
             "unit": user_data[user_id]["unit"],
@@ -1331,14 +1336,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "start_quiz":
         await send_question(update, context)
         return
-    user_data[user_id] = {
-    "subject": "bio",
-    "unit": unit,
-    "section": section,
-    "score": 0,
-    "q_index": 0,
-    "history": []   # 👈 مهم
-}
+
 # ================== الإجابة ==================
     if data in ["0", "1", "2"]:
 
@@ -1363,7 +1361,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text = f"{chr(65+i)} ❌"
             else:
                 text = f"{chr(65+i)}"
-
+            if "history" not in user_data[user_id]:
+                user_data[user_id]["history"] = []
             row.append(InlineKeyboardButton(text, callback_data="locked"))
 
         buttons.append(row)
@@ -1394,6 +1393,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text=text,
                     protect_content=True
                 )
+            try:
+                    await context.bot.send_message(
+                        chat_id=query.message.chat_id,
+                        text="🎉 إجابة صحيحة!",
+                        message_effect_id="5104841245755180586",
+                        protect_content=True
+                    )
             except Exception as e:
                 print("Effect not supported:", e)
 
