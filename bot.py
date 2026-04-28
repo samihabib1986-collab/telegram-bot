@@ -1104,7 +1104,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum"),
             InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens"),              
             ],
-            InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")
+            [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")]
         ]
 
         await query.message.reply_text(
@@ -1173,7 +1173,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("التنفس لدى الإنسان", callback_data="sec_u2_respiration"),
             InlineKeyboardButton("الإطراح عند الإنسان", callback_data="sec_u2_excretion"),                
             ],
-            InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")
+            [InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")]
         ]
 
         await query.message.reply_text(
