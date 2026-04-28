@@ -909,8 +909,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
         return
 
+    username = update.effective_user.username or update.effective_user.first_name
+    mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
+
     await update.message.reply_text(
-        "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة {mention}🌟✨\n\n"
+        f"✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة {mention} 🌟✨\n\n"
         "📚 اختبر نفسك وارتقِ بمستواك\n"
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
@@ -984,7 +987,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton("🔄 إعادة الاختبار", callback_data="restart_quiz")],
-            [InlineKeyboardButton("🔙 رجوع", callback_data="back_to_types")]
+            [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
         ]
 
         await context.bot.send_message(
@@ -1132,32 +1135,49 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
     # 🔙 الرجوع إلى أنواع الأسئلة
-    if data == "back_to_types":
+    if data == "back":
         if user_id not in user_data:
             return
-        keyboard = [
-            [
-            InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-            InlineKeyboardButton("🖼 صور", callback_data="image"),                
-            ],
-            [
-            InlineKeyboardButton("📍 موقع", callback_data="where"),
-            InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
-            ],
-            [
-            InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-            InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-            InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
-            ]
-        ]
 
-        await query.message.reply_text (
-           "📚✨ اختر نوع الأسئلة التي تريد حلها:\n\n",
-            random.choice(welcome_messages),
-            reply_markup=InlineKeyboardMarkup(keyboard)
+        history = user_data[user_id].get("history", [])
+
+        if not history:
+            await query.message.reply_text("🔙 لا يوجد شيء للرجوع إليه")
+            return
+
+        last = history.pop()
+        user_data[user_id]["history"] = history
+
+        await query.answer()
+
+        # 🔥 رجوع حسب آخر حالة
+        if last["type"] == "section_menu":
+
+            keyboard = [
+                [
+                    InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
+                    InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus"),
+                ]
+            ]
+
+            await query.message.reply_text(
+                "📚 اختر القسم مرة أخرى:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
             )
 
-       
+        elif last["type"] == "types_menu":
+
+            keyboard = [
+                [
+                    InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+                    InlineKeyboardButton("🖼 صور", callback_data="image"),
+                ]
+            ]
+
+            await query.message.reply_text(
+                "📚 اختر نوع الأسئلة:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
         return
         # ================== الوحدة 2 ==================
     if data == "bio_u2":
@@ -1271,18 +1291,22 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_messages = [
         "🎉 رائع! اختر نوع الأسئلة التي تريد حلها:",
         "✨ ممتاز! حان وقت اختبار معلوماتك:",
-        "🚀 ممتاز! اختر نوع الأسئلة لبدء التحدي:"
+        "🚀 ممتاز! اختر نوع الأسئلة لبدء التحدي:",
         "👋 أهلاً بك في بوت الأحياء الذكي!",
         "📘 هنا ستتعلم بطريقة ممتعة وسهلة",
         "🎯 حل الأسئلة واجمع النقاط",
-        "🚀 واصِل التقدم لتصبح الأفضل!",
-                ]
+        "🚀 واصِل التقدم لتصبح الأفضل!"
+    ]
     # ================== اختيار نوع السؤال ==================
     if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
 
         if user_id not in user_data:
             return
-
+        user_data[user_id]["history"].append({
+            "type": "types_menu",
+            "unit": user_data[user_id]["unit"],
+            "section": user_data[user_id]["section"]
+        })
         unit = user_data[user_id]["unit"]
         section = user_data[user_id]["section"]
 
@@ -1307,6 +1331,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "start_quiz":
         await send_question(update, context)
         return
+    user_data[user_id] = {
+    "subject": "bio",
+    "unit": unit,
+    "section": section,
+    "score": 0,
+    "q_index": 0,
+    "history": []   # 👈 مهم
+}
 # ================== الإجابة ==================
     if data in ["0", "1", "2"]:
 
