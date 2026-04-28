@@ -878,11 +878,21 @@ pending_users = set()
 
 # ================== الدفع ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
+    user = update.effective_user
+
+    first_name = user.first_name or ""
+    last_name = user.last_name or ""
+
+    full_name = f"{first_name} {last_name}".strip()
+
+    user_id = user.id
 
     await context.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"💳 طلب اشتراك:\n/approve {user_id}"
+        text=f"💳 طلب اشتراك:\n\n"
+             f"👤 الاسم: {full_name}\n"
+             f"🆔 ID: {user_id}\n\n"
+             f"📩 /approve {user_id}"
     )
 
     await update.message.reply_text("⏳ تم إرسال طلب الاشتراك")
