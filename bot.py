@@ -1145,7 +1145,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
 
         await query.message.reply_text (
-           "📚✨ اختر نوع الأسئلة التي تريد حلها:\n\n"
+           "📚✨ اختر نوع الأسئلة التي تريد حلها:\n\n",
             random.choice(welcome_messages),
             reply_markup=InlineKeyboardMarkup(keyboard)
             )
