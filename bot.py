@@ -1248,6 +1248,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         unit, section = mapped
+        if user_id not in user_data:
+            user_data[user_id] = {
+                "subject": "bio",
+                "unit": "",
+                "section": "",
+                "score": 0,
+                "q_index": 0,
+                "history": []
+            }
+
+        # ✅ احفظ القيم هنا
         user_data[user_id]["unit"] = unit
         user_data[user_id]["section"] = section
         user = users.find_one({"_id": user_id})
