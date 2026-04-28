@@ -1097,14 +1097,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [
-            [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam")],
-            [InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus")],                
+            InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
+            InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus"),                
             ],
             [
-            [InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum")],
-            [InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens")],              
+            InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum"),
+            InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens"),              
             ],
-            [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")]
+            InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")
         ]
 
         await query.message.reply_text(
@@ -1129,20 +1129,19 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if user_id not in user_data:
             return
-
         keyboard = [
             [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼 صور", callback_data="image")],                
+            InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+            InlineKeyboardButton("🖼 صور", callback_data="image"),                
             ],
             [
-            [InlineKeyboardButton("📍 موقع", callback_data="where")],
-            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],                
+            InlineKeyboardButton("📍 موقع", callback_data="where"),
+            InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
             ],
             [
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
-            [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],                
+            InlineKeyboardButton("🧠 نتائج", callback_data="result"),
+            InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
+            InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
             ]
         ]
 
@@ -1167,14 +1166,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [
-            [InlineKeyboardButton("الهضم لدى الإنسان", callback_data="sec_u2_digest")],
-            [InlineKeyboardButton("الدوران لدى الإنسان", callback_data="sec_u2_circulation")],                
+            InlineKeyboardButton("الهضم لدى الإنسان", callback_data="sec_u2_digest"),
+            InlineKeyboardButton("الدوران لدى الإنسان", callback_data="sec_u2_circulation"),                
             ],
             [
-            [InlineKeyboardButton("التنفس لدى الإنسان", callback_data="sec_u2_respiration")],
-            [InlineKeyboardButton("الإطراح عند الإنسان", callback_data="sec_u2_excretion")],                
+            InlineKeyboardButton("التنفس لدى الإنسان", callback_data="sec_u2_respiration"),
+            InlineKeyboardButton("الإطراح عند الإنسان", callback_data="sec_u2_excretion"),                
             ],
-            [InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")]
+            InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")
         ]
 
         await query.message.reply_text(
@@ -1242,17 +1241,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel")],
-            [InlineKeyboardButton("🖼 صور", callback_data="image")],                
+            InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+            InlineKeyboardButton("🖼 صور", callback_data="image"),                
             ],
             [
-            [InlineKeyboardButton("📍 موقع", callback_data="where")],
-            [InlineKeyboardButton("📊 ترتيب", callback_data="level")],                
+            InlineKeyboardButton("📍 موقع", callback_data="where"),
+            InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
             ],
             [
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result")],
-            [InlineKeyboardButton("⚙️ وظيفة", callback_data="function")],
-            [InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],                
+            InlineKeyboardButton("🧠 نتائج", callback_data="result"),
+            InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
+            InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
             ]
         ]
 
