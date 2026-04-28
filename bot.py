@@ -1217,8 +1217,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
-    # ================== الأقسام ==================
-    user_data[user_id]["history"].append({"type": "unit_menu"})  
+    # ================== الأقسام ================== 
     if data in [
         "sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal",
         "sec_u2_digest", "sec_u2_circulation", "sec_u2_respiration", "sec_u2_excretion", "sec_u2_nutrition_health"
@@ -1268,15 +1267,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 caption="🎬 مقدمة القسم"
             )
 
-        user_data[user_id] = {
-            "subject": "bio",
-            "unit": unit,
-            "section": section,
-            "score": 0,
-            "q_index": 0,
-            "history": []
-        }
+        if user_id not in user_data:
+            user_data[user_id] = {
+                "subject": "bio",
+                "unit": "",
+                "section": "",
+                "score": 0,
+                "q_index": 0,
+                "history": []
+            }
 
+        user_data[user_id]["history"].append({"type": "unit_menu"})
         keyboard = [
             [
             InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
@@ -1301,10 +1302,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # ================== اختيار نوع السؤال ==================
-    user_data[user_id]["history"].append({
-    "type": "section_menu",
-    "unit": user_data[user_id]["unit"],
-    "section": user_data[user_id]["section"]})
+
     if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
 
         if user_id not in user_data:
