@@ -1151,8 +1151,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         history = user_data[user_id].get("history", [])
 
-        if not history:
-            await query.message("🔙 لا يوجد شيء للرجوع إليه")
+        if len(history) == 0:
+            await query.answer("لا يوجد رجوع")
             return
 
         last = history.pop()
@@ -1160,7 +1160,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await query.answer()
 
-        # 🔥 رجوع حسب آخر حالة
+        # 🔙 رجوع حسب الحالة
         if last["type"] == "section_menu":
 
             keyboard = [
@@ -1171,23 +1171,22 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
 
             await query.message.reply_text(
-                "📚 اختر القسم مرة أخرى:",
+                "📚 اختر القسم:",
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
 
-        elif last["type"] == "types_menu":
+        elif last["type"] == "unit_menu":
 
             keyboard = [
-                [
-                    InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-                    InlineKeyboardButton("🖼 صور", callback_data="image"),
-                ]
+                [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")],
+                [InlineKeyboardButton("الوحدة 2", callback_data="bio_u2")]
             ]
 
             await query.message.reply_text(
-                "📚 اختر نوع الأسئلة:",
+                "📚 اختر الوحدة:",
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
+
         return
         # ================== الوحدة 2 ==================
     if data == "bio_u2":
@@ -1219,6 +1218,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
     # ================== الأقسام ==================
+    user_data[user_id]["history"].append({"type": "unit_menu"})  
     if data in [
         "sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal",
         "sec_u2_digest", "sec_u2_circulation", "sec_u2_respiration", "sec_u2_excretion", "sec_u2_nutrition_health"
@@ -1301,6 +1301,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # ================== اختيار نوع السؤال ==================
+    user_data[user_id]["history"].append({
+    "type": "section_menu",
+    "unit": user_data[user_id]["unit"],
+    "section": user_data[user_id]["section"]})
     if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
 
         if user_id not in user_data:
