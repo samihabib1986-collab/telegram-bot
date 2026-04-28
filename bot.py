@@ -1126,7 +1126,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     # 🔙 الرجوع إلى أنواع الأسئلة
     if data == "back_to_types":
-
+        user_data[user_id] = {
+            "subject": "bio",
+            "unit": unit,
+            "section": section,
+            "score": 0,
+            "q_index": 0
+        }
         if user_id not in user_data:
             return
         keyboard = [
