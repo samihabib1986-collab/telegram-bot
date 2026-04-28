@@ -1020,7 +1020,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not image_id:
             await context.bot.send_message(
                 chat_id=query.message.chat_id,
-                text="❌ الصورة غير موجودة أو الاسم غير مطابق"
+                text="❌لا يوجد اسئلة لهذا القسم حالياً"
             )
             return
 
@@ -1075,7 +1075,18 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ================== المادة ==================
     if data == "bio":
         await query.answer()  # مهم جداً
+        if user_id not in user_data:
+            user_data[user_id] = {
+                "subject": "bio",
+                "unit": "",
+                "section": "",
+                "score": 0,
+                "q_index": 0,
+                "history": []
+            }
 
+        user_data[user_id]["history"] = []
+        user_data[user_id]["history"].append({"type": "main_menu"})
         teacher_image_id = "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ"
 
         caption = (
@@ -1101,11 +1112,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup(keyboard),
             protect_content=True
         )
-
+        user_data[user_id]["history"] = []
+        user_data[user_id]["history"].append({"type": "main_menu"})
         return
     # ================== 1الوحدة ==================
     if data == "bio_u1":
-
+        user_data[user_id]["history"].append({"type": "unit_menu"})
     # 🎬 فيديو الوحدة
         unit_video = UNIT_INTRO_VIDEOS.get("u1")
 
@@ -1152,23 +1164,31 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         history = user_data[user_id].get("history", [])
 
-        if len(history) == 0:
+        if not history:
             await query.answer("لا يوجد رجوع")
             return
 
         last = history.pop()
-        user_data[user_id]["history"] = history
 
         await query.answer()
 
-        # 🔙 رجوع حسب الحالة
-        if last["type"] == "section_menu":
-
+        # 🔙 الرجوع حسب الحالة
+        if last["type"] == "types_menu":
+            # يرجع لأنواع الأسئلة
             keyboard = [
-                [
-                    InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
-                    InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus"),
-                ]
+                [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+                InlineKeyboardButton("🖼 صور", callback_data="image")]
+            ]
+
+            await query.message.reply_text(
+                "اختر نوع الأسئلة:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+
+        elif last["type"] == "section_menu":
+            keyboard = [
+                [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
+                InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus")]
             ]
 
             await query.message.reply_text(
@@ -1177,7 +1197,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         elif last["type"] == "unit_menu":
-
             keyboard = [
                 [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")],
                 [InlineKeyboardButton("الوحدة 2", callback_data="bio_u2")]
@@ -1188,10 +1207,19 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
 
+        elif last["type"] == "main_menu":
+            keyboard = [
+                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
+            ]
+
+            await query.message.reply_text(
+                "📚 اختر المادة:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
         return
         # ================== الوحدة 2 ==================
     if data == "bio_u2":
-
+        user_data[user_id]["history"].append({"type": "unit_menu"})
         unit_video = UNIT_INTRO_VIDEOS.get("u2")
 
         if unit_video:
@@ -1223,7 +1251,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal",
         "sec_u2_digest", "sec_u2_circulation", "sec_u2_respiration", "sec_u2_excretion", "sec_u2_nutrition_health"
     ]:
-
+        user_data[user_id]["history"].append({"type": "section_menu"})
         section_map = {
             # الوحدة 1
             "sec_u1_dam": ("u1", "dam"),
