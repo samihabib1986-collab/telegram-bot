@@ -887,10 +887,12 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     full_name = f"{first_name} {last_name}".strip()
 
     user_id = user.id
-
+    username = user.username or user.full_name or "المستخدم"
+    mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
     await context.bot.send_message(
         chat_id=ADMIN_ID,
         text=f"💳 طلب اشتراك:\n\n"
+            f"{mention}\n"
              f"👤 الاسم: {full_name}\n"
              f"🆔 ID: {user_id}\n\n"
              f"📩 /approve {user_id}"
@@ -938,12 +940,6 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
    
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message:
-        chat_id = update.message.chat_id
-        send = update.message.reply_text
-    else:
-        chat_id = update.callback_query.message.chat_id
-    send = context.bot.send_message
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
 
@@ -954,9 +950,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mentionteach = f"<a href='tg://user?id={6177458463}'>{teachname}</a>"
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
-
-
-    await send(
+    await update.message.reply_text(
         f"""✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 🌟✨\n
     🌟✨{mention} 🌟✨
 
@@ -976,12 +970,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     keyboard = [
-        [InlineKeyboardButton("🧬🌍 علم الأحياء🌍🧬", callback_data="bio")],
-        
+        [InlineKeyboardButton("🧬🌍 علم الأحياء🌍🧬", callback_data="bio")]
     ]
-    await context.bot.send_message(
-        chat_id=chat_id,
-        text="📚 اختر المادة:",
+
+    await update.message.reply_text(
+        "📚 اختر المادة:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -1114,23 +1107,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = query.from_user.id
     data = query.data
-    
-    
-    if data == "go_home":
 
-        # 🧹 تصفير حالة المستخدم بالكامل
-        user_data[user_id] = {
-            "subject": "",
-            "unit": "",
-            "section": "",
-            "score": 0,
-            "q_index": 0,
-            "history": []
-        }
-
-        # 🔁 إعادة تشغيل start
-        await start(update, context)
-        return
 
     # ================== المادة ==================
     if data == "bio":
@@ -1144,7 +1121,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "q_index": 0,
                 "history": []
             }
-    
 
         if "history" not in user_data[user_id]:
             user_data[user_id]["history"] = []
@@ -1427,8 +1403,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
             InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
             InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
-            [InlineKeyboardButton("🏠 الرئيسية", callback_data="go_home"),
-            back_button()]
+            back_button()
         ]
 
         await query.message.reply_text(
@@ -1460,7 +1435,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text("❌ لا يوجد أسئلة لهذا النوع في هذا القسم")
             return
 
-        user_data[user_id]["score"] = 0
+
         user_data[user_id]["category"] = category
         user_data[user_id]["q_index"] = 0
 
