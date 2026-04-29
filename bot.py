@@ -41,7 +41,6 @@ welcome_messages = [
         "🎯 حل الأسئلة واجمع النقاط",
         "🚀 واصِل التقدم لتصبح الأفضل!"
     ]
-
 # ================== إعداد MongoDB ==================
 MONGO_URL = os.environ.get("MONGO_URL")
 
@@ -115,8 +114,8 @@ uploaded_images = {
 "البنكرياس": "AgACAgQAAxkBAAISKWnroaq_3YSRyrHZsbvx8rJ_fg_ZAAKXDGsb74lYU-srhC9ChcJ_AQADAgADeQADOwQ",
 "الغدد الصم": "AgACAgQAAxkBAAISK2nrov53uU1iaKiBKo3UPOUQKjlFAAKYDGsb74lYU1TWZ694bWrdAQADAgADeQADOwQ",
 "بنية الجلد": "AgACAgQAAxkBAAITeGnr3TZBzmxqfuIDKzZCGa090OI6AALMDGsb74lYUx8pO043oYS0AQADAgADeAADOwQ",
-"مقطع طولي للأنف": "AgACAgQAAxkBAAITemnr3dpEKisFEONqV0S65708LxWcAALODGsb74lYU_mOipPesqbFAQADAgADeAADOwQ",
-"أقسام الأذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
+"مقطع طولي في الانف": "AgACAgQAAxkBAAITemnr3dpEKisFEONqV0S65708LxWcAALODGsb74lYU_mOipPesqbFAQADAgADeAADOwQ",
+"اقسام الاذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
 "كرة العين": "AgACAgQAAxkBAAITf2nr3hBZxdkfGMNiLk2bFeYpd7ETAALQDGsb74lYUxk-ui92CqcHAQADAgADeAADOwQ",
 "مقارنة العظام":"AgACAgQAAxkBAAIVgGnsxaQYniAmfOJp99AHUnk1debqAAK1DGsb74lgU1oxFWFedrt3AQADAgADeQADOwQ",
 # ===== الوحدة 2 =====
@@ -132,7 +131,7 @@ uploaded_images = {
 "مقطع طولي في السن":"AgACAgQAAxkBAAIlOGnxCrausbn1nu8_xP53QB_jsEUTAAIUDWsbvS2JU9M6RxiZTsMnAQADAgADeAADOwQ",
 "المعي الدقيق والمعي الغليظ":"AgACAgQAAxkBAAIlOmnxDChuz3AvUuVSpVu7I0V5l9PzAAIaDWsbvS2JUyeneVd33_4qAQADAgADeAADOwQ",
 "الغدة العرقية":"AgACAgQAAxkBAAIlbGnxEW_XFhLkOhPnWXIZI5i1gvyqAAIbDWsbvS2JU9N2Nheq_aUlAQADAgADeAADOwQ",
-"الحويصلات الرئوية":"",
+"الحويصلات الرئوية":"AgACAgQAAxkBAAIq8mnyS4j1N8J5RrFOLVIUzzbj2rweAAJYDWsbvS2RU5TCn-ystE7GAQADAgADeQADOwQ",
 "السدم": "AgACAgQAAxkBAAIhSWnwiLrHp_3AjRPcIHHjR5lgjkcjAAI6DGsbHteBU8QDiIWihJrAAQADAgADeQADOwQ",
 }
 
@@ -904,11 +903,13 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
 
-    user_id = int(context.args[0])
+    if not context.args:
+     await update.message.reply_text("استخدم: /approve user_id")
+    return
 
     users.update_one(
         {"_id": user_id},
-        {"$set": {"approved": True}},
+        {"$set": {"pending": True}},
         upsert=True
     )
 
@@ -924,14 +925,17 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user if update.message else update.callback_query.from_user
 
     user_id = user.id
-    user = update.effective_user if update.message else update.callback_query.from_user
 
     first_name = user.first_name or ""
     last_name = user.last_name or ""
-
+    users.update_one(
+        {"_id": user_id},
+        {"$set": {"approved": True, "pending": False}},
+        upsert=True
+    )
     full_name = f"{first_name} {last_name}".strip()
 
-    mention = f"<a href='tg://user?id={user.id}'>{full_name}</a>"
+   
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -983,7 +987,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "📸 تم استلام الصورة\n\n"
-            f"🆔 File ID:\n{file_id}"
+            "🆔 File ID:\n{file_id}"
         )
         return
 
@@ -998,13 +1002,12 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "🎥 تم استلام الفيديو\n\n"
-            f"🆔 File ID:\n{file_id}"
+            "🆔 File ID:\n{file_id}"
         )
         return
 FREE_SECTIONS = ["dam"]
 # ================== إرسال السؤال (يدعم الصور) ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    current_session = user_data[user_id].get("session")
     query = update.callback_query
     user_id = query.from_user.id
 
@@ -1112,7 +1115,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "history": []
             }
 
-        user_data[user_id]["history"] = []
+        if "history" not in user_data[user_id]:
+            user_data[user_id]["history"] = []
         user_data[user_id]["history"].append({"type": "main_menu"})
         teacher_image_id = "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ"
 
@@ -1139,7 +1143,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup(keyboard),
             protect_content=True
         )
-        user_data[user_id]["history"] = []
         user_data[user_id]["history"].append({"type": "main_menu"})
         return
     # ================== 1الوحدة ==================
@@ -1202,8 +1205,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 🔙 الرجوع حسب الحالة
         if last["type"] == "unit_menu":
             keyboard = [
-            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio")],
-
+            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
+            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
+            back_button()
             ]
 
             await query.message.reply_text(
@@ -1427,7 +1431,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         user_data[user_id]["category"] = category
         user_data[user_id]["q_index"] = 0
-        user_data[user_id]["score"] = 0
 
         keyboard = [[InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")]]
 
@@ -1446,6 +1449,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "go_start":
         await start(update, context)
         return
+
 # ================== الإجابة ==================
     if data in ["0", "1", "2"]:
 
