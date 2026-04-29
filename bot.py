@@ -977,7 +977,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [InlineKeyboardButton("🧬🌍 علم الأحياء🌍🧬", callback_data="bio")],
-        InlineKeyboardButton("🏠 الرئيسية", callback_data="go_home")
+        
     ]
     await context.bot.send_message(
         chat_id=chat_id,
@@ -1427,7 +1427,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
             InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
             InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
-            back_button()
+            [InlineKeyboardButton("🏠 الرئيسية", callback_data="go_home"),
+            back_button()]
         ]
 
         await query.message.reply_text(
@@ -1459,7 +1460,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text("❌ لا يوجد أسئلة لهذا النوع في هذا القسم")
             return
 
-
+        user_data[user_id]["score"] = 0
         user_data[user_id]["category"] = category
         user_data[user_id]["q_index"] = 0
 
