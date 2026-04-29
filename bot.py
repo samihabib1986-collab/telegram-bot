@@ -992,6 +992,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🆔 File ID:\n{file_id}"
         )
         return
+FREE_SECTIONS = ["dam"]
 # ================== إرسال السؤال (يدعم الصور) ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -1307,42 +1308,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
     # ================== الأقسام ================== 
-    
-    
-    
-    
-    
-    
-     
-    
-    if data in [
-        "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal",
-        "sec_u2_digest", "sec_u2_circulation", "sec_u2_respiration", "sec_u2_excretion", "sec_u2_nutrition_health"
-    ]:
-        
-        if not user.get("approved"):
-            keyboard = [
-                [InlineKeyboardButton("💳 طلب اشتراك", callback_data="paid_request")]
-            ]
+    if data.startswith("sec_"):
 
-            await update.message.reply_text(
-                "💰 البوت مدفوع",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-            return
-            if data == "paid_request":
-                await paid(update, context)
-            return
-        user_data[user_id]["history"].append({"type": "section_menu"})
         section_map = {
-            # الوحدة 1
             "sec_u1_dam": ("u1", "dam"),
             "sec_u1_nervus": ("u1", "nervus"),
             "sec_u1_sum": ("u1", "sum"),
             "sec_u1_sens": ("u1", "sens"),
             "sec_u1_heal": ("u1", "heal"),
 
-            # الوحدة 2
             "sec_u2_digest": ("u2", "digest"),
             "sec_u2_circulation": ("u2", "circulation"),
             "sec_u2_respiration": ("u2", "respiration"),
@@ -1351,96 +1325,43 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         mapped = section_map.get(data)
-
         if not mapped:
             return
 
         unit, section = mapped
-        if user_id not in user_data:
-            user_data[user_id] = {
-                "subject": "bio",
-                "unit": "",
-                "section": "",
-                "score": 0,
-                "q_index": 0,
-                "history": []
-            }
 
-        # ✅ احفظ القيم هنا
+        # خزّن البيانات
         user_data[user_id]["unit"] = unit
         user_data[user_id]["section"] = section
+
         user = users.find_one({"_id": user_id})
 
-        # نفس نظام الدفع
-        if section not in ["dam", "digest"]:
+        # 🔒 شرط الدفع
+        if section not in FREE_SECTIONS:
             if not user or not user.get("approved", False):
                 await query.message.reply_text(
-                    "💰 هذا القسم مدفوع\n"
-                    "🎁 المتاح مجاناً فقط: الدعامي + الهضم\n\n"
-                    "📩 اكتب /paid للاشتراك"
+                    "💰 هذا القسم مدفوع\n\n📩 اكتب /paid للاشتراك"
                 )
                 return
 
-        section_video = SECTION_INTRO_VIDEOS.get(section)
+        # 🎉 إذا وصل هنا = مسموح
+        await query.answer("✅ تم الدخول للقسم")
 
-        if section_video:
-            await context.bot.send_video(
-                chat_id=query.message.chat_id,
-                video=section_video,
-                caption="🎬 مقدمة القسم"
-            )
-
-        if user_id not in user_data:
-            user_data[user_id] = {
-                "subject": "bio",
-                "unit": "",
-                "section": "",
-                "score": 0,
-                "q_index": 0,
-                "history": []
-            }
-
-        user_data[user_id]["history"].append({"type": "unit_menu"})
         keyboard = [
-            [
-            InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-            InlineKeyboardButton("🖼 صور", callback_data="image"),                
-            ],
-            [
-            InlineKeyboardButton("📍 موقع", callback_data="where"),
-            InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
-            ],
-            [
-            InlineKeyboardButton("🧠 نتائج", callback_data="result"),
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+            InlineKeyboardButton("🖼 صور", callback_data="image")],
+            [InlineKeyboardButton("📍 موقع", callback_data="where"),
+            InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
             InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-            InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
-            ],
-             back_button()
+            InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
+            back_button()
         ]
 
         await query.message.reply_text(
             "اختر نوع الأسئلة:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
-    elif data =="sec_u1_dam":
-        await query.answer("هذا القسم مجاني، اختر نوع الأسئلة"),
-        keyboard = [
-                [
-                InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-                InlineKeyboardButton("🖼 صور", callback_data="image"),                
-                ],
-                [
-                InlineKeyboardButton("📍 موقع", callback_data="where"),
-                InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
-                ],
-                [
-                InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-                InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-                InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
-                ],
-                back_button()
-            ]
-        return
 
     # ================== اختيار نوع السؤال ==================
 
