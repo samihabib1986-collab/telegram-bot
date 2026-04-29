@@ -939,7 +939,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
     await update.message.reply_text(
-        f"✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة \n{mention} 🌟✨\n\n"
+        "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة \n{mention} 🌟✨\n\n"
         "📚 اختبر نفسك وارتقِ بمستواك\n"
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
@@ -976,7 +976,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "📸 تم استلام الصورة\n\n"
-            f"🆔 File ID:\n{file_id}"
+            "🆔 File ID:\n{file_id}"
         )
         return
 
@@ -991,7 +991,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "🎥 تم استلام الفيديو\n\n"
-            f"🆔 File ID:\n{file_id}"
+            "🆔 File ID:\n{file_id}"
         )
         return
 FREE_SECTIONS = ["dam"]
