@@ -1014,7 +1014,7 @@ FREE_SECTIONS = ["dam"]
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
-
+    score=0
     if user_id not in user_data:
         return
 
