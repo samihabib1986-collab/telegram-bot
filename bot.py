@@ -942,6 +942,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = users.find_one({"_id": user_id})
 
     username = update.effective_user.username or update.effective_user.full_name or "المستخدم"
+    mentionadmin = f"<a href='tg://user?id={ADMIN_ID}'>{username}</a>"
+    mentionteach = f"<a href='tg://user?id={6177458463}'>{username}</a>"
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
     await update.message.reply_text(
@@ -957,8 +959,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     🎁 قسم مجاني: الدعامي الحركي
     💰 باقي الأقسام مدفوعة
 
-    📞 للتواصل مع الدعم: @sami_habib هاتف +واتس:0943 512 782
-    📞 للتواصل مع المدرس: @ahmednourdin هاتف +واتس:0939 138 720
+    📞 للتواصل مع الدعم: {mentionadmin} هاتف +واتس:0943 512 782
+    📞 للتواصل مع المدرس: {mentionteach} هاتف +واتس:0939 138 720
     """,
         parse_mode="HTML"
     )
