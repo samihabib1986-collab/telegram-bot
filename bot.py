@@ -1146,7 +1146,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     # ================== 1الوحدة ==================
     if data == "bio_u1":
-        user_data[user_id]["history"].append({"type": "unit_menu"})
+        user_data[user_id]["history"].append({"action": "bio_u1"})
     # 🎬 فيديو الوحدة
         unit_video = UNIT_INTRO_VIDEOS.get("u1")
 
@@ -1201,55 +1201,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await query.answer()
 
-        # 🔙 الرجوع حسب الحالة
-        if last["type"] == "types_menu":
-            # يرجع لأنواع الأسئلة
-            keyboard = [
-                [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-                InlineKeyboardButton("🖼 صور", callback_data="image")]
-            ]
+        # 🔥 إعادة تنفيذ نفس الزر السابق
+        query.data = last["action"]
 
-            await query.message.reply_text(
-                "اختر نوع الأسئلة:",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-
-        elif last["type"] == "section_menu":
-            keyboard = [
-                [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
-                InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus")]
-            ]
-
-            await query.message.reply_text(
-                "📚 اختر القسم:",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-
-        elif last["type"] == "unit_menu":
-            keyboard = [
-                [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")],
-                [InlineKeyboardButton("الوحدة 2", callback_data="bio_u2")],
-                 back_button()
-            ]
-
-            await query.message.reply_text(
-                "📚 اختر الوحدة:",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-
-        elif last["type"] == "main_menu":
-            keyboard = [
-                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio"),back_button()]
-            ]
-
-            await query.message.reply_text(
-                "📚 اختر المادة:",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
+        await button(update, context)
         return
         # ================== الوحدة 2 ==================
     if data == "bio_u2":
-        user_data[user_id]["history"].append({"type": "unit_menu"})
+        user_data[user_id]["history"].append({"action": "bio_u2"})
         unit_video = UNIT_INTRO_VIDEOS.get("u2")
 
         if unit_video:
@@ -1282,7 +1241,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal",
         "sec_u2_digest", "sec_u2_circulation", "sec_u2_respiration", "sec_u2_excretion", "sec_u2_nutrition_health"
     ]:
-        user_data[user_id]["history"].append({"type": "section_menu"})
+        user_data[user_id]["history"].append({"action": "section_menu"})
         section_map = {
             # الوحدة 1
             "sec_u1_dam": ("u1", "dam"),
@@ -1348,8 +1307,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "q_index": 0,
                 "history": []
             }
-
-        user_data[user_id]["history"].append({"type": "unit_menu"})
+        user_data[user_id]["history"].append({"action": "sec_u1_dam"})
         keyboard = [
             [
             InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
@@ -1382,11 +1340,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         if "history" not in user_data[user_id]:
             user_data[user_id]["history"] = []
-        user_data[user_id]["history"].append({
-            "type": "types_menu",
-            "unit": user_data[user_id]["unit"],
-            "section": user_data[user_id]["section"]
-        })
+        user_data[user_id]["history"].append({"action": data})
         unit = user_data[user_id]["unit"]
         section = user_data[user_id]["section"]
 
