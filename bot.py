@@ -942,8 +942,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = users.find_one({"_id": user_id})
 
     username = update.effective_user.username or update.effective_user.full_name or "المستخدم"
-    mentionadmin = f"<a href='tg://user?id={ADMIN_ID}'>{username}</a>"
-    mentionteach = f"<a href='tg://user?id={6177458463}'>{username}</a>"
+    adminname = "sami habib"
+    teachname = "أحمد نور الدين"
+    mentionadmin = f"<a href='tg://user?id={ADMIN_ID}'>{adminname}</a>"
+    mentionteach = f"<a href='tg://user?id={6177458463}'>{teachname}</a>"
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
     await update.message.reply_text(
