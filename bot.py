@@ -919,7 +919,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=user_id,
-        text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
+        text=f"🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇\n {mention}",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
         ])
