@@ -1166,7 +1166,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum"),
             InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens"),              
             ],
-            [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")]
+            [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")],
+            back_button()
         ]
 
         await query.message.reply_text(
