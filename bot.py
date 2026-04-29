@@ -964,7 +964,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     keyboard = [
-        [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
+        [InlineKeyboardButton("🧬🌍 علم الأحياء🌍🧬", callback_data="bio")]
     ]
 
     await update.message.reply_text(
@@ -1158,16 +1158,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         keyboard = [
-            [
-            InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
-            InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus"),                
-            ],
-            [
-            InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum"),
-            InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens"),              
-            ],
-            [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")],
-            back_button()
+                    [InlineKeyboardButton("🦴القسم الدعامي🦴", callback_data="sec_u1_dam"),
+                    InlineKeyboardButton("🧠الجهاز العصبي🧠", callback_data="sec_u1_nervus"),                
+                    ],
+                    [
+                    InlineKeyboardButton("🧬الغدد الصم🧬", callback_data="sec_u1_sum"),
+                    InlineKeyboardButton("👅أعضاء الحس👅", callback_data="sec_u1_sens"),              
+                    ],
+                    [InlineKeyboardButton("🧑‍⚕️صحة الدعامة والتنسيق🧑‍⚕️", callback_data="sec_u1_heal")],
+                    back_button()
         ]
 
         await query.message.reply_text(
@@ -1205,8 +1204,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 🔙 الرجوع حسب الحالة
         if last["type"] == "unit_menu":
             keyboard = [
-                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")],
-                back_button()
+            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
+            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
+            back_button()
             ]
 
             await query.message.reply_text(
@@ -1239,26 +1239,26 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if data.startswith("sec_u2_"):
                 keyboard = [
                     [
-                    InlineKeyboardButton("الهضم لدى الإنسان", callback_data="sec_u2_digest"),
-                    InlineKeyboardButton("الدوران لدى الإنسان", callback_data="sec_u2_circulation"),                
+                    InlineKeyboardButton("🥗الهضم لدى الإنسان🥗", callback_data="sec_u2_digest"),
+                    InlineKeyboardButton("🫀الدوران لدى الإنسان🫀", callback_data="sec_u2_circulation"),                
                     ],
                     [
-                    InlineKeyboardButton("التنفس لدى الإنسان", callback_data="sec_u2_respiration"),
-                    InlineKeyboardButton("الإطراح عند الإنسان", callback_data="sec_u2_excretion"),                
+                    InlineKeyboardButton("🫁التنفس لدى الإنسان🫁", callback_data="sec_u2_respiration"),
+                    InlineKeyboardButton("🚽الإطراح عند الإنسان🚽", callback_data="sec_u2_excretion"),                
                     ],
-                    [InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")],
+                    [InlineKeyboardButton("🍎صحة وظائف التغذية🍎", callback_data="sec_u2_nutrition_health")],
                     back_button()
                 ]
             elif data.startswith("sec_u1_"):
                 keyboard = [
-                    [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
-                    InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus"),                
+                    [InlineKeyboardButton("🦴القسم الدعامي🦴", callback_data="sec_u1_dam"),
+                    InlineKeyboardButton("🧠الجهاز العصبي🧠", callback_data="sec_u1_nervus"),                
                     ],
                     [
-                    InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum"),
-                    InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens"),              
+                    InlineKeyboardButton("🧬الغدد الصم🧬", callback_data="sec_u1_sum"),
+                    InlineKeyboardButton("👅أعضاء الحس👅", callback_data="sec_u1_sens"),              
                     ],
-                    [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")],
+                    [InlineKeyboardButton("🧑‍⚕️صحة الدعامة والتنسيق🧑‍⚕️", callback_data="sec_u1_heal")],
                     back_button()
                 ]
 
@@ -1269,9 +1269,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif last["type"] == "unit_menu":
             keyboard = [
-                [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
-                [InlineKeyboardButton("الوحدة 2: (الهضم والدوران)", callback_data="bio_u2")],
-                 back_button()
+            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
+            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
+            back_button()
             ]
 
             await query.message.reply_text(
@@ -1281,7 +1281,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif last["type"] == "main_menu":
             keyboard = [
-                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio"),back_button()]
+                [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio"),back_button()]
             ]
 
             await query.message.reply_text(
@@ -1302,16 +1302,16 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         keyboard = [
-            [
-            InlineKeyboardButton("الهضم لدى الإنسان", callback_data="sec_u2_digest"),
-            InlineKeyboardButton("الدوران لدى الإنسان", callback_data="sec_u2_circulation"),                
-            ],
-            [
-            InlineKeyboardButton("التنفس لدى الإنسان", callback_data="sec_u2_respiration"),
-            InlineKeyboardButton("الإطراح عند الإنسان", callback_data="sec_u2_excretion"),                
-            ],
-            [InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")],
-             back_button()
+                    [
+                    InlineKeyboardButton("🥗الهضم لدى الإنسان🥗", callback_data="sec_u2_digest"),
+                    InlineKeyboardButton("🫀الدوران لدى الإنسان🫀", callback_data="sec_u2_circulation"),                
+                    ],
+                    [
+                    InlineKeyboardButton("🫁التنفس لدى الإنسان🫁", callback_data="sec_u2_respiration"),
+                    InlineKeyboardButton("🚽الإطراح عند الإنسان🚽", callback_data="sec_u2_excretion"),                
+                    ],
+                    [InlineKeyboardButton("🍎صحة وظائف التغذية🍎", callback_data="sec_u2_nutrition_health")],
+                    back_button()
         ]
 
         await query.message.reply_text(
