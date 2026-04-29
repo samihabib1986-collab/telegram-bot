@@ -1448,8 +1448,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "start_quiz":
         import time
         user_data[user_id]["session"] = time.time()  # 🔥 مهم
-        score = user_data[user_id].get("score", 0)
-        user_data[user_id]["score"] = score  # تأكد أن المفتاح موجود
+        score = 0
         await send_question(update, context)
         return
     if data == "go_start":
