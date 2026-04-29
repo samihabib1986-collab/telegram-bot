@@ -3,6 +3,7 @@ import os
 import logging
 import asyncio
 import random
+from turtle import update
 from pymongo import MongoClient
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters)
@@ -10,12 +11,12 @@ import random
 parse_mode="HTML"
 # ================== رسائل التشجيع ==================
 positive = [
-    "🎉 ممتاز! إجابة صحيحة ",
+    "🎉 ممتاز! إجابة صحيحة",
     "💪 أحسنت! استمر",
     "🔥 رائع جداً!",
-    "🌟 إجابة قوية!",
-    "👏 أحسنت! أنت في الطريق الصحيح",
-    "✅ إجابة صحيحة! استمر في التعلم",
+    "🌟 إجابة قوية!"
+    "👏 أحسنت! أنت في الطريق الصحيح"
+    "✅ إجابة صحيحة! استمر في التعلم"
 ]
 
 negative = [
@@ -873,8 +874,7 @@ user_data = {}
 approved_users = set()
 pending_users = set()
 
-def back_button():
-    return [InlineKeyboardButton("🔙 رجوع", callback_data="back")]  
+
 
 # ================== الدفع ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -914,10 +914,8 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=user_id,
-        text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
-        ])
+        text="🎉 تم قبول اشتراكك",
+        protect_content=True
     )
     user = update.effective_user if update.message else update.callback_query.from_user
 
@@ -935,25 +933,30 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
 
-    username = update.effective_user.username or update.effective_user.full_name or "المستخدم"
+    if not user:
+        users.insert_one({"_id": user_id, "approved": False})
+        user = {"approved": False}
+
+    if not user.get("approved"):
+        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
+        return
+
+    username = update.effective_user.username or update.effective_user.first_name
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
     await update.message.reply_text(
-        f"✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة \n{mention} 🌟✨\n\n"
+        f"✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة {mention} 🌟✨\n\n"
         "📚 اختبر نفسك وارتقِ بمستواك\n"
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
         "👨‍🏫 إشراف المدرس: أحمد نور الدين\n"
         "💻 برمجة المهندس: سامي حبيب\n"
-        "🎁 قسم مجاني: الدعامي الحركي\n💰 باقي الأقسام مدفوعة\n",
-        "للتواصل مع الدعم: @sami_habib هاتف +واتس:0943 512 782\n",
-        "للتواصل مع المدرس: @ahmednourdin هاتف +واتس:0939 138 720",
-        
+        "🎁 قسم مجاني: الدعامي الحركي\n💰 باقي الأقسام مدفوعة",
         parse_mode="HTML"
     )
 
     keyboard = [
-        [InlineKeyboardButton("🧬🌍 علم الأحياء🌍🧬", callback_data="bio")]
+        [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
     ]
 
     await update.message.reply_text(
@@ -994,7 +997,6 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🆔 File ID:\n{file_id}"
         )
         return
-FREE_SECTIONS = ["dam"]
 # ================== إرسال السؤال (يدعم الصور) ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -1017,8 +1019,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton("🔄 إعادة الاختبار", callback_data="restart_quiz")],
-            back_button(),
-            
+            [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
         ]
 
         await context.bot.send_message(
@@ -1148,15 +1149,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         keyboard = [
-                    [InlineKeyboardButton("🦴القسم الدعامي🦴", callback_data="sec_u1_dam"),
-                    InlineKeyboardButton("🧠الجهاز العصبي🧠", callback_data="sec_u1_nervus"),                
-                    ],
-                    [
-                    InlineKeyboardButton("🧬الغدد الصم🧬", callback_data="sec_u1_sum"),
-                    InlineKeyboardButton("👅أعضاء الحس👅", callback_data="sec_u1_sens"),              
-                    ],
-                    [InlineKeyboardButton("🧑‍⚕️صحة الدعامة والتنسيق🧑‍⚕️", callback_data="sec_u1_heal")],
-                    back_button()
+            [
+            InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
+            InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus"),                
+            ],
+            [
+            InlineKeyboardButton("الغدد الصم", callback_data="sec_u1_sum"),
+            InlineKeyboardButton("أعضاء الحس", callback_data="sec_u1_sens"),              
+            ],
+            [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")]
         ]
 
         await query.message.reply_text(
@@ -1192,65 +1193,23 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer()
 
         # 🔙 الرجوع حسب الحالة
-        if last["type"] == "unit_menu":
-            keyboard = [
-            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
-            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
-            back_button()
-            ]
-
-            await query.message.reply_text(
-                "📚 اختر المادة:",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
-        elif last["type"] == "types_menu":
+        if last["type"] == "types_menu":
             # يرجع لأنواع الأسئلة
             keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-            InlineKeyboardButton("🖼 صور", callback_data="image"),                
-            ],
-            [
-            InlineKeyboardButton("📍 موقع", callback_data="where"),
-            InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
-            ],
-            [
-            InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-            InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-            InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
-            ],
-            back_button()
+                [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+                InlineKeyboardButton("🖼 صور", callback_data="image")]
             ]
+
             await query.message.reply_text(
                 "اختر نوع الأسئلة:",
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
 
         elif last["type"] == "section_menu":
-            if data.startswith("sec_u2_"):
-                keyboard = [
-                    [
-                    InlineKeyboardButton("🥗الهضم لدى الإنسان🥗", callback_data="sec_u2_digest"),
-                    InlineKeyboardButton("🫀الدوران لدى الإنسان🫀", callback_data="sec_u2_circulation"),                
-                    ],
-                    [
-                    InlineKeyboardButton("🫁التنفس لدى الإنسان🫁", callback_data="sec_u2_respiration"),
-                    InlineKeyboardButton("🚽الإطراح عند الإنسان🚽", callback_data="sec_u2_excretion"),                
-                    ],
-                    [InlineKeyboardButton("🍎صحة وظائف التغذية🍎", callback_data="sec_u2_nutrition_health")],
-                    back_button()
-                ]
-            elif data.startswith("sec_u1_"):
-                keyboard = [
-                    [InlineKeyboardButton("🦴القسم الدعامي🦴", callback_data="sec_u1_dam"),
-                    InlineKeyboardButton("🧠الجهاز العصبي🧠", callback_data="sec_u1_nervus"),                
-                    ],
-                    [
-                    InlineKeyboardButton("🧬الغدد الصم🧬", callback_data="sec_u1_sum"),
-                    InlineKeyboardButton("👅أعضاء الحس👅", callback_data="sec_u1_sens"),              
-                    ],
-                    [InlineKeyboardButton("🧑‍⚕️صحة الدعامة والتنسيق🧑‍⚕️", callback_data="sec_u1_heal")],
-                    back_button()
-                ]
+            keyboard = [
+                [InlineKeyboardButton("القسم الدعامي", callback_data="sec_u1_dam"),
+                InlineKeyboardButton("الجهاز العصبي", callback_data="sec_u1_nervus")]
+            ]
 
             await query.message.reply_text(
                 "📚 اختر القسم:",
@@ -1259,9 +1218,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif last["type"] == "unit_menu":
             keyboard = [
-            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
-            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
-            back_button()
+                [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")],
+                [InlineKeyboardButton("الوحدة 2", callback_data="bio_u2")]
             ]
 
             await query.message.reply_text(
@@ -1271,7 +1229,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif last["type"] == "main_menu":
             keyboard = [
-                [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio"),back_button()]
+                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
             ]
 
             await query.message.reply_text(
@@ -1292,16 +1250,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         keyboard = [
-                    [
-                    InlineKeyboardButton("🥗الهضم لدى الإنسان🥗", callback_data="sec_u2_digest"),
-                    InlineKeyboardButton("🫀الدوران لدى الإنسان🫀", callback_data="sec_u2_circulation"),                
-                    ],
-                    [
-                    InlineKeyboardButton("🫁التنفس لدى الإنسان🫁", callback_data="sec_u2_respiration"),
-                    InlineKeyboardButton("🚽الإطراح عند الإنسان🚽", callback_data="sec_u2_excretion"),                
-                    ],
-                    [InlineKeyboardButton("🍎صحة وظائف التغذية🍎", callback_data="sec_u2_nutrition_health")],
-                    back_button()
+            [
+            InlineKeyboardButton("الهضم لدى الإنسان", callback_data="sec_u2_digest"),
+            InlineKeyboardButton("الدوران لدى الإنسان", callback_data="sec_u2_circulation"),                
+            ],
+            [
+            InlineKeyboardButton("التنفس لدى الإنسان", callback_data="sec_u2_respiration"),
+            InlineKeyboardButton("الإطراح عند الإنسان", callback_data="sec_u2_excretion"),                
+            ],
+            [InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")]
         ]
 
         await query.message.reply_text(
@@ -1310,15 +1267,20 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
     # ================== الأقسام ================== 
-    if data.startswith("sec_"):
-
+    if data in [
+        "sec_u1_dam", "sec_u1_nervus", "sec_u1_sum", "sec_u1_sens", "sec_u1_heal",
+        "sec_u2_digest", "sec_u2_circulation", "sec_u2_respiration", "sec_u2_excretion", "sec_u2_nutrition_health"
+    ]:
+        user_data[user_id]["history"].append({"type": "section_menu"})
         section_map = {
+            # الوحدة 1
             "sec_u1_dam": ("u1", "dam"),
             "sec_u1_nervus": ("u1", "nervus"),
             "sec_u1_sum": ("u1", "sum"),
             "sec_u1_sens": ("u1", "sens"),
             "sec_u1_heal": ("u1", "heal"),
 
+            # الوحدة 2
             "sec_u2_digest": ("u2", "digest"),
             "sec_u2_circulation": ("u2", "circulation"),
             "sec_u2_respiration": ("u2", "respiration"),
@@ -1327,43 +1289,78 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         mapped = section_map.get(data)
+
         if not mapped:
             return
 
         unit, section = mapped
+        if user_id not in user_data:
+            user_data[user_id] = {
+                "subject": "bio",
+                "unit": "",
+                "section": "",
+                "score": 0,
+                "q_index": 0,
+                "history": []
+            }
 
-        # خزّن البيانات
+        # ✅ احفظ القيم هنا
         user_data[user_id]["unit"] = unit
         user_data[user_id]["section"] = section
-
         user = users.find_one({"_id": user_id})
 
-        # 🔒 شرط الدفع
-        if section not in FREE_SECTIONS:
+        # نفس نظام الدفع
+        if section not in ["dam", "digest"]:
             if not user or not user.get("approved", False):
                 await query.message.reply_text(
-                    "💰 هذا القسم مدفوع\n\n📩 اكتب /paid للاشتراك"
+                    "💰 هذا القسم مدفوع\n"
+                    "🎁 المتاح مجاناً فقط: الدعامي + الهضم\n\n"
+                    "📩 اكتب /paid للاشتراك"
                 )
                 return
 
-        # 🎉 إذا وصل هنا = مسموح
-        await query.answer("✅ تم الدخول للقسم")
+        section_video = SECTION_INTRO_VIDEOS.get(section)
 
+        if section_video:
+            await context.bot.send_video(
+                chat_id=query.message.chat_id,
+                video=section_video,
+                caption="🎬 مقدمة القسم"
+            )
+
+        if user_id not in user_data:
+            user_data[user_id] = {
+                "subject": "bio",
+                "unit": "",
+                "section": "",
+                "score": 0,
+                "q_index": 0,
+                "history": []
+            }
+
+        user_data[user_id]["history"].append({"type": "unit_menu"})
         keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-            InlineKeyboardButton("🖼 صور", callback_data="image")],
-            [InlineKeyboardButton("📍 موقع", callback_data="where"),
-            InlineKeyboardButton("📊 ترتيب", callback_data="level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
+            [
+            InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+            InlineKeyboardButton("🖼 صور", callback_data="image"),                
+            ],
+            [
+            InlineKeyboardButton("📍 موقع", callback_data="where"),
+            InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
+            ],
+            [
+            InlineKeyboardButton("🧠 نتائج", callback_data="result"),
             InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-            InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
-            back_button()
+            InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
+            ]
         ]
 
         await query.message.reply_text(
             "اختر نوع الأسئلة:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
+
+        return
 
     # ================== اختيار نوع السؤال ==================
 
@@ -1404,9 +1401,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
         await send_question(update, context)
-        return
-    if data == "go_start":
-        await start(update, context)
         return
 
 # ================== الإجابة ==================
