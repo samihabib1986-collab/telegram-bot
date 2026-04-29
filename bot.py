@@ -14,9 +14,9 @@ positive = [
     "🎉 ممتاز! إجابة صحيحة",
     "💪 أحسنت! استمر",
     "🔥 رائع جداً!",
-    "🌟 إجابة قوية!"
-    "👏 أحسنت! أنت في الطريق الصحيح"
-    "✅ إجابة صحيحة! استمر في التعلم"
+    "🌟 إجابة قوية!",
+    "👏 أحسنت! أنت في الطريق الصحيح",
+    "✅ إجابة صحيحة! استمر في التعلم",
 ]
 
 negative = [
@@ -874,7 +874,8 @@ user_data = {}
 approved_users = set()
 pending_users = set()
 
-
+def back_button():
+    return [InlineKeyboardButton("🔙 رجوع", callback_data="back")]  
 
 # ================== الدفع ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -914,8 +915,10 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=user_id,
-        text="🎉 تم قبول اشتراكك",
-        protect_content=True
+        text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
+        ])
     )
     user = update.effective_user if update.message else update.callback_query.from_user
 
@@ -933,19 +936,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
 
-    if not user:
-        users.insert_one({"_id": user_id, "approved": False})
-        user = {"approved": False}
-
     if not user.get("approved"):
-        await update.message.reply_text("💰 البوت مدفوع\nاكتب /paid")
-        return
+        keyboard = [
+            [InlineKeyboardButton("💳 طلب اشتراك", callback_data="paid_request")]
+        ]
 
-    username = update.effective_user.username or update.effective_user.first_name
+        await update.message.reply_text(
+            "💰 البوت مدفوع",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+        if data == "paid_request":
+            await paid(update, context)
+        return
+    username = update.effective_user.username or update.effective_user.full_name or "المستخدم"
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
     await update.message.reply_text(
-        f"✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة {mention} 🌟✨\n\n"
+        f"✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة \n{mention} 🌟✨\n\n"
         "📚 اختبر نفسك وارتقِ بمستواك\n"
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
@@ -1019,7 +1027,8 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton("🔄 إعادة الاختبار", callback_data="restart_quiz")],
-            [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+            back_button(),
+            
         ]
 
         await context.bot.send_message(
@@ -1219,7 +1228,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif last["type"] == "unit_menu":
             keyboard = [
                 [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")],
-                [InlineKeyboardButton("الوحدة 2", callback_data="bio_u2")]
+                [InlineKeyboardButton("الوحدة 2", callback_data="bio_u2")],
+                 back_button()
             ]
 
             await query.message.reply_text(
@@ -1229,7 +1239,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif last["type"] == "main_menu":
             keyboard = [
-                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
+                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio"),back_button()]
             ]
 
             await query.message.reply_text(
@@ -1258,7 +1268,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("التنفس لدى الإنسان", callback_data="sec_u2_respiration"),
             InlineKeyboardButton("الإطراح عند الإنسان", callback_data="sec_u2_excretion"),                
             ],
-            [InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")]
+            [InlineKeyboardButton("صحة وظائف التغذية", callback_data="sec_u2_nutrition_health")],
+             back_button()
         ]
 
         await query.message.reply_text(
@@ -1352,7 +1363,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("🧠 نتائج", callback_data="result"),
             InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
             InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
-            ]
+            ],
+             back_button()
         ]
 
         await query.message.reply_text(
@@ -1401,6 +1413,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
         await send_question(update, context)
+        return
+    if data == "go_start":
+        await start(update, context)
         return
 
 # ================== الإجابة ==================
