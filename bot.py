@@ -949,8 +949,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
     await update.message.reply_text(
-        f"""✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 
-    {mention} 🌟✨
+        f"""✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة 🌟✨\n
+    🌟✨{mention} 🌟✨
 
     📚 اختبر نفسك وارتقِ بمستواك
     🧠 أسئلة متنوعة + صور + فيديوهات
@@ -1014,7 +1014,8 @@ FREE_SECTIONS = ["dam"]
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
-    score=0
+    user_data[user_id]["q_index"] = 0
+    user_data[user_id]["score"] = 0
     if user_id not in user_data:
         return
 
@@ -1448,7 +1449,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data == "start_quiz":
         import time
         user_data[user_id]["session"] = time.time()  # 🔥 مهم
-        score = 0
+        user_data[user_id]["q_index"] = 0
+        user_data[user_id]["score"] = 0
         await send_question(update, context)
         return
     if data == "go_start":
