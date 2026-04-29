@@ -3,12 +3,11 @@ import os
 import logging
 import asyncio
 import random
-from turtle import update
 from pymongo import MongoClient
+from telegram.ext import Defaults
+from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters)
-import random 
-parse_mode="HTML"
+from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters) 
 # ================== رسائل التشجيع ==================
 positive = [
     "🎉 ممتاز! إجابة صحيحة",
@@ -1478,7 +1477,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
 # ================== تشغيل ==================
 
-app = ApplicationBuilder().token(TOKEN).build()
+from telegram.constants import ParseMode
+
+app = (
+    ApplicationBuilder()
+    .token(TOKEN)
+    .defaults(Defaults(parse_mode=ParseMode.HTML))
+    .build()
+    )
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("approve", approve))
 app.add_handler(CommandHandler("start", start))
