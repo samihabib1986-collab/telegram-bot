@@ -41,6 +41,7 @@ welcome_messages = [
         "🎯 حل الأسئلة واجمع النقاط",
         "🚀 واصِل التقدم لتصبح الأفضل!"
     ]
+
 # ================== إعداد MongoDB ==================
 MONGO_URL = os.environ.get("MONGO_URL")
 
@@ -114,8 +115,8 @@ uploaded_images = {
 "البنكرياس": "AgACAgQAAxkBAAISKWnroaq_3YSRyrHZsbvx8rJ_fg_ZAAKXDGsb74lYU-srhC9ChcJ_AQADAgADeQADOwQ",
 "الغدد الصم": "AgACAgQAAxkBAAISK2nrov53uU1iaKiBKo3UPOUQKjlFAAKYDGsb74lYU1TWZ694bWrdAQADAgADeQADOwQ",
 "بنية الجلد": "AgACAgQAAxkBAAITeGnr3TZBzmxqfuIDKzZCGa090OI6AALMDGsb74lYUx8pO043oYS0AQADAgADeAADOwQ",
-"مقطع طولي في الانف": "AgACAgQAAxkBAAITemnr3dpEKisFEONqV0S65708LxWcAALODGsb74lYU_mOipPesqbFAQADAgADeAADOwQ",
-"اقسام الاذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
+"مقطع طولي للأنف": "AgACAgQAAxkBAAITemnr3dpEKisFEONqV0S65708LxWcAALODGsb74lYU_mOipPesqbFAQADAgADeAADOwQ",
+"أقسام الأذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
 "كرة العين": "AgACAgQAAxkBAAITf2nr3hBZxdkfGMNiLk2bFeYpd7ETAALQDGsb74lYUxk-ui92CqcHAQADAgADeAADOwQ",
 "مقارنة العظام":"AgACAgQAAxkBAAIVgGnsxaQYniAmfOJp99AHUnk1debqAAK1DGsb74lgU1oxFWFedrt3AQADAgADeQADOwQ",
 # ===== الوحدة 2 =====
@@ -131,6 +132,7 @@ uploaded_images = {
 "مقطع طولي في السن":"AgACAgQAAxkBAAIlOGnxCrausbn1nu8_xP53QB_jsEUTAAIUDWsbvS2JU9M6RxiZTsMnAQADAgADeAADOwQ",
 "المعي الدقيق والمعي الغليظ":"AgACAgQAAxkBAAIlOmnxDChuz3AvUuVSpVu7I0V5l9PzAAIaDWsbvS2JUyeneVd33_4qAQADAgADeAADOwQ",
 "الغدة العرقية":"AgACAgQAAxkBAAIlbGnxEW_XFhLkOhPnWXIZI5i1gvyqAAIbDWsbvS2JU9N2Nheq_aUlAQADAgADeAADOwQ",
+"الحويصلات الرئوية":"",
 "السدم": "AgACAgQAAxkBAAIhSWnwiLrHp_3AjRPcIHHjR5lgjkcjAAI6DGsbHteBU8QDiIWihJrAAQADAgADeQADOwQ",
 }
 
@@ -981,7 +983,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "📸 تم استلام الصورة\n\n"
-            "🆔 File ID:\n{file_id}"
+            f"🆔 File ID:\n{file_id}"
         )
         return
 
@@ -996,12 +998,13 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "🎥 تم استلام الفيديو\n\n"
-            "🆔 File ID:\n{file_id}"
+            f"🆔 File ID:\n{file_id}"
         )
         return
 FREE_SECTIONS = ["dam"]
 # ================== إرسال السؤال (يدعم الصور) ==================
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    current_session = user_data[user_id].get("session")
     query = update.callback_query
     user_id = query.from_user.id
 
@@ -1199,9 +1202,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 🔙 الرجوع حسب الحالة
         if last["type"] == "unit_menu":
             keyboard = [
-            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
-            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
-            back_button()
+            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio")],
+
             ]
 
             await query.message.reply_text(
@@ -1425,6 +1427,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         user_data[user_id]["category"] = category
         user_data[user_id]["q_index"] = 0
+        user_data[user_id]["score"] = 0
 
         keyboard = [[InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")]]
 
@@ -1436,12 +1439,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
+        import time
+        user_data[user_id]["session"] = time.time()  # 🔥 مهم
         await send_question(update, context)
         return
     if data == "go_start":
         await start(update, context)
         return
-
 # ================== الإجابة ==================
     if data in ["0", "1", "2"]:
 
@@ -1449,8 +1453,25 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         info = user_data[user_id]
+
+        # ✅ تحقق من الجلسة (مهم جداً)
+        if "session" not in info:
+            return
+
+        current_session = info["session"]
+
+        # 👇 تحقق أن هذه الإجابة لنفس الاختبار الحالي
+        if info.get("session") != current_session:
+            return
+
         category = info["category"]
-        q = subjects["bio"][category][info["q_index"]]
+
+        # ✅ حماية إضافية
+        q_list = subjects["bio"].get(category)
+        if not q_list or info["q_index"] >= len(q_list):
+            return
+
+        q = q_list[info["q_index"]]
 
         selected_index = int(data)
         correct_index = q["options"].index(q["answer"])
