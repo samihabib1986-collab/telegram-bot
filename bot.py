@@ -1202,7 +1202,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer()
 
         # 🔙 الرجوع حسب الحالة
-        if last["type"] == "types_menu":
+        if last["type"] == "unit_menu":
+            keyboard = [
+                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")],
+                back_button()
+            ]
+
+            await query.message.reply_text(
+                "📚 اختر المادة:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        elif last["type"] == "types_menu":
             # يرجع لأنواع الأسئلة
             keyboard = [
             [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
@@ -1250,6 +1260,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     [InlineKeyboardButton("صحة الدعامة والتنسيق", callback_data="sec_u1_heal")],
                     back_button()
                 ]
+
             await query.message.reply_text(
                 "📚 اختر القسم:",
                 reply_markup=InlineKeyboardMarkup(keyboard)
@@ -1257,8 +1268,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif last["type"] == "unit_menu":
             keyboard = [
-                [InlineKeyboardButton("الوحدة 1", callback_data="bio_u1")],
-                [InlineKeyboardButton("الوحدة 2", callback_data="bio_u2")],
+                [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
+                [InlineKeyboardButton("الوحدة 2: (الهضم والدوران)", callback_data="bio_u2")],
                  back_button()
             ]
 
