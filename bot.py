@@ -939,7 +939,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
 
     await update.message.reply_text(
-        "✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة \n{mention} 🌟✨\n\n"
+        f"✨🌟 أهلاً وسهلاً بك في منصة بوابة العلامة الكاملة \n{mention} 🌟✨\n\n"
         "📚 اختبر نفسك وارتقِ بمستواك\n"
         "🧠 أسئلة متنوعة + صور + فيديوهات\n"
         "🚀 طريقك للنجاح يبدأ الآن\n\n"
@@ -1342,13 +1342,41 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if section not in FREE_SECTIONS:
             if not user or not user.get("approved", False):
                 await query.message.reply_text(
-                    "💰 هذا القسم مدفوع\n\n📩 اكتب /paid للاشتراك"
+                    "💰 هذا القسم مدفوع\n\n📩 اضغط /paid للاشتراك"
                 )
                 return
 
         # 🎉 إذا وصل هنا = مسموح
         await query.answer("✅ تم الدخول للقسم")
+        if user_id not in user_data:
+            user_data[user_id] = {
+                "subject": "bio",
+                "unit": "",
+                "section": "",
+                "score": 0,
+                "q_index": 0,
+                "history": []
+            }
 
+        user_data[user_id]["unit"] = unit
+        user_data[user_id]["section"] = section
+
+        user = users.find_one({"_id": user_id})
+
+        if section not in FREE_SECTIONS:
+            if not user or not user.get("approved", False):
+                await query.message.reply_text("💰 هذا القسم مدفوع\n📩 اضغط /paid للاشتراك")
+                return
+
+        section_video = SECTION_INTRO_VIDEOS.get(section)
+
+        if section_video:
+            await context.bot.send_video(
+                chat_id=query.message.chat_id,
+                video=section_video,
+                caption="🎬 مقدمة القسم",
+                protect_content=True
+            )
         keyboard = [
             [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
             InlineKeyboardButton("🖼 صور", callback_data="image")],
