@@ -1415,7 +1415,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif last["type"] == "main_menu":
             keyboard = [
-                [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio"),back_button()]
+                [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]
             ]
 
             await query.message.reply_text(
