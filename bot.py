@@ -919,6 +919,7 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🧾 كود العملية: {code}\n\n"
             "📸 أرسل صورة التحويل بعد الدفع"
         )
+        [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
     )
     os.remove(file_name)
     
@@ -1103,8 +1104,6 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
-    if user and user.get("payment_mode") == "shamcash" and user.get("pending"):
-     return
     if update.message.photo:
         file_id = update.message.photo[-1].file_id
 
