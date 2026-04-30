@@ -1228,6 +1228,11 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard),
         protect_content=True
     )
+    
+    
+    
+    # ================== المادة ==================
+    
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
@@ -1235,7 +1240,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
 
 
-    # ================== المادة ==================
     if data == "bio":
         await query.answer()  # مهم جداً
         if user_id not in user_data:
@@ -1704,4 +1708,5 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("delete", delete_user))
 app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
+app.add_handler(CallbackQueryHandler(button))
 app.run_polling()
