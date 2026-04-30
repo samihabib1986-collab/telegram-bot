@@ -1,3 +1,4 @@
+from operator import index
 import time
 import os
 import logging
@@ -1100,11 +1101,12 @@ FREE_SECTIONS = ["dam"]
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
-    user_data[user_id]["q_index"] = 0
     user_data[user_id]["score"] = 0
     if user_id not in user_data:
+            return
+    if user_data[user_id].get("locked"):
         return
-
+    user_data[user_id]["locked"] = True
     info = user_data[user_id]
 
     subject = info["subject"]
@@ -1191,7 +1193,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = query.from_user.id
     data = query.data
-
+    user_data[user_id]["locked"] = False
 
     # ================== المادة ==================
     if data == "bio":
@@ -1272,8 +1274,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if user_id not in user_data:
             return
-
-        user_data[user_id]["q_index"] = 0
         user_data[user_id]["score"] = 0
 
         await send_question(update, context)
@@ -1621,7 +1621,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(
                 random.choice(negative) + f"\n\n📌 الإجابة الصحيحة: {q['answer']}"
             )
-        info["q_index"] += 1
+        user_data[user_id]["q_index"] = index + 1
 
         await asyncio.sleep(1)
         await send_question(update, context)
