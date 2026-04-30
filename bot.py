@@ -883,6 +883,7 @@ def generate_code():
     return str(random.randint(100000, 999999))
 # ================== الدفع (شام كاش) ==================
 async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
     query = update.callback_query
     await query.answer()
 
@@ -919,7 +920,7 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🧾 كود العملية: {code}\n\n"
             "📸 أرسل صورة التحويل بعد الدفع"
         ),
-        reply_markup=InlineKeyboardMarkup([
+    reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
         ])
         )
@@ -1235,7 +1236,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-
+    await query.answer()
     user_id = query.from_user.id
     data = query.data
 
