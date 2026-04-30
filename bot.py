@@ -915,7 +915,7 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
         caption=(
             "💳 الدفع عبر شام كاش\n\n"
             f"📌 رقم المحفظة: {wallet_number}\n"
-            "💰 المبلغ:  5$ او 60 000 ل.س\n"
+            "💰 المبلغ:  5$ او 60000 ل.س\n"
             f"🧾 كود العملية: {code}\n\n"
             "📸 أرسل صورة التحويل بعد الدفع"
         )
@@ -949,7 +949,7 @@ async def delete_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== استقبال صورة التحويل ==================
 async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    user = users.find_one({"_id": user_id})
+    user = users.find_one({"_id": update.effective_user.id})
 
     # ❌ تجاهل أي شخص ليس في وضع دفع
     if not user or user.get("payment_mode") != "shamcash":
@@ -1032,7 +1032,7 @@ async def handle_admin_buttons(update: Update, context: ContextTypes.DEFAULT_TYP
             chat_id=user_id,
             text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🚀 بدء", callback_data="main_menu")]
+                [InlineKeyboardButton("🚀 بدء", callback_data="bio")]
             ])
             )
     elif data.startswith("reject_"):
@@ -1688,14 +1688,13 @@ app = (
     .defaults(Defaults(parse_mode=ParseMode.HTML))
     .build()
     )
-app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="pay_shamcash"))
+app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
 app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
-app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="approve_|reject_"))
+app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_)$"))
+
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CallbackQueryHandler(button))
+app.add_handler(CommandHandler("delete", delete_user))
+
 app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
-app.add_handler(CommandHandler("delete", delete_user))
-app.add_handler(CallbackQueryHandler(handle_admin_buttons))
-app.run_polling()
