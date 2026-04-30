@@ -1,4 +1,3 @@
-from operator import index
 import time
 import os
 import logging
@@ -11,6 +10,7 @@ from telegram.ext import Defaults
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters) 
+
 # ================== رسائل التشجيع ==================
 positive = [
     "🎉 ممتاز! إجابة صحيحة",
@@ -1101,23 +1101,18 @@ FREE_SECTIONS = ["dam"]
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
+    user_data[user_id]["q_index"] = 0
     user_data[user_id]["score"] = 0
     if user_id not in user_data:
         return
 
-    info = user_data[user_id]
-    if info.get("locked"):
-        return
-
-    info["locked"] = True
-    user_data[user_id]["locked"] = True
     info = user_data[user_id]
 
     subject = info["subject"]
     category = info["category"]
     index = info["q_index"]
 
-    q_list = subjects["bio"].get(category, [])
+    q_list = subjects[subject][category]
 
     if index >= len(q_list):
 
@@ -1175,24 +1170,31 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text += f"{chr(65+i)} - {opt}\n"
 
 
-    keyboard = InlineKeyboardMarkup([[
+    msg = await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text=text,
+        protect_content=True
+    )
+    keyboard = [[
         InlineKeyboardButton("A", callback_data="0"),
         InlineKeyboardButton("B", callback_data="1"),
         InlineKeyboardButton("C", callback_data="2"),
-    ]])
+    ]]
 
     await context.bot.send_message(
         chat_id=query.message.chat_id,
-        text=text + "\n\n📌 اختر الإجابة:",
-        reply_markup=keyboard,
+        text="اختر الإجابة:",
+        reply_markup=InlineKeyboardMarkup(keyboard),
         protect_content=True
     )
-        # ================== المادة ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
     user_id = query.from_user.id
     data = query.data
+
+
+    # ================== المادة ==================
     if data == "bio":
         await query.answer()  # مهم جداً
         if user_id not in user_data:
@@ -1271,6 +1273,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if user_id not in user_data:
             return
+
+        user_data[user_id]["q_index"] = 0
         user_data[user_id]["score"] = 0
 
         await send_question(update, context)
@@ -1530,16 +1534,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
-
-        if user_id not in user_data:
-            await query.message.reply_text("❌ لم يتم اختيار المادة بعد")
-            return
-
-        user_data[user_id]["session"] = time.time()
+        import time
+        user_data[user_id]["session"] = time.time()  # 🔥 مهم
         user_data[user_id]["q_index"] = 0
         user_data[user_id]["score"] = 0
-
         await send_question(update, context)
+        return
+    if data == "go_start":
+        await start(update, context)
         return
 
 # ================== الإجابة ==================
@@ -1620,7 +1622,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(
                 random.choice(negative) + f"\n\n📌 الإجابة الصحيحة: {q['answer']}"
             )
-        user_data[user_id]["q_index"] += 1
+        info["q_index"] += 1
 
         await asyncio.sleep(1)
         await send_question(update, context)
