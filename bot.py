@@ -1188,16 +1188,14 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard),
         protect_content=True
     )
+        # ================== المادة ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-
+    await query.answer()  # مهم جداً
     user_id = query.from_user.id
     data = query.data
     user_data[user_id]["locked"] = False
-
-    # ================== المادة ==================
     if data == "bio":
-        await query.answer()  # مهم جداً
         if user_id not in user_data:
             user_data[user_id] = {
                 "subject": "bio",
