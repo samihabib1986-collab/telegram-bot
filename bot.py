@@ -876,70 +876,112 @@ pending_users = set()
 
 def back_button():
     return [InlineKeyboardButton("🔙 رجوع", callback_data="back")]  
+# ==================  توليد كود الدفع  ==================
+def generate_code():
+    return str(random.randint(100000, 999999))
+# ================== الدفع (شام كاش) ==================
+async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
 
-# ================== الدفع ==================
+    user = query.from_user
+    code = generate_code()
+
+    users.update_one(
+        {"_id": user.id},
+        {"$set": {"payment_code": code, "pending": True}},
+        upsert=True
+    )
+
+    await query.message.reply_text(
+        f"💳 الدفع عبر شام كاش\n\n"
+        f"📌 رقم المحفظة: 09XXXXXXXX\n"
+        f"💰 المبلغ: 5$\n"
+        f"🧾 كود العملية: {code}\n\n"
+        f"📸 أرسل صورة التحويل هنا بعد الدفع"
+    )
+# ================== استقبال صورة التحويل ==================
+async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+
+    # تحويل الصورة للأدمن
+    await context.bot.forward_message(
+        chat_id=ADMIN_ID,
+        from_chat_id=update.message.chat_id,
+        message_id=update.message.message_id
+    )
+
+    # إرسال أزرار للأدمن
+    await context.bot.send_message(
+        chat_id=ADMIN_ID,
+        text=f"📩 إثبات دفع\n🆔 {user.id}",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user.id}")],
+            [InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user.id}")]
+        ])
+    )
+
+    await update.message.reply_text("⏳ تم إرسال الإثبات للمراجعة")
+# ================== الدفع (اليدوي ) ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
     first_name = user.first_name or ""
     last_name = user.last_name or ""
-
     full_name = f"{first_name} {last_name}".strip()
-
     user_id = user.id
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")]
+    ])
 
     await context.bot.send_message(
         chat_id=ADMIN_ID,
         text=f"💳 طلب اشتراك:\n\n"
              f"👤 الاسم: {full_name}\n"
-             f"🆔 ID: {user_id}\n\n"
-             f"📩 /approve {user_id}"
+             f"🆔 ID: {user_id}",
+        reply_markup=keyboard
     )
 
     await update.message.reply_text("⏳ تم إرسال طلب الاشتراك")
+# ================== زر القبول ==================
+async def handle_admin_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
 
-# ================== الموافقة ==================
-# ================== الموافقة ==================
-async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
+    # تأكد أن اللي ضغط هو الأدمن
+    if query.from_user.id != ADMIN_ID:
         return
 
-    if not context.args:
-        await update.message.reply_text("استخدم: /approve user_id")
-        return
+    data = query.data
+    user_id = int(data.split("_")[1])
+    if data.startswith("approve_"):
+        # تحديث قاعدة البيانات
+        users.update_one(
+            {"_id": user_id},
+            {"$set": {"approved": True, "pending": False}},
+            upsert=True
+        )
 
-    user_id = int(context.args[0])
+        # تعديل رسالة الأدمن
+        await query.edit_message_text("✅ تم قبول المستخدم")
 
-    # تحديث قاعدة البيانات
-    users.update_one(
-        {"_id": user_id},
-        {"$set": {"approved": True, "pending": False}},
-        upsert=True
-    )
+        # إرسال رسالة للمستخدم
+        await context.bot.send_message(
+            chat_id=user_id,
+            text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
+            ])
+            )
+    elif data.startswith("reject_"):
+        await query.edit_message_text("❌ تم رفض الطلب")
 
-    await update.message.reply_text("✅ تم التفعيل")
-
-    # إرسال رسالة للمستخدم
-    await context.bot.send_message(
-        chat_id=user_id,
-        text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
-        ])
-    )   
-    user = update.effective_user if update.message else update.callback_query.from_user
-
-    user_id = user.id
-
-    first_name = user.first_name or ""
-    last_name = user.last_name or ""
-    users.update_one(
-        {"_id": user_id},
-        {"$set": {"approved": True, "pending": False}},
-        upsert=True
-    )
-    full_name = f"{first_name} {last_name}".strip()
-
+        await context.bot.send_message(
+            chat_id=user_id,
+            text="❌ تم رفض عملية الدفع"
+        )
+        
 
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1556,8 +1598,10 @@ app = (
     .build()
     )
 app.add_handler(CommandHandler("paid", paid))
-app.add_handler(CommandHandler("approve", approve))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
+app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="pay_shamcash"))
+app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_)"))
+app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
 app.run_polling()
