@@ -1135,7 +1135,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⏳ تم إرسال الإثبات للمراجعة")
         return
 
-    # ================== حالة عادية ==================
+    # ================== الحالة العادية ==================
     if update.message.photo:
         file_id = update.message.photo[-1].file_id
 
@@ -1720,20 +1720,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_question(update, context)
     return
 # ================== تشغيل ==================
-from telegram.ext import MessageFilter
-
-class PaymentFilter(MessageFilter):
-    def filter(self, message):
-        user = users.find_one({"_id": message.from_user.id})
-        return (
-            user
-            and user.get("payment_mode") == "shamcash"
-            and user.get("pending") is True
-        )
-
-payment_filter = PaymentFilter()
-from telegram.constants import ParseMode
-
 app = (
     ApplicationBuilder()
     .token(TOKEN)
@@ -1753,10 +1739,10 @@ app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|r
 app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
 app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 
-# الميديا (🔥 الوحيد)
+# 🔥 الميديا (واحد فقط)
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 
-# الأزرار العامة
+# باقي الأزرار
 app.add_handler(CallbackQueryHandler(button))
 
 # ================== تشغيل ==================
