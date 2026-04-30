@@ -1448,16 +1448,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 🔒 شرط الدفع
         if section not in FREE_SECTIONS:
             if not user or not user.get("approved", False):
-                await query.message.reply_text(
-                    "💰 هذا القسم مدفوع\n\n📩 ",
-                    keyboard = [
+                keyboard = InlineKeyboardMarkup([
                     [InlineKeyboardButton("💳 شام كاش", callback_data="pay_shamcash")],
                     [InlineKeyboardButton("🧾 دفع يدوي", callback_data="paid")]
-                    ]
-                )
-                await update.message.reply_text(
-                    "💰 اختر طريقة الدفع:",
-                    reply_markup=InlineKeyboardMarkup(keyboard)
+                ])
+                await query.answer()
+                await query.message.reply_text(
+                    "💰 هذا القسم مدفوع\n\n📩 اختر طريقة الدفع:",
+                    reply_markup=keyboard
                 )
                 return
 
@@ -1475,14 +1473,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         user_data[user_id]["unit"] = unit
         user_data[user_id]["section"] = section
-
         user = users.find_one({"_id": user_id})
-
-        if section not in FREE_SECTIONS:
-            if not user or not user.get("approved", False):
-                await query.message.reply_text("💰 هذا القسم مدفوع\n📩 اضغط /paid للاشتراك")
-                return
-
         section_video = SECTION_INTRO_VIDEOS.get(section)
 
         if section_video:
