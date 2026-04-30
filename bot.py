@@ -901,10 +901,14 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     users.update_one(
         {"_id": user.id},
-        {"$set": {"payment_code": code, "approved": True,"pending": True, "method": "shamcash"}},
+        {"$set": {
+            "payment_code": code,
+            "approved": False,   # ❌ ليس True
+            "pending": True,
+            "method": "shamcash"
+        }},
         upsert=True
     )
-
     await query.message.reply_photo(
         photo=open(file_name, "rb"),
         caption=(
@@ -1068,6 +1072,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== رفع الصور والفيديوهات (File ID) ==================
 async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+    user_id = update.effective_user.id
+    user = users.find_one({"_id": user_id})
+
+    # 🚨 إذا المستخدم في وضع الدفع لا تعالج الصورة هنا
+    if user and user.get("payment_mode"):
+        return
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
     if user and user.get("payment_mode"):
