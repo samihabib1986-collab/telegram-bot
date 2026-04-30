@@ -901,7 +901,7 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     users.update_one(
         {"_id": user.id},
-        {"$set": {"payment_code": code, "pending": True, "method": "shamcash"}},
+        {"$set": {"payment_code": code, "approved": True,"pending": True, "method": "shamcash"}},
         upsert=True
     )
 
@@ -910,7 +910,7 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
         caption=(
             "💳 الدفع عبر شام كاش\n\n"
             f"📌 رقم المحفظة: {wallet_number}\n"
-            "💰 المبلغ: 5$\n"
+            "💰 المبلغ:  5$ او 60 000 ل.س\n"
             f"🧾 كود العملية: {code}\n\n"
             "📸 أرسل صورة التحويل بعد الدفع"
         )
@@ -941,7 +941,9 @@ async def delete_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== استقبال صورة التحويل ==================
 async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    if not user_data or not user_data.get("pending"):
+    user_id = update.effective_user.id
+    user = users.find_one({"_id": user_id})
+    if not user or not user.get("pending"):
         return
     # تحويل الصورة للأدمن
     await context.bot.forward_message(
@@ -998,7 +1000,7 @@ async def handle_admin_buttons(update: Update, context: ContextTypes.DEFAULT_TYP
         # تحديث قاعدة البيانات
         users.update_one(
             {"_id": user_id},
-            {"$set": {"pending": True, "method": "manual"}},
+            {"$set": {"approved": True, "pending": False, "method": "manual"}},
             upsert=True
         )
 
@@ -1447,7 +1449,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if section not in FREE_SECTIONS:
             if not user or not user.get("approved", False):
                 await query.message.reply_text(
-                    "💰 هذا القسم مدفوع\n\n📩 اضغط /paid للاشتراك"
+                    "💰 هذا القسم مدفوع\n\n📩 ",
+                    keyboard = [
+                    [InlineKeyboardButton("💳 شام كاش", callback_data="pay_shamcash")],
+                    [InlineKeyboardButton("🧾 دفع يدوي", callback_data="paid")]
+                    ]
+                )
+                await update.message.reply_text(
+                    "💰 اختر طريقة الدفع:",
+                    reply_markup=InlineKeyboardMarkup(keyboard)
                 )
                 return
 
@@ -1640,11 +1650,12 @@ app = (
     .defaults(Defaults(parse_mode=ParseMode.HTML))
     .build()
     )
+app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="pay_shamcash"))
+app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="approve_|reject_"))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
-app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="pay_shamcash"))
 app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
 app.add_handler(CommandHandler("delete", delete_user))
 app.add_handler(CallbackQueryHandler(handle_admin_buttons))
