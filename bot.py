@@ -881,6 +881,19 @@ def back_button():
 # ==================  توليد كود الدفع  ==================
 def generate_code():
     return str(random.randint(100000, 999999))
+
+
+# ==================   التحقق من الصورة   ==================
+
+def is_payment_user(update):
+    user = users.find_one({"_id": update.effective_user.id})
+    
+    return (
+        user 
+        and user.get("payment_mode") == "shamcash"
+        and user.get("pending")
+    )
+
 # ================== الدفع (شام كاش) ==================
 async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
@@ -1693,21 +1706,15 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return
 # ================== تشغيل ==================
 
-from telegram.constants import ParseMode
 
-app = (
-    ApplicationBuilder()
-    .token(TOKEN)
-    .defaults(Defaults(parse_mode=ParseMode.HTML))
-    .build()
-    )
-app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
-app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
-app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_).*"))
-app.add_handler(CommandHandler("paid", paid))
+app = (ApplicationBuilder().token(TOKEN).defaults(Defaults(parse_mode=ParseMode.HTML)).build())
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("delete", delete_user))
-app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
+app.add_handler(CommandHandler("paid", paid))
+app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_).*"))
+app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
+app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
+app.add_handler(MessageHandler(filters.PHOTO & filters.Create(is_payment_user),receive_payment_proof))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 app.add_handler(CallbackQueryHandler(button))
 app.run_polling()
