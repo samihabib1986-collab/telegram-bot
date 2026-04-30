@@ -904,8 +904,9 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {"$set": {
             "payment_code": code,
             "approved": False,   # ❌ ليس True
+            "payment_mode": "shamcash",
             "pending": True,
-            "method": "shamcash"
+            
         }},
         upsert=True
     )
@@ -920,6 +921,9 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     )
     os.remove(file_name)
+    
+    
+    
 # ================== حذف مستخدم (للاستخدام الداخلي فقط) ==================
 async def delete_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
@@ -944,10 +948,11 @@ async def delete_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== استقبال صورة التحويل ==================
 async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
-    if not user or not user.get("payment_mode"):
+
+    # ❌ تجاهل أي شخص ليس في وضع دفع
+    if not user or user.get("payment_mode") != "shamcash":
         return
     if not user or not user.get("pending"):
         return
@@ -971,7 +976,10 @@ async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TY
     await update.message.reply_text("⏳ تم إرسال الإثبات للمراجعة")
 # ================== الدفع (اليدوي ) ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
     user = update.effective_user
+
+    await query.answer()
 
     first_name = user.first_name or ""
     last_name = user.last_name or ""
@@ -979,7 +987,8 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = user.id
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")]
+        [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")],
+        [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
     ])
 
     await context.bot.send_message(
@@ -990,7 +999,12 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=keyboard
     )
 
-    await update.message.reply_text("⏳ تم إرسال طلب الاشتراك")
+    await query.message.reply_text(
+        "⏳ تم إرسال طلب الاشتراك\n\nاضغط الرجوع للمتابعة 👇",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
+        ])
+    )
 # ================== زر القبول ==================
 async def handle_admin_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -1071,13 +1085,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ================== رفع الصور والفيديوهات (File ID) ==================
-async def handle_media(update, context):
+async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
 
     # 🚨 إذا المستخدم في وضع الدفع لا تعالج الصورة هنا
-    if user and user.get("payment_mode"):
+    if user and user.get("payment_mode") == "shamcash":
         return
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
@@ -1559,9 +1573,27 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(update, context)
         return
     if data == "go_start":
-        await start(update, context)
-        return
+        keyboard = [
+            [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")],
+            [InlineKeyboardButton("💳 الدفع", callback_data="payment_menu")]
+        ]
 
+        await query.message.reply_text(
+            "📚 اختر من القائمة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
+    if data == "payment_menu":
+        keyboard = [
+            [InlineKeyboardButton("💳 شام كاش", callback_data="pay_shamcash")],
+            [InlineKeyboardButton("🧾 دفع يدوي", callback_data="paid")]
+        ]
+
+        await query.message.reply_text(
+            "💰 اختر طريقة الدفع:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+        return
 # ================== الإجابة ==================
     if data in ["0", "1", "2"]:
 
@@ -1662,8 +1694,8 @@ app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="approve_|rej
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
-app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
+app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 app.add_handler(CommandHandler("delete", delete_user))
 app.add_handler(CallbackQueryHandler(handle_admin_buttons))
 app.run_polling()
