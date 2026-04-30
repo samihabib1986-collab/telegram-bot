@@ -915,7 +915,28 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     )
     os.remove(file_name)
-    
+# ================== حذف مستخدم (للاستخدام الداخلي فقط) ==================
+async def delete_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+
+    if not context.args:
+        await update.message.reply_text("استخدم: /delete user_id")
+        return
+
+    try:
+        user_id = int(context.args[0])
+    except:
+        await update.message.reply_text("❌ ID غير صحيح")
+        return
+
+    result = users.delete_one({"_id": user_id})
+
+    if result.deleted_count:
+        await update.message.reply_text("🗑 تم حذف المستخدم")
+    else:
+        await update.message.reply_text("⚠️ المستخدم غير موجود")
+
 # ================== استقبال صورة التحويل ==================
 async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -1621,4 +1642,5 @@ app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="pay_shamcash"))
 app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_)"))
 app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
+app.add_handler(CommandHandler("delete", delete_user))
 app.run_polling()
