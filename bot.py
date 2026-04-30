@@ -943,6 +943,8 @@ async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TY
     user = update.effective_user
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
+    if not user or not user.get("payment_mode"):
+        return
     if not user or not user.get("pending"):
         return
     # تحويل الصورة للأدمن
@@ -1067,7 +1069,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== رفع الصور والفيديوهات (File ID) ==================
 async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-
+    user = users.find_one({"_id": user_id})
+    if user and user.get("payment_mode"):
+        return
     if update.message.photo:
         file_id = update.message.photo[-1].file_id
 
@@ -1078,8 +1082,8 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         })
 
         await update.message.reply_text(
-            "📸 تم استلام الصورة\n\n"
-            "🆔 File ID:\n{file_id}"
+            f"📸 تم استلام الصورة\n\n"
+            f"🆔 File ID:\n{file_id}"
         )
         return
 
@@ -1093,8 +1097,8 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         })
 
         await update.message.reply_text(
-            "🎥 تم استلام الفيديو\n\n"
-            "🆔 File ID:\n{file_id}"
+            f"🎥 تم استلام الفيديو\n\n"
+            f"🆔 File ID:\n{file_id}"
         )
         return
 FREE_SECTIONS = ["dam"]
@@ -1642,6 +1646,7 @@ app = (
     .build()
     )
 app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="pay_shamcash"))
+app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="approve_|reject_"))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
