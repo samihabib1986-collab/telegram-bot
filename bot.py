@@ -918,9 +918,11 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "💰 المبلغ:  5$ او 60000 ل.س\n"
             f"🧾 كود العملية: {code}\n\n"
             "📸 أرسل صورة التحويل بعد الدفع"
+        ),
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
+        ])
         )
-        [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
-    )
     os.remove(file_name)
     
     
@@ -1100,10 +1102,9 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = users.find_one({"_id": user_id})
 
     # 🚨 إذا المستخدم في وضع الدفع لا تعالج الصورة هنا
-    if user and user.get("payment_mode") == "shamcash":
+    if user and user.get("payment_mode") == "shamcash"and user.get("pending"):
         return
-    user_id = update.effective_user.id
-    user = users.find_one({"_id": user_id})
+
     if update.message.photo:
         file_id = update.message.photo[-1].file_id
 
@@ -1585,7 +1586,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     if data == "go_start":
         keyboard = [
-            [InlineKeyboardButton("🧬 علم الأحياء", callback_data="start")],
+            [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")],
             [InlineKeyboardButton("💳 الدفع", callback_data="payment_menu")]
         ]
 
