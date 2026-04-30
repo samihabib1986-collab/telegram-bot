@@ -1018,7 +1018,7 @@ async def handle_admin_buttons(update: Update, context: ContextTypes.DEFAULT_TYP
             chat_id=user_id,
             text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
+                [InlineKeyboardButton("🚀 بدء", callback_data="main_menu")]
             ])
             )
     elif data.startswith("reject_"):
@@ -1071,7 +1071,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ================== رفع الصور والفيديوهات (File ID) ==================
-async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_media(update, context):
     
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
