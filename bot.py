@@ -1007,8 +1007,8 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-    await query.message.reply_text(
-        "⏳ تم إرسال طلب الاشتراك\n\nاضغط الرجوع للمتابعة 👇",
+    await send_func(        
+                    "⏳ تم إرسال طلب الاشتراك\n\nاضغط الرجوع للمتابعة 👇",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
         ])
@@ -1103,8 +1103,8 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
-    if user and user.get("payment_mode"):
-        return
+    if user and user.get("payment_mode") == "shamcash" and user.get("pending"):
+     return
     if update.message.photo:
         file_id = update.message.photo[-1].file_id
 
@@ -1698,7 +1698,7 @@ app = (
     )
 app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
 app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
-app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_)"))
+app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_).*"))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("delete", delete_user))
