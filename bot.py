@@ -1103,9 +1103,13 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     user_data[user_id]["score"] = 0
     if user_id not in user_data:
-            return
-    if user_data[user_id].get("locked"):
         return
+
+    info = user_data[user_id]
+    if info.get("locked"):
+        return
+
+    info["locked"] = True
     user_data[user_id]["locked"] = True
     info = user_data[user_id]
 
@@ -1113,7 +1117,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category = info["category"]
     index = info["q_index"]
 
-    q_list = subjects[subject][category]
+    q_list = subjects["bio"].get(category, [])
 
     if index >= len(q_list):
 
@@ -1171,21 +1175,16 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text += f"{chr(65+i)} - {opt}\n"
 
 
-    msg = await context.bot.send_message(
-        chat_id=query.message.chat_id,
-        text=text,
-        protect_content=True
-    )
-    keyboard = [[
+    keyboard = InlineKeyboardMarkup([[
         InlineKeyboardButton("A", callback_data="0"),
         InlineKeyboardButton("B", callback_data="1"),
         InlineKeyboardButton("C", callback_data="2"),
-    ]]
+    ]])
 
     await context.bot.send_message(
         chat_id=query.message.chat_id,
-        text="اختر الإجابة:",
-        reply_markup=InlineKeyboardMarkup(keyboard),
+        text=text + "\n\n📌 اختر الإجابة:",
+        reply_markup=keyboard,
         protect_content=True
     )
         # ================== المادة ==================
@@ -1621,7 +1620,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(
                 random.choice(negative) + f"\n\n📌 الإجابة الصحيحة: {q['answer']}"
             )
-        user_data[user_id]["q_index"] = index + 1
+        user_data[user_id]["q_index"] += 1
 
         await asyncio.sleep(1)
         await send_question(update, context)
