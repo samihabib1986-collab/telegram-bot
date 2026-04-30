@@ -899,29 +899,34 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("⏳ تم إرسال طلب الاشتراك")
 
 # ================== الموافقة ==================
+# ================== الموافقة ==================
 async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
 
     if not context.args:
-     await update.message.reply_text("استخدم: /approve user_id")
-    return
+        await update.message.reply_text("استخدم: /approve user_id")
+        return
 
+    user_id = int(context.args[0])
+
+    # تحديث قاعدة البيانات
     users.update_one(
         {"_id": user_id},
-        {"$set": {"pending": True}},
+        {"$set": {"approved": True, "pending": False}},
         upsert=True
     )
 
     await update.message.reply_text("✅ تم التفعيل")
 
+    # إرسال رسالة للمستخدم
     await context.bot.send_message(
         chat_id=user_id,
         text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
         ])
-    )
+    )   
     user = update.effective_user if update.message else update.callback_query.from_user
 
     user_id = user.id
@@ -935,7 +940,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     full_name = f"{first_name} {last_name}".strip()
 
-   
+
 # ================== START (ترحيب مزخرف) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
