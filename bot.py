@@ -10,7 +10,6 @@ from telegram.ext import Defaults
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters) 
-qrcode[pil]
 # ================== رسائل التشجيع ==================
 positive = [
     "🎉 ممتاز! إجابة صحيحة",
