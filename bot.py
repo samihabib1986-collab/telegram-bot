@@ -1531,14 +1531,16 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # ================== بدء الاختبار ==================
     if data == "start_quiz":
-        import time
-        user_data[user_id]["session"] = time.time()  # 🔥 مهم
+
+        if user_id not in user_data:
+            await query.message.reply_text("❌ لم يتم اختيار المادة بعد")
+            return
+
+        user_data[user_id]["session"] = time.time()
         user_data[user_id]["q_index"] = 0
         user_data[user_id]["score"] = 0
+
         await send_question(update, context)
-        return
-    if data == "go_start":
-        await start(update, context)
         return
 
 # ================== الإجابة ==================
