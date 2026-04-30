@@ -887,7 +887,9 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user = query.from_user
     code = generate_code()
-
+    def generate_qr(data, filename):
+        qr = qrcode.make(data)
+        qr.save(filename)
     wallet_number = "5e5b1d5ed4a8b86a85fd3beb63f0b1fa"
 
     # البيانات داخل QR (تقدر تعدلها حسب شام كاش)
@@ -898,7 +900,7 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     users.update_one(
         {"_id": user.id},
-        {"$set": {"payment_code": code, "pending": True}},
+        {"$set": {"payment_code": code, "pending": True, "method": "shamcash"}},
         upsert=True
     )
 
@@ -912,10 +914,13 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📸 أرسل صورة التحويل بعد الدفع"
         )
     )
+    os.remove(file_name)
+    
 # ================== استقبال صورة التحويل ==================
 async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-
+    if not user_data or not user_data.get("pending"):
+        return
     # تحويل الصورة للأدمن
     await context.bot.forward_message(
         chat_id=ADMIN_ID,
@@ -926,10 +931,10 @@ async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TY
     # إرسال أزرار للأدمن
     await context.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"📩 إثبات دفع\n🆔 {user.id}",
+        text=f"📩 إثبات دفع\n👤 {user.first_name}\n🆔 {user.id}",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user.id}")],
-            [InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user.id}")]
+            [InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user.id}")],
         ])
     )
 
@@ -971,7 +976,7 @@ async def handle_admin_buttons(update: Update, context: ContextTypes.DEFAULT_TYP
         # تحديث قاعدة البيانات
         users.update_one(
             {"_id": user_id},
-            {"$set": {"approved": True, "pending": False}},
+            {"$set": {"pending": True, "method": "manual"}},
             upsert=True
         )
 
