@@ -887,12 +887,10 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     full_name = f"{first_name} {last_name}".strip()
 
     user_id = user.id
-    username = user.username or user.full_name or "المستخدم"
-    mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
+
     await context.bot.send_message(
         chat_id=ADMIN_ID,
         text=f"💳 طلب اشتراك:\n\n"
-            f"{mention}\n"
              f"👤 الاسم: {full_name}\n"
              f"🆔 ID: {user_id}\n\n"
              f"📩 /approve {user_id}"
@@ -919,7 +917,7 @@ async def approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=user_id,
-        text=f"🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇\n {mention}",
+        text="🎉 تم قبول اشتراكك\n\nاضغط لبدء استخدام البوت 👇",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("🚀 بدء", callback_data="go_start")]
         ])
