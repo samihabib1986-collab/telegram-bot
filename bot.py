@@ -10,7 +10,6 @@ from telegram.ext import Defaults
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters) 
-
 # ================== رسائل التشجيع ==================
 positive = [
     "🎉 ممتاز! إجابة صحيحة",
@@ -1622,10 +1621,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(
                 random.choice(negative) + f"\n\n📌 الإجابة الصحيحة: {q['answer']}"
             )
-        info["q_index"] += 1
+    info["q_index"] += 1
 
-        await asyncio.sleep(1)
-        await send_question(update, context)
+    await asyncio.sleep(1)
+    await send_question(update, context)
         
 # ================== تشغيل ==================
 
@@ -1637,7 +1636,6 @@ app = (
     .defaults(Defaults(parse_mode=ParseMode.HTML))
     .build()
     )
-app.add_handler(CallbackQueryHandler(handle_admin_buttons))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
