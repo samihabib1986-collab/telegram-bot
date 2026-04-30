@@ -1109,14 +1109,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== رفع الصور والفيديوهات (File ID) ==================
 async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
     user_id = update.effective_user.id
     user = users.find_one({"_id": user_id})
 
-    # 🚨 إذا المستخدم في وضع الدفع لا تعالج الصورة هنا
-    if user and user.get("payment_mode") == "shamcash"and user.get("pending"):
+    # ================== حالة الدفع ==================
+    if user and user.get("payment_mode") == "shamcash" and user.get("pending"):
+
+        # إرسال الصورة للأدمن
+        await context.bot.forward_message(
+            chat_id=ADMIN_ID,
+            from_chat_id=update.message.chat_id,
+            message_id=update.message.message_id
+        )
+
+        # إرسال أزرار للأدمن
+        await context.bot.send_message(
+            chat_id=ADMIN_ID,
+            text=f"📩 إثبات دفع\n👤 {update.effective_user.first_name}\n🆔 {user_id}",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")],
+                [InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user_id}")],
+            ])
+        )
+
+        await update.message.reply_text("⏳ تم إرسال الإثبات للمراجعة")
         return
 
+    # ================== حالة عادية ==================
     if update.message.photo:
         file_id = update.message.photo[-1].file_id
 
@@ -1127,8 +1146,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         })
 
         await update.message.reply_text(
-            f"📸 تم استلام الصورة\n\n"
-            f"🆔 File ID:\n{file_id}"
+            f"📸 تم استلام الصورة\n\n🆔 File ID:\n{file_id}"
         )
         return
 
@@ -1142,8 +1160,7 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         })
 
         await update.message.reply_text(
-            f"🎥 تم استلام الفيديو\n\n"
-            f"🆔 File ID:\n{file_id}"
+            f"🎥 تم استلام الفيديو\n\n🆔 File ID:\n{file_id}"
         )
         return
 FREE_SECTIONS = ["dam"]
@@ -1724,52 +1741,23 @@ app = (
     .build()
 )
 
-# ================== 1️⃣ أوامر ==================
+# أوامر
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("delete", delete_user))
 app.add_handler(CommandHandler("paid", paid))
 
+# الأدمن
+app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_).*"))
 
-# ================== 2️⃣ أزرار الأدمن ==================
-app.add_handler(CallbackQueryHandler(
-    handle_admin_buttons,
-    pattern="^(approve_|reject_).*"
-))
+# الدفع
+app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
+app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 
+# الميديا (🔥 الوحيد)
+app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 
-# ================== 3️⃣ أزرار الدفع ==================
-app.add_handler(CallbackQueryHandler(
-    shamcash_payment,
-    pattern="^pay_shamcash$"
-))
-
-app.add_handler(CallbackQueryHandler(
-    paid,
-    pattern="^paid$"
-))
-
-
-# ================== 4️⃣ صور الدفع فقط (مهم 🔥) ==================
-app.add_handler(
-    MessageHandler(
-        filters.PHOTO & payment_filter,
-        receive_payment_proof
-    )
-)
-
-
-# ================== 5️⃣ الميديا العادية ==================
-app.add_handler(
-    MessageHandler(
-        filters.PHOTO | filters.VIDEO,
-        handle_media
-    )
-)
-
-
-# ================== 6️⃣ كل الأزرار الأخرى ==================
+# الأزرار العامة
 app.add_handler(CallbackQueryHandler(button))
-
 
 # ================== تشغيل ==================
 app.run_polling()
