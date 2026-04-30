@@ -1691,10 +1691,8 @@ app = (
 app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
 app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_)$"))
-
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("delete", delete_user))
-
 app.add_handler(MessageHandler(filters.PHOTO, receive_payment_proof))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
