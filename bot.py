@@ -3,6 +3,7 @@ import os
 import logging
 import asyncio
 import random
+import qrcode
 from pymongo import MongoClient
 from telegram.ext import Defaults
 from telegram.constants import ParseMode
@@ -887,18 +888,29 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = query.from_user
     code = generate_code()
 
+    wallet_number = "5e5b1d5ed4a8b86a85fd3beb63f0b1fa"
+
+    # البيانات داخل QR (تقدر تعدلها حسب شام كاش)
+    qr_data = f"ShamCash:{wallet_number}|Amount:5|Code:{code}"
+
+    file_name = f"qr_{user.id}.png"
+    generate_qr(qr_data, file_name)
+
     users.update_one(
         {"_id": user.id},
         {"$set": {"payment_code": code, "pending": True}},
         upsert=True
     )
 
-    await query.message.reply_text(
-        f"💳 الدفع عبر شام كاش\n\n"
-        f"📌 رقم المحفظة: 09XXXXXXXX\n"
-        f"💰 المبلغ: 5$\n"
-        f"🧾 كود العملية: {code}\n\n"
-        f"📸 أرسل صورة التحويل هنا بعد الدفع"
+    await query.message.reply_photo(
+        photo=open(file_name, "rb"),
+        caption=(
+            "💳 الدفع عبر شام كاش\n\n"
+            f"📌 رقم المحفظة: {wallet_number}\n"
+            "💰 المبلغ: 5$\n"
+            f"🧾 كود العملية: {code}\n\n"
+            "📸 أرسل صورة التحويل بعد الدفع"
+        )
     )
 # ================== استقبال صورة التحويل ==================
 async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
