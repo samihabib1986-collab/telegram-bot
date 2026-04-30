@@ -169,7 +169,7 @@ subjects = {
 {"type": "image", "image": "عظام الطرف السفلي","question":"5","options": ["عظم الظنبوب","عظم الشظية","عظم الفخد"],"answer": "عظم الظنبوب"},
 {"type": "image", "image": "القفص الصدري","question": "5","options": ["الاضلاع","الاضلاع السائبة","العمود الفقري"],"answer": "الاضلاع السائبة"},
 {"type": "image", "image": "القفص الصدري","question": "2","options": ["عظم القص","الاضلاع","العمود الفقري"],"answer": "عظم القص"},
-{"type": "image", "image": "الفقرة","question": "5","options": ["سطح مفصلي","نتوء جانبي","ثقب فقري"],"answer": "نتوء جانبي"},
+{"type": "image", "image": "الفقرة","question": "5","options": ["سطح مفصلي","نتوء شوكي","ثقب فقري"],"answer": "نتوء شوكي"},
 {"type": "image", "image": "الفقرة","question": "3","options": ["ثقب فقري","نتوء شوكي","سطح مفصلي"],"answer": "سطح مفصلي"},
 {"type": "image", "image": "العمود الفقري","question": "5","options": ["الفقرات العصعصية","الفقرات الظهرية","الفقرات القطنية"],"answer": "الفقرات العصعصية"},
 {"type": "image", "image": "العمود الفقري","question": "4","options": ["الفقرات القطنية","الفقرات العجزية","الفقرات الظهرية"],"answer": "الفقرات العجزية"},
@@ -710,7 +710,7 @@ subjects = {
 {"type": "image", "image": "مقطع عرضي للقلب", "question": "(رقم 3)", "options": ["البطين الأيسر", "الأذينة اليسرى", "البطين الأيمن"], "answer": "الأذينة اليسرى"},
 {"type": "image", "image": "مقطع عرضي للقلب", "question": "(رقم 1)", "options": ["الشريان الرئوي", "الشريان الأبهر", "الوريد الأجوف"], "answer": "الشريان الأبهر"},
 {"type": "image", "image": "الدم", "question": "(رقم 4)", "options": ["الكريات البيضاء", "الكريات الحمراء", "الصفيحات الدموية"], "answer": "الكريات الحمراء"},
-{"type": "image", "image": "الدم", "question": "(رقم 2)", "options": ["الكريات البيضاء", "الكريات الحمراء", "أرومات الليف"], "answer": "الكريات البيضاء"},
+{"type": "image", "image": "الدم", "question": "(رقم 3)", "options": ["الكريات البيضاء", "الكريات الحمراء", "أرومات الليف"], "answer": "الكريات البيضاء"},
 {"type": "image", "image": "الجهاز البلغمي", "question": "(رقم 1)", "options": ["اوعية البلغمية", "العقد لمفية مغبنية", "العقد لمفية عنقية"], "answer": "العقد لمفية عنقية"},
 {"type": "image", "image": "دورتا الدم", "question": "(رقم 11)", "options": ["الشريان الابهر", "الوريد الرئوي", "الشريان الرئوي"], "answer": "الشريان الابهر"},
 {"type": "image", "image": "مقطع عرضي للقلب", "question": "(رقم 2)", "options": ["غشاء التامور", "غشاء الجنب", "الشريان الرئوي"], "answer": "الشريان الرئوي"},
@@ -992,38 +992,44 @@ async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TY
 # ================== الدفع (اليدوي ) ==================
 async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    # 👇 تحديد نوع التحديث
     if update.callback_query:
         query = update.callback_query
         await query.answer()
         user = query.from_user
         send_func = query.message.reply_text
-
     else:
         user = update.effective_user
         send_func = update.message.reply_text
 
-    first_name = user.first_name or ""
-    last_name = user.last_name or ""
-    full_name = f"{first_name} {last_name}".strip()
     user_id = user.id
+    first_name = user.first_name or ""
+    username = user.username
+
+    # 👇 إنشاء الرابط
+    if username:
+        user_link = f"https://t.me/{username}"
+    else:
+        user_link = f"tg://user?id={user_id}"
 
     keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("💬 مراسلة المستخدم", url=user_link)],
         [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")]
     ])
 
     # إرسال للأدمن
     await context.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"💳 طلب اشتراك:\n\n"
-             f"👤 الاسم: {full_name}\n"
-             f"🆔 ID: {user_id}",
+        text=(
+            f"💳 طلب اشتراك:\n\n"
+            f"👤 الاسم: {first_name}\n"
+            f"🆔 ID: {user_id}\n"
+            f"🔗 الرابط: {user_link}"
+        ),
         reply_markup=keyboard
     )
 
-
-    await send_func(        
-                    "⏳ تم إرسال طلب الاشتراك\n\nاضغط الرجوع للمتابعة 👇",
+    await send_func(
+        "⏳ تم إرسال طلب الاشتراك\n\nاضغط الرجوع للمتابعة 👇",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
         ])
@@ -1739,11 +1745,11 @@ app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|r
 app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
 app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 
-# 🔥 الميديا (واحد فقط)
+# 🔥 الميديا (واحد فقط) 
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 
 # باقي الأزرار
 app.add_handler(CallbackQueryHandler(button))
 
 # ================== تشغيل ==================
-app.run_polling()
+app.run_polling()   
