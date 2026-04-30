@@ -1100,10 +1100,13 @@ FREE_SECTIONS = ["dam"]
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
-    user_data[user_id]["q_index"] = 0
-    user_data[user_id]["score"] = 0
     if user_id not in user_data:
         return
+
+    info = user_data[user_id]
+
+    info.setdefault("q_index", 0)
+    info.setdefault("score", 0)
 
     info = user_data[user_id]
 
@@ -1621,11 +1624,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(
                 random.choice(negative) + f"\n\n📌 الإجابة الصحيحة: {q['answer']}"
             )
-        info["q_index"] += 1
+    info["q_index"] += 1
 
     await asyncio.sleep(1)
+
     await send_question(update, context)
-        
+    return
 # ================== تشغيل ==================
 
 from telegram.constants import ParseMode
