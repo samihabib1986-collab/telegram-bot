@@ -6,7 +6,7 @@ import random
 import qrcode
 from pymongo import MongoClient
 from qrcode.image import pil
-from telegram.ext import Defaults
+from telegram.ext import (Defaults,MessageFilter)
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (ApplicationBuilder,CommandHandler,CallbackQueryHandler,MessageHandler,ContextTypes,filters) 
@@ -966,27 +966,25 @@ async def delete_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== استقبال صورة التحويل ==================
 async def receive_payment_proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    user = users.find_one({"_id": update.effective_user.id})
+    user = users.find_one({"_id": user_id})
 
-    # ❌ تجاهل أي شخص ليس في وضع دفع
-    if not user or user.get("payment_mode") != "shamcash":
-        return
-    if not user or not user.get("pending"):
-        return
-    # تحويل الصورة للأدمن
+    # ❌ إذا ليس في وضع الدفع → تجاهل واسمح للـ handler الثاني يشتغل
+    if not user or user.get("payment_mode") != "shamcash" or not user.get("pending"):
+        return  # 👈 هذا مهم جداً
+
+    # ✅ فقط هنا يعتبر إثبات دفع
     await context.bot.forward_message(
         chat_id=ADMIN_ID,
         from_chat_id=update.message.chat_id,
         message_id=update.message.message_id
     )
 
-    # إرسال أزرار للأدمن
     await context.bot.send_message(
         chat_id=ADMIN_ID,
-        text=f"📩 إثبات دفع\n👤 {user.first_name}\n🆔 {user.id}",
+        text=f"📩 إثبات دفع\n👤 {user.get('name','')}\n🆔 {user_id}",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user.id}")],
-            [InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user.id}")],
+            [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")],
+            [InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user_id}")],
         ])
     )
 
@@ -1705,16 +1703,73 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_question(update, context)
     return
 # ================== تشغيل ==================
+from telegram.ext import MessageFilter
 
+class PaymentFilter(MessageFilter):
+    def filter(self, message):
+        user = users.find_one({"_id": message.from_user.id})
+        return (
+            user
+            and user.get("payment_mode") == "shamcash"
+            and user.get("pending") is True
+        )
+
+payment_filter = PaymentFilter()
 from telegram.constants import ParseMode
-app = (ApplicationBuilder().token(TOKEN).defaults(Defaults(parse_mode=ParseMode.HTML)).build())
+
+app = (
+    ApplicationBuilder()
+    .token(TOKEN)
+    .defaults(Defaults(parse_mode=ParseMode.HTML))
+    .build()
+)
+
+# ================== 1️⃣ أوامر ==================
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("delete", delete_user))
 app.add_handler(CommandHandler("paid", paid))
-app.add_handler(CallbackQueryHandler(handle_admin_buttons, pattern="^(approve_|reject_).*"))
-app.add_handler(CallbackQueryHandler(shamcash_payment, pattern="^pay_shamcash$"))
-app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
-app.add_handler(MessageHandler(filters.PHOTO & filters.Create(is_payment_user),receive_payment_proof))
-app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
+
+
+# ================== 2️⃣ أزرار الأدمن ==================
+app.add_handler(CallbackQueryHandler(
+    handle_admin_buttons,
+    pattern="^(approve_|reject_).*"
+))
+
+
+# ================== 3️⃣ أزرار الدفع ==================
+app.add_handler(CallbackQueryHandler(
+    shamcash_payment,
+    pattern="^pay_shamcash$"
+))
+
+app.add_handler(CallbackQueryHandler(
+    paid,
+    pattern="^paid$"
+))
+
+
+# ================== 4️⃣ صور الدفع فقط (مهم 🔥) ==================
+app.add_handler(
+    MessageHandler(
+        filters.PHOTO & payment_filter,
+        receive_payment_proof
+    )
+)
+
+
+# ================== 5️⃣ الميديا العادية ==================
+app.add_handler(
+    MessageHandler(
+        filters.PHOTO | filters.VIDEO,
+        handle_media
+    )
+)
+
+
+# ================== 6️⃣ كل الأزرار الأخرى ==================
 app.add_handler(CallbackQueryHandler(button))
+
+
+# ================== تشغيل ==================
 app.run_polling()
