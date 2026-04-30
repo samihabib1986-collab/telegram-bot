@@ -1637,6 +1637,7 @@ app = (
     .defaults(Defaults(parse_mode=ParseMode.HTML))
     .build()
     )
+app.add_handler(CallbackQueryHandler(handle_admin_buttons))
 app.add_handler(CommandHandler("paid", paid))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
