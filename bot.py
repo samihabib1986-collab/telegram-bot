@@ -95,6 +95,7 @@ if not TOKEN:
 
 # ================== الأدمن ==================
 ADMIN_ID = 8491023024
+
 # ================== فيديوهات ==================
 UNIT_INTRO_VIDEOS = {
     "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",# 🎬 فيديو الوحدة الأولى 
@@ -1544,8 +1545,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(f"❌ خطأ في إرسال صورة المدرس: {e}")
             
             keyboard = [
-                [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
-                [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
+            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
+            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
+            [InlineKeyboardButton("🧬 الوحدة 3: (الوراثة والتكاثر) 🧬", callback_data="bio_u3")],
             ]
             
             try:
@@ -1643,7 +1645,42 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض الأقسام: {e}")
             return
+        # ================== الوحدة 3 ==================
+        if data == "bio_u3":
+            user_data[user_id]["history"].append({"type": "unit_menu"})
+            
+            # إضافة للملاحة
+            screen = ScreenState(
+                screen_type=ScreenType.SECTION_MENU,
+                context_data={"unit": "u3"}
+            )
+            navigation.add_screen(user_id, screen)
+            
+            unit_video = UNIT_INTRO_VIDEOS.get("u3")
 
+            if unit_video:
+                try:
+                    await context.bot.send_video(
+                        chat_id=query.message.chat_id,
+                        video=unit_video,
+                        caption="🎬 مقدمة الوحدة 3"
+                    )
+                except Exception as e:
+                    logger.error(f"❌ خطأ في إرسال فيديو الوحدة: {e}")
+            keyboard = [
+                [InlineKeyboardButton("🧬 الوراثة🧬", callback_data="sec_u3_genetics"),
+                    InlineKeyboardButton("👶 أجهزة التكاثر👶", callback_data="sec_u3_reproduction")],
+                [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+            ]
+            try:
+                await query.message.reply_text(
+                    "📚 اختر القسم:",
+                    reply_markup=InlineKeyboardMarkup(keyboard)
+                )
+                logger.info(f"✅ عرضت أقسام الوحدة 3 للمستخدم {user_id}")
+            except Exception as e:
+                logger.error(f"❌ خطأ في عرض الأقسام: {e}")
+            return
         # ============ الأقسام ============
         if data.startswith("sec_"):
 
@@ -1657,7 +1694,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "sec_u2_circulation": ("u2", "circulation"),
                 "sec_u2_respiration": ("u2", "respiration"),
                 "sec_u2_excretion": ("u2", "excretion"),
-                "sec_u2_nutrition_health": ("u2", "nutrition_health"),
+                "sec_u2_nutrition_health": ("u2", "nutrition_health"),               
+                "sec_u3_genetics": ("u3", "genetics"),
+                "sec_u3_reproduction": ("u3", "reproduction"),
             }
 
             mapped = section_map.get(data)
