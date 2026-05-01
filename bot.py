@@ -1680,7 +1680,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             keyboard = [
                 [InlineKeyboardButton("🧬 الوراثة🧬", callback_data="sec_u3_genetics"),
-                InlineKeyboardButton("👶 أجهزة التكاثر👶", callback_data="sec_u3_reproduction"),]
+                InlineKeyboardButton("👶 أجهزة التكاثر👶", callback_data="sec_u3_reproduction"),],
                 [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
             ]
 
@@ -1709,6 +1709,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "sec_u2_respiration": ("u2", "respiration"),
                 "sec_u2_excretion": ("u2", "excretion"),
                 "sec_u2_nutrition_health": ("u2", "nutrition_health"),
+                "sec_u3_genetics": ("u3", "genetics"),
+                "sec_u3_reproduction": ("u3", "reproduction"),                
             }
 
             mapped = section_map.get(data)
