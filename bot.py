@@ -1217,28 +1217,29 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         user_link = f"tg://user?id={user_id}"
 
-    try:
-        await context.bot.send_message(
-            chat_id=ADMIN_ID,
-            text=(
-                f"💳 طلب اشتراك:\n\n"
-                f"👤 الاسم: {first_name}\n"
-                f"🆔 ID: {user_id}\n"
-                f"🔗 الرابط: {user_link}"
-            ),
-            reply_markup=keyboard
-        )
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("💬 مراسلة المستخدم", url=user_link)],
+        [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")]
+    ])
 
-        await send_func(
-            "⏳ تم إرسال طلب الاشتراك\n\nاضغط الرجوع للمتابعة 👇",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
-            ])
-        )
-        logger.info(f"✅ تم إرسال طلب اشتراك من {user_id}")
-    except Exception as e:
-        logger.error(f"❌ خطأ في معالجة الدفع اليدوي: {e}")
+    # إرسال للأدمن
+    await context.bot.send_message(
+        chat_id=ADMIN_ID,
+        text=(
+            f"💳 طلب اشتراك:\n\n"
+            f"👤 الاسم: {first_name}\n"
+            f"🆔 ID: {user_id}\n"
+            f"🔗 الرابط: {user_link}"
+        ),
+        reply_markup=keyboard
+    )
 
+    await send_func(
+        "⏳ تم إرسال طلب الاشتراك\n\nاضغط الرجوع للمتابعة 👇",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 رجوع", callback_data="go_start")]
+        ])
+    )
 # ================== قبول الطلب ==================
 async def handle_admin_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """معالج أزرار الأدمن"""
