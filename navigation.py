@@ -375,7 +375,7 @@ class ScreenBuilder:
                 ],
             ] 
             text = """
-📚 الوحدة 3: وظائف التغذية
+📚 الوحدة2: وظائف التغذية
 
 اختر القسم الذي تريد حل الأسئلة فيه
             """
@@ -391,6 +391,11 @@ class ScreenBuilder:
                     InlineKeyboardButton("🔙 رجوع", callback_data="back"),
                 ],                
             ]
+            text = """
+📚 الوحدة 3: علم الوراثة والتكاثر
+
+اختر القسم الذي تريد حل الأسئلة فيه
+            """
         await query.message.reply_text(
             text,
             reply_markup=InlineKeyboardMarkup(keyboard),
