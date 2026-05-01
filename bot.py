@@ -1160,8 +1160,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = users.find_one({"_id": user_id})
 
     username = update.effective_user.username or update.effective_user.full_name or "المستخدم"
-    adminname = "sami habib"
-    teachname = "أحمد نور الدين"
+    adminname = "@سامي حبيب"
+    teachname = "@أحمد نور الدين"
     mentionadmin = f"<a href='tg://user?id={ADMIN_ID}'>{adminname}</a>"
     mentionteach = f"<a href='tg://user?id={6177458463}'>{teachname}</a>"
     mention = f"<a href='tg://user?id={user_id}'>{username}</a>"
@@ -1387,9 +1387,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             protect_content=True
         )
         keyboard = [
-            [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
-            [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")],
-            [InlineKeyboardButton("🧬 الوحدة 3: (الوراثة والتكاثر) 🧬", callback_data="bio_u3")]
+            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
+            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
+            [InlineKeyboardButton("🧬 الوحدة 3: (الوراثة والتكاثر) 🧬", callback_data="bio_u3")],
 
         ]
         await context.bot.send_message(
@@ -1470,29 +1470,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "📚 اختر المادة:",
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
-        elif last["type"] == "types_menu":
-            # يرجع لأنواع الأسئلة
-            keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-            InlineKeyboardButton("🖼 صور", callback_data="image"),                
-            ],
-            [
-            InlineKeyboardButton("📍 موقع", callback_data="where"),
-            InlineKeyboardButton("📊 ترتيب", callback_data="level"),                
-            ],
-            [
-            InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-            InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-            InlineKeyboardButton("⚡ مقارنة", callback_data="compare"),                
-            ],
-            back_button()
-            ]
-            await query.message.reply_text(
-                "اختر نوع الأسئلة:",
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
 
-        elif last["type"] == "section_menu":
+        elif last["type"] == "types_menu":
             if data.startswith("sec_u2_"):
                 keyboard = [
                     [
