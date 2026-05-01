@@ -321,7 +321,7 @@ class ScreenBuilder:
             context: context من Telegram
             query: callback_query
             user_id: معرف المستخدم
-            unit: رقم الوحدة (u1 أو u2)
+            unit: رقم الوحدة (u1 أو u2 او u3)
         """
         from telegram import InlineKeyboardButton, InlineKeyboardMarkup
         
@@ -353,7 +353,7 @@ class ScreenBuilder:
 اختر القسم الذي تريد حل الأسئلة فيه
             """
         
-        else:  # u2
+        elif unit == "u2":
             keyboard = [
                 [
                     InlineKeyboardButton("🥗 الهضم لدى الإنسان 🥗", callback_data="sec_u2_digest"),
@@ -373,14 +373,24 @@ class ScreenBuilder:
                 [
                     InlineKeyboardButton("🔙 رجوع", callback_data="back"),
                 ],
-            ]
-            
+            ] 
             text = """
-📚 الوحدة 2: وظائف التغذية
+📚 الوحدة 3: وظائف التغذية
 
 اختر القسم الذي تريد حل الأسئلة فيه
             """
-        
+        elif unit == "u3": 
+            keyboard = [
+                [
+                    InlineKeyboardButton("🧬 الوراثة🧬", callback_data="sec_u3_genetics"),
+                ], 
+                [
+                    InlineKeyboardButton("👶 أجهزة التكاثر👶", callback_data="sec_u3_reproduction"),
+                ],
+                [
+                    InlineKeyboardButton("🔙 رجوع", callback_data="back"),
+                ],                
+            ]
         await query.message.reply_text(
             text,
             reply_markup=InlineKeyboardMarkup(keyboard),
