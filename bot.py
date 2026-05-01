@@ -1503,6 +1503,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"❌ خطأ في إرسال السؤال: {e}")
 
 # ================== معالج الأزرار ==================
+# ================== معالج الأزرار (المصحح) ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """معالج جميع أزرار الـ callback"""
     query = update.callback_query
@@ -1524,17 +1525,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "history": []
                 }
 
-            if "history" not in user_data[user_id]:
-                user_data[user_id]["history"] = []
-            
-            user_data[user_id]["history"].append({"type": "main_menu"})
-            
-            # إضافة للملاحة
+            # ============ إضافة للملاحة الجديدة ============
             screen = ScreenState(
-                screen_type=ScreenType.UNIT_MENU,
+                screen_type=ScreenType.MAIN_MENU,
                 context_data={}
             )
             navigation.add_screen(user_id, screen)
+            
+            logger.info(f"✅ المستخدم {user_id} اختار المادة (bio)")
             
             teacher_image_id = "AgACAgQAAxkBAAIat2nuYkI0Vyu42G9VYtE--7R0Ms2MAAKZDGsboG9wU0hGmo9s3vMvAQADAgADeQADOwQ"
 
@@ -1557,9 +1555,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(f"❌ خطأ في إرسال صورة المدرس: {e}")
             
             keyboard = [
-            [InlineKeyboardButton("💀الوحدة 1: (الدعامة والتنسيق)💀", callback_data="bio_u1")],
-            [InlineKeyboardButton("🧑‍🍳الوحدة 2: (وظائف التغذية)🧑‍🍳", callback_data="bio_u2")],
-            [InlineKeyboardButton("🧬 الوحدة 3: (الوراثة والتكاثر) 🧬", callback_data="bio_u3")],
+                [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
+                [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
             ]
             
             try:
@@ -1576,11 +1573,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # ============ الوحدة 1 ============
         if data == "bio_u1":
-            user_data[user_id]["history"].append({"type": "unit_menu"})
+            logger.info(f"✅ المستخدم {user_id} اختار الوحدة 1")
             
-            # إضافة للملاحة
+            # ============ إضافة للملاحة الجديدة ============
             screen = ScreenState(
-                screen_type=ScreenType.SECTION_MENU,
+                screen_type=ScreenType.UNIT_MENU,
                 context_data={"unit": "u1"}
             )
             navigation.add_screen(user_id, screen)
@@ -1618,11 +1615,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # ============ الوحدة 2 ============
         if data == "bio_u2":
-            user_data[user_id]["history"].append({"type": "unit_menu"})
+            logger.info(f"✅ المستخدم {user_id} اختار الوحدة 2")
             
-            # إضافة للملاحة
+            # ============ إضافة للملاحة الجديدة ============
             screen = ScreenState(
-                screen_type=ScreenType.SECTION_MENU,
+                screen_type=ScreenType.UNIT_MENU,
                 context_data={"unit": "u2"}
             )
             navigation.add_screen(user_id, screen)
@@ -1657,44 +1654,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض الأقسام: {e}")
             return
-        # ================== الوحدة 3 ==================
-        if data == "bio_u3":
-            user_data[user_id]["history"].append({"type": "unit_menu"})
-            
-            # إضافة للملاحة
-            screen = ScreenState(
-                screen_type=ScreenType.SECTION_MENU,
-                context_data={"unit": "u3"}
-            )
-            navigation.add_screen(user_id, screen)
-            
-            unit_video = UNIT_INTRO_VIDEOS.get("u3")
 
-            if unit_video:
-                try:
-                    await context.bot.send_video(
-                        chat_id=query.message.chat_id,
-                        video=unit_video,
-                        caption="🎬 مقدمة الوحدة 3"
-                    )
-                except Exception as e:
-                    logger.error(f"❌ خطأ في إرسال فيديو الوحدة: {e}")
-            keyboard = [
-                [InlineKeyboardButton("🧬 الوراثة🧬", callback_data="sec_u3_genetics"),
-                    InlineKeyboardButton("👶 أجهزة التكاثر👶", callback_data="sec_u3_reproduction")],
-                [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
-            ]
-            try:
-                await query.message.reply_text(
-                    "📚 اختر القسم:",
-                    reply_markup=InlineKeyboardMarkup(keyboard)
-                )
-                logger.info(f"✅ عرضت أقسام الوحدة 3 للمستخدم {user_id}")
-            except Exception as e:
-                logger.error(f"❌ خطأ في عرض الأقسام: {e}")
-            return
         # ============ الأقسام ============
         if data.startswith("sec_"):
+            logger.info(f"✅ المستخدم {user_id} اختار قسم: {data}")
 
             section_map = {
                 "sec_u1_dam": ("u1", "dam"),
@@ -1706,29 +1669,49 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "sec_u2_circulation": ("u2", "circulation"),
                 "sec_u2_respiration": ("u2", "respiration"),
                 "sec_u2_excretion": ("u2", "excretion"),
-                "sec_u2_nutrition_health": ("u2", "nutrition_health"),               
-                "sec_u3_genetics": ("u3", "genetics"),
-                "sec_u3_reproduction": ("u3", "reproduction"),
+                "sec_u2_nutrition_health": ("u2", "nutrition_health"),
             }
 
             mapped = section_map.get(data)
             if not mapped:
                 logger.error(f"❌ قسم غير معروف: {data}")
+                await query.answer("❌ قسم غير معروف", show_alert=True)
                 return
 
             unit, section = mapped
 
+            # تحديث بيانات المستخدم
+            if user_id not in user_data:
+                user_data[user_id] = {
+                    "subject": "bio",
+                    "unit": "",
+                    "section": "",
+                    "score": 0,
+                    "q_index": 0,
+                    "history": []
+                }
+
             user_data[user_id]["unit"] = unit
             user_data[user_id]["section"] = section
 
-            user = users.find_one({"_id": user_id})
+            # ============ إضافة للملاحة الجديدة (مهم جداً) ============
+            screen = ScreenState(
+                screen_type=ScreenType.SECTION_MENU,
+                context_data={"unit": unit, "section": section}
+            )
+            navigation.add_screen(user_id, screen)
+            
+            logger.info(f"✅ أضيفت شاشة القسم للملاحة: {unit}/{section}")
 
             # التحقق من الدفع
+            user = users.find_one({"_id": user_id})
+
             if section not in FREE_SECTIONS:
                 if not user or not user.get("approved", False):
                     keyboard = InlineKeyboardMarkup([
                         [InlineKeyboardButton("💳 شام كاش", callback_data="pay_shamcash")],
-                        [InlineKeyboardButton("🧾 دفع يدوي", callback_data="paid")]
+                        [InlineKeyboardButton("🧾 دفع يدوي", callback_data="paid")],
+                        [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
                     ])
                     try:
                         await query.answer()
@@ -1743,26 +1726,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # السماح بالدخول
             await query.answer("✅ تم الدخول للقسم")
-            
-            # إضافة للملاحة
-            screen = ScreenState(
-                screen_type=ScreenType.TYPES_MENU,
-                context_data={"unit": unit, "section": section}
-            )
-            navigation.add_screen(user_id, screen)
-            
-            if user_id not in user_data:
-                user_data[user_id] = {
-                    "subject": "bio",
-                    "unit": "",
-                    "section": "",
-                    "score": 0,
-                    "q_index": 0,
-                    "history": []
-                }
-
-            user_data[user_id]["unit"] = unit
-            user_data[user_id]["section"] = section
             
             section_video = SECTION_INTRO_VIDEOS.get(section)
 
@@ -1783,7 +1746,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("📍 موقع", callback_data="where"),
                  InlineKeyboardButton("📊 ترتيب", callback_data="level")],
                 [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-                 InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
+                 InlineKeyboardButton("⚙️ وظ��فة", callback_data="function"),
                  InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
                 [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
             ]
@@ -1794,27 +1757,28 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
                 logger.info(f"✅ عرضت أنواع الأسئلة للمستخدم {user_id}")
+                print_user_navigation_debug(user_id)
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض أنواع الأسئلة: {e}")
+            return
 
         # ============ اختيار نوع السؤال ============
         if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
+            logger.info(f"✅ المستخدم {user_id} اختار نوع سؤال: {data}")
 
             if user_id not in user_data:
                 await query.answer("❌ حدث خطأ", show_alert=True)
+                logger.error(f"❌ المستخدم {user_id} لا يملك بيانات")
                 return
             
-            if "history" not in user_data[user_id]:
-                user_data[user_id]["history"] = []
-            
-            user_data[user_id]["history"].append({
-                "type": "types_menu",
-                "unit": user_data[user_id]["unit"],
-                "section": user_data[user_id]["section"]
-            })
-            
-            unit = user_data[user_id]["unit"]
-            section = user_data[user_id]["section"]
+            # الحصول على البيانات من user_data
+            unit = user_data[user_id].get("unit")
+            section = user_data[user_id].get("section")
+
+            if not unit or not section:
+                await query.answer("❌ بيانات ناقصة", show_alert=True)
+                logger.error(f"❌ بيانات ناقصة للمستخدم {user_id}")
+                return
 
             category = f"{unit}_{section}_{data}"
 
@@ -1822,30 +1786,38 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if category not in bio_subjects:
                 try:
-                    await query.message.reply_text("❌ لا يوجد أسئلة لهذا النوع في هذا القسم")
+                    await query.message.reply_text(
+                        "❌ لا يوجد أسئلة لهذا النوع في هذا القسم"
+                    )
                 except Exception as e:
                     logger.error(f"❌ خطأ في الرسالة: {e}")
+                logger.warning(f"⚠️ الفئة {category} غير موجودة")
                 return
 
             user_data[user_id]["category"] = category
             user_data[user_id]["q_index"] = 0
 
-            # إضافة للملاحة
+            # ============ إضافة للملاحة الجديدة (مهم جداً) ============
             screen = ScreenState(
-                screen_type=ScreenType.QUIZ,
-                context_data={"type": data}
+                screen_type=ScreenType.TYPES_MENU,
+                context_data={"unit": unit, "section": section, "type": data}
             )
             navigation.add_screen(user_id, screen)
+            
+            logger.info(f"✅ أضيفت شاشة نوع الأسئلة للملاحة: {data}")
+            print_user_navigation_debug(user_id)
 
-            keyboard = [[InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")],
-                        [InlineKeyboardButton("🔙 رجوع", callback_data="back")]]
+            keyboard = [
+                [InlineKeyboardButton("▶️ بدء", callback_data="start_quiz")],
+                [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+            ]
 
             try:
                 await query.message.reply_text(
                     random.choice(welcome_messages),
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
-                logger.info(f"✅ جاهز لبدء الاختبار مع المستخدم {user_id}")
+                logger.info(f"✅ جاهز لبدء ا��اختبار مع المستخدم {user_id}")
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض شاشة البداية: {e}")
             return
@@ -1878,7 +1850,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if data == "payment_menu":
             keyboard = [
                 [InlineKeyboardButton("💳 شام كاش", callback_data="pay_shamcash")],
-                [InlineKeyboardButton("🧾 دفع يدوي", callback_data="paid")]
+                [InlineKeyboardButton("🧾 دفع يدوي", callback_data="paid")],
+                [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
             ]
 
             try:
@@ -1890,9 +1863,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(f"❌ خطأ في عرض طرق الدفع: {e}")
             return
 
-        # ============ الرجوع ============
+        # ============ الرجوع (مهم جداً) ============
         if data == "back":
+            logger.info(f"🔙 المستخدم {user_id} ضغط الرجوع")
+            print_user_navigation_debug(user_id)  # طباعة التفاصيل
             await handle_back_button(update, context)
+            print_user_navigation_debug(user_id)  # طباعة التفاصيل بعد الرجوع
             return
 
         # ============ إعادة الاختبار ============
@@ -1950,8 +1926,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text = f"{chr(65+i)} ❌"
                 else:
                     text = f"{chr(65+i)}"
-                if "history" not in user_data[user_id]:
-                    user_data[user_id]["history"] = []
+                
                 row.append(InlineKeyboardButton(text, callback_data="locked"))
 
             buttons.append(row)
@@ -2004,8 +1979,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     except Exception as e:
         logger.error(f"❌ خطأ عام في معالج الأزرار: {e}")
+        import traceback
+        traceback.print_exc()
         await query.answer("❌ حدث خطأ غير متوقع", show_alert=True)
-
 # ================== تشغيل البوت ==================
 app = (
     ApplicationBuilder()
