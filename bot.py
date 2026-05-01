@@ -180,9 +180,11 @@ uploaded_images = {
 "المورثات": "",
 "الجهاز التكاثري الأنثوي": "",
 }
-PDF_FILES = {
-    "u1_dam": "FILE_ID_HERE",
-    "u1_nervus": "FILE_ID_HERE",
+EXAM_PDFS = {
+    "model_1": {"title": "📄 نموذج امتحاني 1","file_id": "BQACAgQAAxkBAAI20Gn02OXJNzeq04DSPTUzeP0Jy1CxAAJNHgACORGhU_vz-mtxWTNpOwQ"},
+    "model_2": {"title": "📄 نموذج امتحاني 2","file_id": "BQACAgQAAxkBAAI20mn02Rt0BlZsNrdT5APn8iG5-8C0AALjGgACc7CoUwpe-pb_rLDUOwQ"},
+    "model_3": {"title": "📄 نموذج امتحاني 3","file_id": "BQACAgQAAxkBAAI21Gn02Sc0nQABYDetrlFoohe7F8bCqAAC5BoAAnOwqFMnvlflD4rJjjsE"},
+    "model_4": {"title": "📄 نموذج امتحاني 4","file_id": "BQACAgQAAxkBAAI21mn02THl88giozANFyKHwUeeRb1tAALlGgACc7CoU59AMuB1LuWwOwQ"},
 }
 # ================== بنك الأسئلة ==================
 subjects = {
@@ -1568,7 +1570,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
                 [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")],
                 [InlineKeyboardButton("الوحدة 3: (علم الوراثة والتكاثر)", callback_data="bio_u3")],
-                [InlineKeyboardButton("📄نماذج امتحانية", callback_data="show_pdf")]
+                    [InlineKeyboardButton("نماذج امتحانية", callback_data="nmazg")]
             ]
             
             try:
@@ -2035,58 +2037,34 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         traceback.print_exc()
         await query.answer("❌ حدث خطأ غير متوقع", show_alert=True)
         
-    if data == "show_pdf":
-        unit = user_data[user_id]["unit"]
-        section = user_data[user_id]["section"]
+    if data == "nmazg":
+        keyboard = []
 
-        key = f"{unit}_{section}"
-        pdf_id = PDF_FILES.get(key)
+        for key, pdf in EXAM_PDFS.items():
+            keyboard.append([
+                InlineKeyboardButton(pdf["title"], callback_data=f"pdf_{key}")
+            ])
 
-        if pdf_id:
-            await context.bot.send_document(
-                chat_id=query.message.chat_id,
-                document=pdf_id,
-                caption="📄 ملخص القسم"
-            )
-        else:
-            await query.message.reply_text("❌ لا يوجد ملف PDF حالياً")
+        keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data="back")])
+
+        await query.message.reply_text(
+            "📄 اختر نموذج امتحاني:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )    
         
-async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
+    if data.startswith("pdf_"):
+        key = data.replace("pdf_", "")
+        pdf = EXAM_PDFS.get(key)
 
-    # ❌ منع غير الأدمن
-    if user_id != ADMIN_ID:
-        return
-
-    try:
-        document = update.message.document
-
-        # تأكد أنه PDF
-        if document.mime_type != "application/pdf":
-            await update.message.reply_text("❌ هذا ليس ملف PDF")
+        if not pdf:
+            await query.message.reply_text("❌ الملف غير موجود")
             return
 
-        file_id = document.file_id
-        file_name = document.file_name
-
-        await update.message.reply_text(
-            f"""✅ تم استلام ملف PDF
-
-        📄 الاسم: {file_name}
-        🆔 File ID:
-        <code>{file_id}</code>
-
-        📌 انسخه وضعه في الكود"""
-        )
-
-        logger.info(f"✅ الأدمن رفع PDF: {file_name}")
-
-    except Exception as e:
-        logger.error(f"❌ خطأ في استقبال PDF: {e}")        
-        
-        
-        
-        
+        await context.bot.send_document(
+            chat_id=query.message.chat_id,
+            document=pdf["file_id"],
+            caption=pdf["title"]
+        )        
         
         
         
@@ -2117,7 +2095,7 @@ app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 
 # pdf
-app.add_handler(MessageHandler(filters.Document.PDF, handle_pdf))
+
 # باقي الأزرار
 app.add_handler(CallbackQueryHandler(button))
 
