@@ -180,7 +180,10 @@ uploaded_images = {
 "المورثات": "",
 "الجهاز التكاثري الأنثوي": "",
 }
-
+PDF_FILES = {
+    "u1_dam": "FILE_ID_HERE",
+    "u1_nervus": "FILE_ID_HERE",
+}
 # ================== بنك الأسئلة ==================
 subjects = {
     "bio": {
@@ -1509,8 +1512,8 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"❌ خطأ في إرسال السؤال: {e}")
 
+
 # ================== معالج الأزرار ==================
-# ================== معالج الأزرار (المصحح) ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """معالج جميع أزرار الـ callback"""
     query = update.callback_query
@@ -1565,6 +1568,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
                 [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")],
                 [InlineKeyboardButton("الوحدة 3: (علم الوراثة والتكاثر)", callback_data="bio_u3")],
+                [InlineKeyboardButton("📄نماذج امتحانية", callback_data="show_pdf")]
             ]
             
             try:
@@ -1662,7 +1666,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض الأقسام: {e}")
             return
-        # ============ الوحدة 2 ============
+        # ============ الوحدة 3 ============
         if data == "bio_u3":
             logger.info(f"✅ المستخدم {user_id} اختار الوحدة 3")
             
@@ -2024,12 +2028,71 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await send_question(update, context)
             return
-    
+        
     except Exception as e:
         logger.error(f"❌ خطأ عام في معالج الأزرار: {e}")
         import traceback
         traceback.print_exc()
         await query.answer("❌ حدث خطأ غير متوقع", show_alert=True)
+        
+    if data == "show_pdf":
+        unit = user_data[user_id]["unit"]
+        section = user_data[user_id]["section"]
+
+        key = f"{unit}_{section}"
+        pdf_id = PDF_FILES.get(key)
+
+        if pdf_id:
+            await context.bot.send_document(
+                chat_id=query.message.chat_id,
+                document=pdf_id,
+                caption="📄 ملخص القسم"
+            )
+        else:
+            await query.message.reply_text("❌ لا يوجد ملف PDF حالياً")
+        
+async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    # ❌ منع غير الأدمن
+    if user_id != ADMIN_ID:
+        return
+
+    try:
+        document = update.message.document
+
+        # تأكد أنه PDF
+        if document.mime_type != "application/pdf":
+            await update.message.reply_text("❌ هذا ليس ملف PDF")
+            return
+
+        file_id = document.file_id
+        file_name = document.file_name
+
+        await update.message.reply_text(
+            f"""✅ تم استلام ملف PDF
+
+        📄 الاسم: {file_name}
+        🆔 File ID:
+        <code>{file_id}</code>
+
+        📌 انسخه وضعه في الكود"""
+        )
+
+        logger.info(f"✅ الأدمن رفع PDF: {file_name}")
+
+    except Exception as e:
+        logger.error(f"❌ خطأ في استقبال PDF: {e}")        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
 # ================== تشغيل البوت ==================
 app = (
     ApplicationBuilder()
@@ -2053,6 +2116,8 @@ app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 # الوسائط
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 
+# pdf
+app.add_handler(MessageHandler(filters.Document.PDF, handle_pdf))
 # باقي الأزرار
 app.add_handler(CallbackQueryHandler(button))
 
