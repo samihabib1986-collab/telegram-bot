@@ -100,7 +100,7 @@ ADMIN_ID = 8491023024
 UNIT_INTRO_VIDEOS = {
     "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",# 🎬 فيديو الوحدة الأولى 
     "u2": "BAACAgQAAxkBAAIarWnuYDZ8o-UdC47sqMr0kxoHjzhUAAL-HAACoG9wU3XlGC00flPjOwQ",  # 🎬 فيديو الوحدة الثانية
-    "u3":"BAACAgQAAxkBAAI0m2n0mhCpw78vIuNo-5ZJgdGlAbL4AAL8HQACORGhU_cwcUwQzddnOwQ"
+    "u3":"BAACAgQAAxkBAAI0m2n0mhCpw78vIuNo-5ZJgdGlAbL4AAL8HQACORGhU_cwcUwQzddnOwQ"# 🎬 فيديو الوحدة الثالثة
 }
 
 SECTION_INTRO_VIDEOS = {
@@ -1643,6 +1643,44 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("🫁 التنفس لدى الإنسان 🫁", callback_data="sec_u2_respiration"),
                  InlineKeyboardButton("🚽 الإطراح عند الإنسان 🚽", callback_data="sec_u2_excretion")],
                 [InlineKeyboardButton("🍎 صحة وظائف التغذية 🍎", callback_data="sec_u2_nutrition_health")],
+                [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+            ]
+
+            try:
+                await query.message.reply_text(
+                    "📚 اختر القسم:",
+                    reply_markup=InlineKeyboardMarkup(keyboard)
+                )
+                logger.info(f"✅ عرضت أقسام الوحدة 2 للمستخدم {user_id}")
+            except Exception as e:
+                logger.error(f"❌ خطأ في عرض الأقسام: {e}")
+            return
+        # ============ الوحدة 2 ============
+        if data == "bio_u3":
+            logger.info(f"✅ المستخدم {user_id} اختار الوحدة 3")
+            
+            # ============ إضافة للملاحة الجديدة ============
+            screen = ScreenState(
+                screen_type=ScreenType.UNIT_MENU,
+                context_data={"unit": "u2"}
+            )
+            navigation.add_screen(user_id, screen)
+            
+            unit_video = UNIT_INTRO_VIDEOS.get("u3")
+
+            if unit_video:
+                try:
+                    await context.bot.send_video(
+                        chat_id=query.message.chat_id,
+                        video=unit_video,
+                        caption="🎬 مقدمة الوحدة 3"
+                    )
+                except Exception as e:
+                    logger.error(f"❌ خطأ في إرسال فيديو الوحدة: {e}")
+
+            keyboard = [
+                [InlineKeyboardButton("🧬 الوراثة🧬", callback_data="sec_u3_genetics"),
+                InlineKeyboardButton("👶 أجهزة التكاثر👶", callback_data="sec_u3_reproduction"),]
                 [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
             ]
 
