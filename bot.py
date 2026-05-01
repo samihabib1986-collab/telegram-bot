@@ -1662,7 +1662,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # ============ إضافة للملاحة الجديدة ============
             screen = ScreenState(
                 screen_type=ScreenType.UNIT_MENU,
-                context_data={"unit": "u2"}
+                context_data={"unit": "u3"}
             )
             navigation.add_screen(user_id, screen)
             
@@ -1689,7 +1689,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "📚 اختر القسم:",
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
-                logger.info(f"✅ عرضت أقسام الوحدة 2 للمستخدم {user_id}")
+                logger.info(f"✅ عرضت أقسام الوحدة 3 للمستخدم {user_id}")
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض الأقسام: {e}")
             return
