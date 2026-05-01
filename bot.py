@@ -1583,7 +1583,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
                 [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")],
                 [InlineKeyboardButton("الوحدة 3: (علم الوراثة والتكاثر)", callback_data="bio_u3")],
-                    [InlineKeyboardButton("نماذج امتحانية", callback_data="nmazg")]
+                [InlineKeyboardButton("نماذج امتحانية", callback_data="nmazg")]
             ]
             
             try:
@@ -2078,35 +2078,35 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             document=pdf["file_id"],
             caption=pdf["title"]
         )        
-        
+  
 async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
+    # فقط الأدمن
+    if user_id != ADMIN_ID:
+        return
+
     try:
         document = update.message.document
-        
-        # تحقق أنه PDF
+
         if document.mime_type != "application/pdf":
             return
 
         file_id = document.file_id
-
-        # تخزين في MongoDB
-        media_db.insert_one({
-            "type": "pdf",
-            "file_id": file_id,
-            "user_id": user_id
-        })
+        file_name = document.file_name
 
         await update.message.reply_text(
-            f"📄 تم استلام ملف PDF\n\n🆔 File ID:\n{file_id}"
+            f"""✅ تم استلام PDF
+
+📄 الاسم: {file_name}
+🆔 File ID:
+<code>{file_id}</code>"""
         )
 
-        logger.info(f"✅ تم استلام PDF من {user_id}")
+        logger.info(f"✅ PDF من الأدمن: {file_name}")
 
     except Exception as e:
-        logger.error(f"❌ خطأ في استقبال PDF: {e}")        
-        
+        logger.error(f"❌ خطأ PDF: {e}")        
         
         
 
@@ -2134,7 +2134,7 @@ app.add_handler(CallbackQueryHandler(paid, pattern="^paid$"))
 app.add_handler(MessageHandler(filters.PHOTO | filters.VIDEO, handle_media))
 
 # pdf
-
+app.add_handler(MessageHandler(filters.Document.PDF, handle_pdf))
 # باقي الأزرار
 app.add_handler(CallbackQueryHandler(button))
 
