@@ -1556,7 +1556,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             keyboard = [
                 [InlineKeyboardButton("الوحدة 1: (الدعامة والتنسيق)", callback_data="bio_u1")],
-                [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")]
+                [InlineKeyboardButton("الوحدة 2: (وظائف التغذية)", callback_data="bio_u2")],
+                [InlineKeyboardButton("الوحدة 3: (علم الوراثة والتكاثر)", callback_data="bio_u3")],
             ]
             
             try:
@@ -1746,7 +1747,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("📍 موقع", callback_data="where"),
                  InlineKeyboardButton("📊 ترتيب", callback_data="level")],
                 [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-                 InlineKeyboardButton("⚙️ وظ��فة", callback_data="function"),
+                 InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
                  InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
                 [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
             ]
