@@ -2079,7 +2079,33 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             caption=pdf["title"]
         )        
         
+async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    try:
+        document = update.message.document
         
+        # تحقق أنه PDF
+        if document.mime_type != "application/pdf":
+            return
+
+        file_id = document.file_id
+
+        # تخزين في MongoDB
+        media_db.insert_one({
+            "type": "pdf",
+            "file_id": file_id,
+            "user_id": user_id
+        })
+
+        await update.message.reply_text(
+            f"📄 تم استلام ملف PDF\n\n🆔 File ID:\n{file_id}"
+        )
+
+        logger.info(f"✅ تم استلام PDF من {user_id}")
+
+    except Exception as e:
+        logger.error(f"❌ خطأ في استقبال PDF: {e}")        
         
         
         
