@@ -181,10 +181,10 @@ uploaded_images = {
 "الجهاز التكاثري الأنثوي": "AgACAgQAAxkBAAI3iWn0_RJx67feKBtx91hDUf0AARIBOAACHw1rG3OwqFPL714hAij06QEAAwIAA3gAAzsE",
 }
 EXAM_PDFS = {
-    "model_1": {"title": "📄 نموذج امتحاني 1","file_id": "BQACAgQAAxkBAAI20Gn02OXJNzeq04DSPTUzeP0Jy1CxAAJNHgACORGhU_vz-mtxWTNpOwQ"},
-    "model_2": {"title": "📄 نموذج امتحاني 2","file_id": "BQACAgQAAxkBAAI20mn02Rt0BlZsNrdT5APn8iG5-8C0AALjGgACc7CoUwpe-pb_rLDUOwQ"},
-    "model_3": {"title": "📄 نموذج امتحاني 3","file_id": "BQACAgQAAxkBAAI21Gn02Sc0nQABYDetrlFoohe7F8bCqAAC5BoAAnOwqFMnvlflD4rJjjsE"},
-    "model_4": {"title": "📄 نموذج امتحاني 4","file_id": "BQACAgQAAxkBAAI21mn02THl88giozANFyKHwUeeRb1tAALlGgACc7CoU59AMuB1LuWwOwQ"},
+    "model_1": {"title": "📄 نموذج امتحاني 1","file_id": "BQACAgQAAxkBAAI3uWn1CTgoeOhYMINd1fB1bZV-rEoXAAKRGwACc7CoUyrbzt_8AAF8sDsE"},
+    "model_2": {"title": "📄 نموذج امتحاني 2","file_id": "BQACAgQAAxkBAAI3u2n1CVw4nJ-To--sXkcuuh9knTrBAAKSGwACc7CoU4lv3tDZqjRDOwQ"},
+    "model_3": {"title": "📄 نموذج امتحاني 3","file_id": "BQACAgQAAxkBAAI3vWn1CXaB6fU5K4bunDTcSuthLOeEAAKTGwACc7CoUyHwClfiwcHNOwQ"},
+    "model_4": {"title": "📄 نموذج امتحاني 4","file_id": "BQACAgQAAxkBAAI3v2n1CYqvUWJKpD8TTQiudjVAOyDOAAKUGwACc7CoUyYi1v_l06ssOwQ"},
 }
 # ================== بنك الأسئلة ==================
 subjects = {
