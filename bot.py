@@ -1206,13 +1206,21 @@ async def paid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("✅ قبول", callback_data=f"approve_{user_id}")]
     ])
+    username = user.username
+    if username:
+        user_link = f"https://t.me/{username}"
+    else:
+        user_link = f"tg://user?id={user_id}"
 
     try:
         await context.bot.send_message(
             chat_id=ADMIN_ID,
-            text=f"💳 طلب اشتراك:\n\n"
-                 f"👤 الاسم: {full_name}\n"
-                 f"🆔 ID: {user_id}",
+            text=(
+                f"💳 طلب اشتراك:\n\n"
+                f"👤 الاسم: {first_name}\n"
+                f"🆔 ID: {user_id}\n"
+                f"🔗 الرابط: {user_link}"
+            ),
             reply_markup=keyboard
         )
 
