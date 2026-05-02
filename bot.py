@@ -4100,7 +4100,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")],
-            [InlineKeyboardButton("⭐ مستواي", callback_data="my_level")]
+                [
+                InlineKeyboardButton("⭐ مستواي", callback_data="my_level"),
+                [InlineKeyboardButton("🏆 المتصدرون", callback_data="leaderboard")]
+                ]
         ]
 
         await update.message.reply_text(
@@ -4118,7 +4121,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.info(f"✅ بداية جديدة للمستخدم {user_id}")
     except Exception as e:
         logger.error(f"❌ خطأ في دالة START: {e}")
-
+# ================== عرض الاسم مزخرف  ==================        
+    users.update_one(
+        {"_id": user_id},
+        {"$set": {
+            "name": update.effective_user.full_name
+        }},
+        upsert=True
+    )
 # ================== رفع الوسائط ==================
 async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """معالج رفع الصور والفيديوهات"""
@@ -4361,6 +4371,48 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.info(f"✅ عرضت قائمة الوحدات للمستخدم {user_id}")
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض قائمة الوحدات: {e}")
+            return
+# ============  المنافسة ============
+
+        if data == "leaderboard":
+            # 🔝 أفضل 10
+            top_users = list(users.find().sort("points", -1).limit(10))
+
+            text = "🏆 أفضل اللاعبين:\n\n"
+
+            medals = ["🥇", "🥈", "🥉"]
+
+            for i, u in enumerate(top_users):
+                name = u.get("name", f"User {u['_id']}")
+                points = u.get("points", 0)
+
+                if i < 3:
+                    icon = medals[i]
+                else:
+                    icon = f"{i+1}-"
+
+                text += f"{icon} {name} — {points}⭐\n"
+
+            # 📍 ترتيب المستخدم الحالي
+            all_users = list(users.find().sort("points", -1))
+
+            rank = None
+            for i, u in enumerate(all_users):
+                if u["_id"] == user_id:
+                    rank = i + 1
+                    break
+
+            user_db = users.find_one({"_id": user_id})
+            my_points = user_db.get("points", 0)
+
+            text += "\n────────────\n"
+
+            if rank:
+                text += f"📍 ترتيبك: {rank}\n⭐ نقاطك: {my_points}"
+            else:
+                text += "❌ لم تدخل الترتيب بعد"
+
+            await query.message.reply_text(text)
             return
 # ============ تحديد المستوى ============
         if data == "my_level":
