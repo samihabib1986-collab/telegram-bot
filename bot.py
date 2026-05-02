@@ -1597,7 +1597,46 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض قائمة الوحدات: {e}")
             return
+# ============ أنواع الأسئلة ============
+        if data in ["taaleel", "image", "where", "level", "result", "function", "compare"]:
+            
+            if user_id not in user_data:
+                await query.answer("❌ حدث خطأ", show_alert=True)
+                return
 
+            info = user_data[user_id]
+
+            unit = info.get("unit")
+            section = info.get("section")
+
+            if not unit or not section:
+                await query.answer("❌ بيانات غير مكتملة", show_alert=True)
+                return
+
+            # بناء اسم الكاتيجوري
+            category = f"{unit}_{section}_{data}"
+
+            info["category"] = category
+            info["q_index"] = 0
+            info["score"] = 0
+
+            logger.info(f"📘 المستخدم {user_id} اختار النوع: {category}")
+
+            # إضافة شاشة الاختبار للملاحة
+            screen = ScreenState(
+                screen_type=ScreenType.QUIZ,
+                context_data={}
+            )
+            navigation.add_screen(user_id, screen)
+
+            # عرض شاشة بدء الاختبار
+            await ScreenBuilder.build_quiz_menu(
+                context,
+                query,
+                user_id
+            )
+
+            return
         # ============ الوحدة 1 ============
         if data == "bio_u1":
             logger.info(f"✅ المستخدم {user_id} اختار الوحدة 1")
@@ -1720,7 +1759,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(f"❌ خطأ في عرض الأقسام: {e}")
             return
 
-        # ============ الأقسام ============
 # ============ الأقسام ============
         if data.startswith("sec_"):
             logger.info(f"✅ المستخدم {user_id} اختار قسم: {data}")
@@ -2048,7 +2086,7 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"❌ خطأ PDF: {e}")        
         
-        
+                        
 
 # ================== تشغيل البوت ==================
 app = (
