@@ -4550,7 +4550,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "sec_u2_nutrition_health": ("u2", "nutrition_health"),
 
                 # ===== u3 =====
-                "sec_u3_pollution": ("u3", "pollution"),
+                "sec_u3_genetics": ("u3", "genetics"),
                 "sec_u3_reproduction": ("u3", "reproduction"),
                 
                 # ===== u4 =====
