@@ -1721,14 +1721,27 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         # ============ الأقسام ============
-
+# ============ الأقسام ============
         if data.startswith("sec_"):
             logger.info(f"✅ المستخدم {user_id} اختار قسم: {data}")
-
             section_map = {
+                # ===== u1 =====
                 "sec_u1_dam": ("u1", "dam"),
                 "sec_u1_nervus": ("u1", "nervus"),
-                # ... إلخ
+                "sec_u1_sum": ("u1", "sum"),
+                "sec_u1_sens": ("u1", "sens"),
+                "sec_u1_heal": ("u1", "heal"),
+
+                # ===== u2 =====
+                "sec_u2_digest": ("u2", "digest"),
+                "sec_u2_circulation": ("u2", "circulation"),
+                "sec_u2_respiration": ("u2", "respiration"),
+                "sec_u2_excretion": ("u2", "excretion"),
+                "sec_u2_nutrition_health": ("u2", "nutrition_health"),
+
+                # ===== u3 =====
+                "sec_u3_genetics": ("u3", "genetics"),
+                "sec_u3_reproduction": ("u3", "reproduction"),
             }
 
             mapped = section_map.get(data)
