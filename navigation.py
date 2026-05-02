@@ -272,43 +272,46 @@ class ScreenBuilder:
     
     كل شاشة لها دالة مخصصة تبني محتواها
     """
+# أضف دالة بناء SECTION_MENU
+@staticmethod
+async def build_section_menu(
+    context,
+    query,
+    user_id: int,
+    unit: str,
+    section: str
+) -> None:
+    """بناء شاشة القسم"""
+    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
     
-    @staticmethod
-    async def build_section_menu(
-        context,
-        query,
-        user_id: int,
-        unit: str,
-        section: str
-    ) -> None:
-        """بناء شاشة القسم"""
-        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-        
-        keyboard = [
-            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-             InlineKeyboardButton("🖼 صور", callback_data="image")],
-            [InlineKeyboardButton("📍 موقع", callback_data="where"),
-             InlineKeyboardButton("📊 ترتيب", callback_data="level")],
-            [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-             InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-             InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
-            [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
-        ]
-        
-        text = """
+    keyboard = [
+        [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+         InlineKeyboardButton("🖼 صور", callback_data="image")],
+        [InlineKeyboardButton("📍 موقع", callback_data="where"),
+         InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+        [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
+         InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
+         InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
+        [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+    ]
+    
+    text = """
 📝 اختر نوع الأسئلة:
 
 سيتم عرض أسئلة من هذا النوع فقط
-        """
-        
-        await query.message.reply_text(
-            text,
-            reply_markup=InlineKeyboardMarkup(keyboard),
-            parse_mode="HTML"
-        )
-        
-        logger.info(f"✅ عرضت شاشة القسم ({unit}/{section}) للمستخدم {user_id}")
+    """
     
+    await query.message.reply_text(
+        text,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="HTML"
+    )
+    
+    logger.info(f"✅ عرضت شاشة القسم ({unit}/{section}) للمستخدم {user_id}")
+    
+    
+    
+        
     @staticmethod
     async def build_main_menu(
         context,
@@ -365,14 +368,12 @@ class ScreenBuilder:
             keyboard = [
                 [
                     InlineKeyboardButton("🦴 القسم الدعامي 🦴", callback_data="sec_u1_dam"),
-                ],
-                [
+
                     InlineKeyboardButton("🧠 الجهاز العصبي 🧠", callback_data="sec_u1_nervus"),
                 ],
                 [
                     InlineKeyboardButton("🧬 الغدد الصم 🧬", callback_data="sec_u1_sum"),
-                ],
-                [
+
                     InlineKeyboardButton("👅 أعضاء الحس 👅", callback_data="sec_u1_sens"),
                 ],
                 [
@@ -393,14 +394,10 @@ class ScreenBuilder:
             keyboard = [
                 [
                     InlineKeyboardButton("🥗 الهضم لدى الإنسان 🥗", callback_data="sec_u2_digest"),
-                ],
-                [
                     InlineKeyboardButton("🫀 الدوران لدى الإنسان 🫀", callback_data="sec_u2_circulation"),
                 ],
                 [
                     InlineKeyboardButton("🫁 التنفس لدى الإنسان 🫁", callback_data="sec_u2_respiration"),
-                ],
-                [
                     InlineKeyboardButton("🚽 الإطراح عند الإنسان 🚽", callback_data="sec_u2_excretion"),
                 ],
                 [
@@ -419,9 +416,22 @@ class ScreenBuilder:
             keyboard = [
                 [
                     InlineKeyboardButton("🧬 الوراثة🧬", callback_data="sec_u3_genetics"),
-                ], 
-                [
                     InlineKeyboardButton("👶 أجهزة التكاثر👶", callback_data="sec_u3_reproduction"),
+                ],
+                [
+                    InlineKeyboardButton("🔙 رجوع", callback_data="back"),
+                ],                
+            ]
+            text = """
+📚 الوحدة 3: علم الوراثة والتكاثر
+
+اختر القسم الذي تريد حل الأسئلة فيه
+            """
+        elif unit == "u4": 
+            keyboard = [
+                [
+                    InlineKeyboardButton("🌱 التكاثر لدى النباتات البذرية🌱", callback_data="sec_u4_reproduction"),
+                     InlineKeyboardButton("🌍 التلوث🌍", callback_data="sec_u4_pollution"),
                 ],
                 [
                     InlineKeyboardButton("🔙 رجوع", callback_data="back"),
