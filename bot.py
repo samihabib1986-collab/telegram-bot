@@ -171,7 +171,7 @@ uploaded_images = {
 "السدم": "AgACAgQAAxkBAAIhSWnwiLrHp_3AjRPcIHHjR5lgjkcjAAI6DGsbHteBU8QDiIWihJrAAQADAgADeQADOwQ",
 # ===== الوحدة 3 =====
 "الجنين": "AgACAgQAAxkBAAI0k2n0hted0V6XpcJYxN6HJw9xKbhLAAL7C2sbORGhU4c7eW5MRDwcAQADAgADeQADOwQ",
-"المورثات والصبغيات": "AgACAgQAAxkBAAI0lWn0jhzG4S4Re-L1xwdB-srEK17_AAL9C2sbORGhU9_Dufuu9SpEAQADAgADeAADOwQ",
+" المورثات والصبغيات": "AgACAgQAAxkBAAI0lWn0jhzG4S4Re-L1xwdB-srEK17_AAL9C2sbORGhU9_Dufuu9SpEAQADAgADeAADOwQ",
 "الجهاز التكاثري الذكري": "AgACAgQAAxkBAAI0o2n0nFWR_z7UWzVaHl8og9Bay8-NAAINDGsbORGhUzp166niWVZ8AQADAgADeQADOwQ",
 "النطفة": "AgACAgQAAxkBAAI0n2n0mvNiNHTIii2jGmqNaAGXJ37KAAIIDGsbORGhU2txIf05oEB9AQADAgADeQADOwQ",
 "الجنين داخل الرحم والمشيمة": "AgACAgQAAxkBAAI3i2n0_eOixfNSBS4twac9MM6OnTJVAAIgDWsbc7CoU1BBXZXIXCngAQADAgADeAADOwQ",
