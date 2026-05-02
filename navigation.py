@@ -272,46 +272,43 @@ class ScreenBuilder:
     
     كل شاشة لها دالة مخصصة تبني محتواها
     """
-# أضف دالة بناء SECTION_MENU
-@staticmethod
-async def build_section_menu(
-    context,
-    query,
-    user_id: int,
-    unit: str,
-    section: str
-) -> None:
-    """بناء شاشة القسم"""
-    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
     
-    keyboard = [
-        [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
-         InlineKeyboardButton("🖼 صور", callback_data="image")],
-        [InlineKeyboardButton("📍 موقع", callback_data="where"),
-         InlineKeyboardButton("📊 ترتيب", callback_data="level")],
-        [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
-         InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
-         InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
-        [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
-    ]
-    
-    text = """
+    @staticmethod
+    async def build_section_menu(
+        context,
+        query,
+        user_id: int,
+        unit: str,
+        section: str
+    ) -> None:
+        """بناء شاشة القسم"""
+        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+        
+        keyboard = [
+            [InlineKeyboardButton("📘 تعليل", callback_data="taaleel"),
+             InlineKeyboardButton("🖼 صور", callback_data="image")],
+            [InlineKeyboardButton("📍 موقع", callback_data="where"),
+             InlineKeyboardButton("📊 ترتيب", callback_data="level")],
+            [InlineKeyboardButton("🧠 نتائج", callback_data="result"),
+             InlineKeyboardButton("⚙️ وظيفة", callback_data="function"),
+             InlineKeyboardButton("⚡ مقارنة", callback_data="compare")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+        ]
+        
+        text = """
 📝 اختر نوع الأسئلة:
 
 سيتم عرض أسئلة من هذا النوع فقط
-    """
-    
-    await query.message.reply_text(
-        text,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="HTML"
-    )
-    
-    logger.info(f"✅ عرضت شاشة القسم ({unit}/{section}) للمستخدم {user_id}")
-    
-    
-    
+        """
         
+        await query.message.reply_text(
+            text,
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="HTML"
+        )
+        
+        logger.info(f"✅ عرضت شاشة القسم ({unit}/{section}) للمستخدم {user_id}")
+    
     @staticmethod
     async def build_main_menu(
         context,
