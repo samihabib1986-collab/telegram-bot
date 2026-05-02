@@ -4100,7 +4100,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")],
-            InlineKeyboardButton("⭐ مستواي", callback_data="my_level")
+            [InlineKeyboardButton("⭐ مستواي", callback_data="my_level")]
         ]
 
         await update.message.reply_text(
