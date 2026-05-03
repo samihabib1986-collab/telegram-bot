@@ -3861,20 +3861,20 @@ async def shamcash_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # تحديث قاعدة البيانات
     users.update_one(
         {"_id": user.id},
-        {"$set": {
-            "payment_code": code,
-            "approved": False,
-            "payment_mode": "shamcash",
-            "pending": True,
-        }
-         },
-        {"$setOnInsert": {
-        "points": 0,
-        "level": 1
-    }},
+        {
+            "$set": {
+                "payment_code": code,
+                "approved": False,
+                "payment_mode": "shamcash",
+                "pending": True,
+            },
+            "$setOnInsert": {
+                "points": 0,
+                "level": 1
+            }
+        },
         upsert=True
     )
-
     try:
         await query.message.reply_photo(
             photo=open(file_name, "rb"),
@@ -4374,9 +4374,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(f"❌ خطأ في عرض قائمة الوحدات: {e}")
             return
 # ============  المنافسة ============
-        if data == "pay_shamcash":
-            await shamcash_payment(update, context)
-            return
+
         if data == "leaderboard":
             # 🔝 أفضل 10
             top_users = list(users.find().sort("points", -1).limit(10))
