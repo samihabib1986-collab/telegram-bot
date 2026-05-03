@@ -4375,6 +4375,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 # ============  المنافسة ============
         if data == "pay_shamcash":
+            await shamcash_payment(update, context)
             return
         if data == "leaderboard":
             # 🔝 أفضل 10
