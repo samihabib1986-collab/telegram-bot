@@ -191,7 +191,7 @@ uploaded_images = {
 "حبة طلع ناضجة": "AgACAgQAAxkBAAJAm2n3BeuhizFKW9-uUrd5qbiapmZdAAKwD2sbthi4UytFU5Fe7UFQAQADAgADeAADOwQ",
 "العضو التكاثري الأنثوي (المدقة)": "AgACAgQAAxkBAAJAnWn3BfDsujPgbjFfM55XAAH-uaRJOQACsQ9rG7YYuFN3UJT9BYyxmAEAAwIAA3gAAzsE",
 "المورثات": "AgACAgQAAxkBAAI3gGn0-rWjnFPfSGgcXdzBJa_nhOnWAAIdDWsbc7CoUz4gn5ZWyociAQADAgADeAADOwQ",
-"أقسام الزهرة": "AgACAgQAAxkBAAJBrmn3DWXK1FF5Rk8IQ39H3YMRRFisAAK3D2sbthi4U2i8_nKMaPCOAQADAgADeAADOwQ",
+"أقسمام الزهرة": "AgACAgQAAxkBAAJBrmn3DWXK1FF5Rk8IQ39H3YMRRFisAAK3D2sbthi4U2i8_nKMaPCOAQADAgADeAADOwQ",
 
 
 }
