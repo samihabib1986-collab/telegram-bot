@@ -4627,6 +4627,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 context_data={"unit": "u4"}
             )
             navigation.add_screen(user_id, screen)
+            unit_video = UNIT_INTRO_VIDEOS.get("u4")
+
+            if unit_video:
+                try:
+                    await context.bot.send_video(
+                        chat_id=query.message.chat_id,
+                        video=unit_video,
+                        caption="🎬 مقدمة الوحدة 4"
+                    )
+                except Exception as e:
+                    logger.error(f"❌ خطأ في إرسال فيديو الوحدة: {e}")
 
             keyboard = [
                 [
