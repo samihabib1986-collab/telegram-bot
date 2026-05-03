@@ -4304,6 +4304,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== معالج الأزرار ==================
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     """معالج جميع أزرار الـ callback"""
     query = update.callback_query
     await query.answer()
@@ -4373,7 +4374,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(f"❌ خطأ في عرض قائمة الوحدات: {e}")
             return
 # ============  المنافسة ============
-
+        if data == "pay_shamcash":
+            return
         if data == "leaderboard":
             # 🔝 أفضل 10
             top_users = list(users.find().sort("points", -1).limit(10))
