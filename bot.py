@@ -101,7 +101,7 @@ UNIT_INTRO_VIDEOS = {
     "u1": "BAACAgQAAxkBAAIG_GnmTG0PIxI5oVt3I9oK1G3n2XtBAAI7GwACj3k4U_ihISwgbvOoOwQ",# 🎬 فيديو الوحدة الأولى 
     "u2": "BAACAgQAAxkBAAIarWnuYDZ8o-UdC47sqMr0kxoHjzhUAAL-HAACoG9wU3XlGC00flPjOwQ",  # 🎬 فيديو الوحدة الثانية
     "u3":"BAACAgQAAxkBAAI0m2n0mhCpw78vIuNo-5ZJgdGlAbL4AAL8HQACORGhU_cwcUwQzddnOwQ",# 🎬 فيديو الوحدة الثالثة
-    "u4":"BAACAgQAAxkBAAI0m2n0mhCpw78vIuNo-5ZJgdGlAbL4AAL8HQACORGhU_cwcUwQzddnOwQ"# 🎬 فيديو الوحدة الرابعة
+    "u4":"BAACAgQAAxkBAAJDyWn3kb9N0bLwnSgXseBKLCjt-lNoAAKjHQACthjAUwupcFAay8vsOwQ"# 🎬 فيديو الوحدة الرابعة
 }
 
 SECTION_INTRO_VIDEOS = {
@@ -121,8 +121,8 @@ SECTION_INTRO_VIDEOS = {
     "genetics":"BAACAgQAAxkBAAI0nWn0mreSXPuxhFHsnejEc8_1A2cUAAL9HQACORGhU0GbWUtd39hoOwQ",
     "reproduction":"BAACAgQAAxkBAAI0l2n0mOCCE3NIdD71WOG7kcw5rq-nAAL7HQACORGhU2wIN72mDd6aOwQ",
         # ===== الوحدة 4 =====
-    "reproduction":"BAACAgQAAxkBAAI0nWn0mreSXPuxhFHsnejEc8_1A2cUAAL9HQACORGhU0GbWUtd39hoOwQ",
-    "pollution":"BAACAgQAAxkBAAI0l2n0mOCCE3NIdD71WOG7kcw5rq-nAAL7HQACORGhU2wIN72mDd6aOwQ"
+    "reproduction2":"BAACAgQAAxkBAAJDzGn3kwWvGbKc1UL8N-GmY1sqeJx-AAKoHQACthjAUzb2u66SaE4zOwQ",
+    "pollution":"BAACAgQAAxkBAAJDBGn3MuRgneRO0nae7ExJrgaTZwwpAAJJHQACthjAU746fHN8RoOjOwQ"
     
 }
 
@@ -183,6 +183,17 @@ uploaded_images = {
 "المشيمة":"AgACAgQAAxkBAAI3fmn0-d3wASmBHhhE9TagXJU_zL1BAAIbDWsbc7CoU2HvqJF8U22NAQADAgADeAADOwQ",
 "المورثات": "AgACAgQAAxkBAAI3gGn0-rWjnFPfSGgcXdzBJa_nhOnWAAIdDWsbc7CoUz4gn5ZWyociAQADAgADeAADOwQ",
 "الجهاز التكاثري الأنثوي": "AgACAgQAAxkBAAI3iWn0_RJx67feKBtx91hDUf0AARIBOAACHw1rG3OwqFPL714hAij06QEAAwIAA3gAAzsE",
+
+
+# ===== الوحدة 4 =====
+"'المخروط ذكر'": "AgACAgQAAxkBAAJAlWn3BdwDnxAIftf1LF-2sSscsSjwAAKuD2sbthi4UwRa64L6hv4DAQADAgADeAADOwQ",
+"مقطع طولي في مخروط مؤنث": "AgACAgQAAxkBAAJAmWn3Bed8zvi0qrdUF6pl2h_IAAHrRgACrw9rG7YYuFNeeeouCsyo0QEAAwIAA3gAAzsE",
+"حبة طلع ناضجة": "AgACAgQAAxkBAAJAm2n3BeuhizFKW9-uUrd5qbiapmZdAAKwD2sbthi4UytFU5Fe7UFQAQADAgADeAADOwQ",
+"العضو التكاثري الأنثوي (المدقة)": "AgACAgQAAxkBAAJAnWn3BfDsujPgbjFfM55XAAH-uaRJOQACsQ9rG7YYuFN3UJT9BYyxmAEAAwIAA3gAAzsE",
+"المورثات": "AgACAgQAAxkBAAI3gGn0-rWjnFPfSGgcXdzBJa_nhOnWAAIdDWsbc7CoUz4gn5ZWyociAQADAgADeAADOwQ",
+"أقسام الزهرة": "AgACAgQAAxkBAAJBrmn3DWXK1FF5Rk8IQ39H3YMRRFisAAK3D2sbthi4U2i8_nKMaPCOAQADAgADeAADOwQ",
+
+
 }
 EXAM_PDFS = {
     "model_1": {"title": "📄 نموذج امتحاني 1","file_id": "BQACAgQAAxkBAAI3uWn1CTgoeOhYMINd1fB1bZV-rEoXAAKRGwACc7CoUyrbzt_8AAF8sDsE"},
@@ -3588,58 +3599,66 @@ subjects = {'bio':
 'حماية أجزاء الزهرة الداخلية قبل تفتحها',
 'إنتاج حبات الطلع'],
 'question': '10. ما هي وظيفة الكأس (السبلات)؟'}],
-'u4_reproduction2_image': [{'answer': 'كيس الطلع',
-'image': 'رسم تخطيطي لمقطع طولي لمخروط ذكر',
-'options': ['كيس الطلع', 'البويضة', 'الرحم'],
-'question': 'يدل الجزء الموجود على الوجه السفلي لكل حرشفة في المخروط الذكري '
+'u4_reproduction2_image': [{'answer': 'حبات الطلع',
+'image': 'المخروط ذكر',
+'options': ['حبات الطلع', 'البويضة', 'الرحم'],
+'question': '(الرقم 1) '
 '(والذي ينتج الطلع) على:',
 'type': 'image'},
-{'answer': 'البويضات العارية',
+{'answer': 'قنابة',
 'image': 'مقطع طولي في مخروط مؤنث',
-'options': ['حبات الطلع', 'البويضات العارية', 'الثمار'],
-'question': 'البنى العارية التي تتوضع فوق حراشف المخروط المؤنث في الصنوبر هي:',
+'options': ['حبات الطلع', 'البويضات العارية', 'قنابة'],
+'question': '(الرقم 4)',
 'type': 'image'},
-{'answer': 'الأكياس الهوائية',
+{'answer': 'غلاف سيللوزي داخلي',
 'image': 'حبة طلع ناضجة',
-'options': ['النطاف', 'الأكياس الهوائية', 'الخلية الإعاشية'],
-'question': 'البنى الجانبية الشفافة التي تساعد حبة طلع الصنوبر على الانتشار '
-'بالرياح هي:',
+'options': ['غلاف سيللوزي داخلي', 'الأكياس الهوائية', 'الخلية الإعاشية'],
+'question': '(الرقم 3) ',
 'type': 'image'},
 {'answer': 'نواة الخلية الإعاشية',
 'image': 'حبة طلع ناضجة',
 'options': ['نواة الخلية التكاثرية', 'نواة الخلية الإعاشية', 'النواة القطبية'],
-'question': 'النواة الكبيرة الموجودة داخل حبة الطلع والمسؤولة عن توجيه نمو '
-'الأنبوب هي:',
+'question': '(الرقم 1) ',
 'type': 'image'},
 {'answer': 'الميسم',
 'image': 'العضو التكاثري الأنثوي (المدقة)',
 'options': ['القلم', 'الميسم', 'المبيض'],
-'question': 'الجزء العلوي اللزج من المدقة الذي يستقبل حبات الطلع يسمى:',
+'question': '(الرقم 5)',
 'type': 'image'},
 {'answer': 'المبيض',
 'image': 'العضو التكاثري الأنثوي (المدقة)',
 'options': ['الميسم', 'المبيض', 'التخت'],
-'question': 'الجزء المنتفخ السفلي الذي يحتوي على البويضات ويتحول لثمرة هو:',
+'question': '(الرقم 7)',
+'type': 'image'},
+{'answer': 'سبلة',
+'image': 'أقسمام الزهرة',
+'options': ['الأسهر', 'سبلة', 'خيط'],
+'question': '(الرقم 11)',
 'type': 'image'},
 {'answer': 'محور المخروط',
-'image': 'رسم تخطيطي لمقطع طولي لمخروط ذكر',
+'image': 'المخروط ذكر',
 'options': ['محور المخروط', 'السداة', 'القلم'],
-'question': 'المحور المركزي الذي ترتكز عليه الحراشف الذكرية يسمى:',
+'question': '(الرقم 3)',
 'type': 'image'},
-{'answer': 'الخلية التكاثرية',
+{'answer': 'الخلية الإعاشية',
 'image': 'حبة طلع ناضجة',
 'options': ['الخلية الإعاشية', 'الخلية التكاثرية', 'الخلية المساعدة'],
-'question': 'الخلية الصغيرة داخل حبة الطلع التي تنقسم لتعطي النطاف النباتية هي:',
+'question': '(الرقم 5)',
 'type': 'image'},
-{'answer': 'القلم',
+{'answer': 'الخلايا القطبية',
 'image': 'العضو التكاثري الأنثوي (المدقة)',
-'options': ['الأسهر', 'القلم', 'الحبل السري'],
-'question': 'الأنبوب الضيق الذي يصل الميسم بالمبيض تمر عبره أنابيب الطلع هو:',
+'options': ['الأسهر', 'القلم', 'الخلايا القطبية'],
+'question': '(الرقم 4)',
 'type': 'image'},
-{'answer': 'حراشف خشبية متسمكة',
+{'answer': 'خيط',
+'image': 'أقسمام الزهرة',
+'options': ['الأسهر', 'القلم', 'خيط'],
+'question': '(الرقم 9)',
+'type': 'image'},
+{'answer': 'حرشفة',
 'image': 'مقطع طولي في مخروط مؤنث',
-'options': ['حراشف ورقية', 'حراشف خشبية متسمكة', 'بتلات ملونة'],
-'question': 'في المخروط المؤنث الناضج، الحراشف تصبح قاسية ويطلق عليها وصف:',
+'options': ['بذيرة', 'حرشفة', 'بتلات ملونة'],
+'question': '(الرقم 3)',
 'type': 'image'}],
 'u4_reproduction2_level': [{'answer': 'خلية أم (2n) ⬅️ انقسام منصف ⬅️ أربع حبات طلع (1n)',
 'options': ['حبة طلع ⬅️ انقسام منصف ⬅️ خلية أم',
