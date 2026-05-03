@@ -186,7 +186,7 @@ uploaded_images = {
 
 
 # ===== الوحدة 4 =====
-"'المخروط ذكر'": "AgACAgQAAxkBAAJAlWn3BdwDnxAIftf1LF-2sSscsSjwAAKuD2sbthi4UwRa64L6hv4DAQADAgADeAADOwQ",
+"المخروط ذكر": "AgACAgQAAxkBAAJAlWn3BdwDnxAIftf1LF-2sSscsSjwAAKuD2sbthi4UwRa64L6hv4DAQADAgADeAADOwQ",
 "مقطع طولي في مخروط مؤنث": "AgACAgQAAxkBAAJAmWn3Bed8zvi0qrdUF6pl2h_IAAHrRgACrw9rG7YYuFNeeeouCsyo0QEAAwIAA3gAAzsE",
 "حبة طلع ناضجة": "AgACAgQAAxkBAAJAm2n3BeuhizFKW9-uUrd5qbiapmZdAAKwD2sbthi4UytFU5Fe7UFQAQADAgADeAADOwQ",
 "العضو التكاثري الأنثوي (المدقة)": "AgACAgQAAxkBAAJAnWn3BfDsujPgbjFfM55XAAH-uaRJOQACsQ9rG7YYuFN3UJT9BYyxmAEAAwIAA3gAAzsE",
