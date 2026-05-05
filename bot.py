@@ -202,8 +202,7 @@ EXAM_PDFS = {
     "model_4": {"title": "📄 نموذج امتحاني 4","file_id": "BQACAgQAAxkBAAI3v2n1CYqvUWJKpD8TTQiudjVAOyDOAAKUGwACc7CoUyYi1v_l06ssOwQ"},
 }
 # ================== بنك الأسئلة ==================
-# ملف تم توليده تلقائياً
-# ملف تم توليده تلقائياً
+
 
 subjects = {'bio': 
 {'u1_dam_compare': [{'answer': 'الرمادية مركزية (شكل فراشة) والبيضاء محيطية',
@@ -4589,6 +4588,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         # ============ اختيار الفيزياء ============
         if data == "physics":
+            if user_id != ADMIN_ID:
+                await query.answer("🚫 هذه المادة قيد التطوير", show_alert=True)
+                return
             if user_id not in user_data:
                 user_data[user_id] = {
                     "subject": "physics",
