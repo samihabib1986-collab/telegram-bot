@@ -266,6 +266,24 @@ navigation = NavigationHistory(max_history=20)
 
 # ============ فئة بناء الشاشات ============
 class ScreenBuilder:
+
+    @staticmethod
+    async def build_main_menu(
+        context,
+        query,
+        user_id: int
+    ):
+        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+        keyboard = [
+            [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")],
+            [InlineKeyboardButton("⚡ الفيزياء", callback_data="physics")]
+        ]
+
+        await query.message.reply_text(
+            "📚 اختر المادة:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
     """
     بناء محتوى الشاشات (نصوص وأزرار)
     بطريقة منظمة وموحدة
