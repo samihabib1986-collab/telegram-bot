@@ -349,41 +349,31 @@ async def build_physics_types_menu(context, query, user_id: int, unit: str):
         
         
         
-        
+            
     @staticmethod
-    async def build_main_menu(
-        context,
-        query,
-        user_id: int
-    ) -> None:
-        """
-        بناء شاشة القائمة الرئيسية
-        
-        Args:
-            context: context من Telegram
-            query: callback_query
-            user_id: معرف المستخدم
-        """
+    async def build_main_menu(context, query, user_id: int):
         from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-                
+
         keyboard = [
             [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]
         ]
 
-        if user_id == 8491023024:  # ADMIN
+        # 👇 الفيزياء فقط للأدمن
+        if user_id == 8491023024:
             keyboard.append([InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")])
-    
-        text = """
-📚 اختر المادة:
 
-يمكنك اختيار المادة التي تريد حل الأسئلة فيها
+        text = """
+    📚 اختر المادة:
+
+    يمكنك اختيار المادة التي تريد حل الأسئلة فيها
         """
-        
+
         await query.message.reply_text(
             text,
             reply_markup=InlineKeyboardMarkup(keyboard),
             parse_mode="HTML"
-        )
+        )        
+
         
         logger.info(f"✅ عرضت شاشة القائمة الرئيسية للمستخدم {user_id}")
     
