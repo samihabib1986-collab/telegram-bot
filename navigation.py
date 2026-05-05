@@ -268,65 +268,55 @@ navigation = NavigationHistory(max_history=20)
 class ScreenBuilder:
 
     @staticmethod
-    async def build_main_menu(
-        context,
-        query,
-        user_id: int
-    ):
+    async def build_main_menu(context, query, user_id):
         from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
         keyboard = [
-            [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")],
-            [InlineKeyboardButton("⚡ الفيزياء", callback_data="physics")]
+            [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")]
         ]
+
+        if user_id == 8491023024:
+            keyboard.append([InlineKeyboardButton("⚡ الفيزياء", callback_data="physics")])
 
         await query.message.reply_text(
             "📚 اختر المادة:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
-    """
-    بناء محتوى الشاشات (نصوص وأزرار)
-    بطريقة منظمة وموحدة
-    
-    كل شاشة لها دالة مخصصة تبني محتواها
-    """
-    
-@staticmethod
-async def build_physics_types_menu(context, query, user_id: int, unit: str):
-    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-    unit_names = {
-        "u1": "⚡ الكهرباء والمغناطيسية",
-        "u2": "⚙️ الميكانيك والطاقة",
-        "u3": "🌊 الأمواج والاهتزازات"
-    }
+    @staticmethod
+    async def build_unit_menu(context, query, user_id, unit):
+        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-    keyboard = [
-        [InlineKeyboardButton("✅ اختيار من متعدد", callback_data="mcq")],
-        [InlineKeyboardButton("🧠 تفسير علمي", callback_data="explain")],
-        [InlineKeyboardButton("✏️ فراغات", callback_data="fill")],
-        [InlineKeyboardButton("🧪 تجربة", callback_data="experiment")],
-        [InlineKeyboardButton("📐 مسائل", callback_data="problem")],
-        [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
-    ]
+        if unit == "ph":
+            keyboard = [
+                [InlineKeyboardButton("⚡ الكهرباء والمغناطيسية", callback_data="ph_u1")],
+                [InlineKeyboardButton("⚙️ الميكانيك والطاقة", callback_data="ph_u2")],
+                [InlineKeyboardButton("🌊 الأمواج والاهتزازات", callback_data="ph_u3")],
+                [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+            ]
 
-    text = f"""
-📚 {unit_names.get(unit, unit)}
+            await query.message.reply_text(
+                "📚 اختر وحدة الفيزياء:",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
 
-اختر نوع الأسئلة:
-"""
+    @staticmethod
+    async def build_physics_types_menu(context, query, user_id, unit):
+        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-    await query.message.reply_text(
-        text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+        keyboard = [
+            [InlineKeyboardButton("✅ اختيار من متعدد", callback_data="ph_mcq")],
+            [InlineKeyboardButton("🧠 تفسير علمي", callback_data="ph_explain")],
+            [InlineKeyboardButton("✏️ فراغات", callback_data="ph_fill")],
+            [InlineKeyboardButton("🧪 تجربة علمية", callback_data="ph_exp")],
+            [InlineKeyboardButton("🧮 مسائل", callback_data="ph_calc")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+        ]
 
-    logger.info(f"✅ عرضت أنواع الفيزياء للوحدة {unit} للمستخدم {user_id}")    
-
-
-
-
-
+        await query.message.reply_text(
+            f"📘 اختر نوع الأسئلة للوحدة {unit}:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 # أضف دالة بناء SECTION_MENU
     @staticmethod
@@ -364,28 +354,6 @@ async def build_physics_types_menu(context, query, user_id: int, unit: str):
         )
         
         logger.info(f"✅ عرضت شاشة القسم ({unit}/{section}) للمستخدم {user_id}")
-        
-        
-        
-            
-    @staticmethod
-    async def build_main_menu(context, query, user_id: int):
-        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
-        keyboard = [
-            [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]
-        ]
-
-        # 👇 الفيزياء فقط للأدمن
-        if user_id == 8491023024:
-            keyboard.append([InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")])
-
-        text = """
-    📚 اختر المادة:
-
-    يمكنك اختيار المادة التي تريد حل الأسئلة فيها
-        """
-
         await query.message.reply_text(
             text,
             reply_markup=InlineKeyboardMarkup(keyboard),
