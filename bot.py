@@ -4310,13 +4310,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         keyboard = [
-            [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")],
-             [InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")],
-                [
-                InlineKeyboardButton("⭐ مستواي", callback_data="my_level"),
-                InlineKeyboardButton("🏆 المتصدرون", callback_data="leaderboard")
-                ]
-        ]
+            [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]]
+        if user_id == ADMIN_ID:
+            keyboard.append([InlineKeyboardButton("⚡ الفيزياء", callback_data="physics")])
+
+        keyboard.append([
+            InlineKeyboardButton("⭐ مستواي", callback_data="my_level"),
+            InlineKeyboardButton("🏆 المتصدرون", callback_data="leaderboard")
+            ])
 
         await update.message.reply_text(
             "📚 اختر المادة:",
@@ -4588,9 +4589,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         # ============ اختيار الفيزياء ============
         if data == "physics":
-            if user_id != ADMIN_ID:
-                await query.answer("🚫 هذه المادة قيد التطوير", show_alert=True)
-                return
+
             if user_id not in user_data:
                 user_data[user_id] = {
                     "subject": "physics",
@@ -4649,20 +4648,30 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # ============ نوع الأسئلة ============   
         if data.startswith("ph_u"):
 
+            if user_id not in user_data:
+                await query.answer("❌ حدث خطأ", show_alert=True)
+                return
+
             unit = data.replace("ph_", "")  # u1 / u2 / u3
 
+            # حفظ الوحدة
             user_data[user_id]["unit"] = unit
 
+            # 👇 هنا التعديل المهم: عرض الأنواع مباشرة
             keyboard = [
-                [InlineKeyboardButton("✅ اختر الجواب الصحيح", callback_data="mcq")],
+                [InlineKeyboardButton("✅ اختيار من متعدد", callback_data="mcq")],
                 [InlineKeyboardButton("🧠 تفسير علمي", callback_data="explain")],
                 [InlineKeyboardButton("✏️ فراغات", callback_data="fill")],
-                [InlineKeyboardButton("🧪 تجارب", callback_data="experiment")],
+                [InlineKeyboardButton("🧪 تجربة", callback_data="experiment")],
                 [InlineKeyboardButton("📐 مسائل", callback_data="problem")],
                 [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
             ]
 
-            await query.message.reply_text("اختر نوع الأسئلة:", reply_markup=InlineKeyboardMarkup(keyboard))
+            await query.message.reply_text(
+                f"📚 اختر نوع الأسئلة للوحدة ({unit}):",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+
             return
      # ============  المنافسة ============
         if data == "leaderboard":
