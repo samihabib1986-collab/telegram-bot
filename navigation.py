@@ -24,7 +24,7 @@ class ScreenType(Enum):
     PAYMENT = "payment"
     ADMIN_PANEL = "admin_panel"
     RESULTS = "results"
-
+    PHYSICS_TYPES = "physics_types"
 
 # ============ تمثيل حالة الشاشة ============
 @dataclass
@@ -272,6 +272,44 @@ class ScreenBuilder:
     
     كل شاشة لها دالة مخصصة تبني محتواها
     """
+    
+@staticmethod
+async def build_physics_types_menu(context, query, user_id: int, unit: str):
+    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+    unit_names = {
+        "u1": "⚡ الكهرباء والمغناطيسية",
+        "u2": "⚙️ الميكانيك والطاقة",
+        "u3": "🌊 الأمواج والاهتزازات"
+    }
+
+    keyboard = [
+        [InlineKeyboardButton("✅ اختيار من متعدد", callback_data="mcq")],
+        [InlineKeyboardButton("🧠 تفسير علمي", callback_data="explain")],
+        [InlineKeyboardButton("✏️ فراغات", callback_data="fill")],
+        [InlineKeyboardButton("🧪 تجربة", callback_data="experiment")],
+        [InlineKeyboardButton("📐 مسائل", callback_data="problem")],
+        [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
+    ]
+
+    text = f"""
+📚 {unit_names.get(unit, unit)}
+
+اختر نوع الأسئلة:
+"""
+
+    await query.message.reply_text(
+        text,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+    logger.info(f"✅ عرضت أنواع الفيزياء للوحدة {unit} للمستخدم {user_id}")    
+
+
+
+
+
+
 # أضف دالة بناء SECTION_MENU
     @staticmethod
     async def build_section_menu(
@@ -327,11 +365,14 @@ class ScreenBuilder:
             user_id: معرف المستخدم
         """
         from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-        
+                
         keyboard = [
-            [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")],
+            [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]
         ]
-        
+
+        if user_id == 8491023024:  # ADMIN
+            keyboard.append([InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")])
+    
         text = """
 📚 اختر المادة:
 
@@ -438,7 +479,7 @@ class ScreenBuilder:
                 ],                
             ]
             text = """
-📚 الوحدة 3: علم الوراثة والتكاثر
+📚 الوحدة 4: علم الوراثة والتكاثر
 
 اختر القسم الذي تريد حل الأسئلة فيه
             """
@@ -594,10 +635,12 @@ class ScreenBuilder:
 SCREEN_BUILDERS = {
     ScreenType.MAIN_MENU: ScreenBuilder.build_main_menu,
     ScreenType.UNIT_MENU: ScreenBuilder.build_unit_menu,
-    ScreenType.SECTION_MENU: ScreenBuilder.build_section_menu,  # ✅ أضفنا هنا
+    ScreenType.SECTION_MENU: ScreenBuilder.build_section_menu,
     ScreenType.TYPES_MENU: ScreenBuilder.build_types_menu,
     ScreenType.QUIZ: ScreenBuilder.build_quiz_menu,
     ScreenType.PAYMENT: ScreenBuilder.build_payment_menu,
+    ScreenType.PHYSICS_TYPES: ScreenBuilder.build_physics_types_menu,
+
 }
 
 
