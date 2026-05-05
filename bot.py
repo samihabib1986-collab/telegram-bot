@@ -4310,10 +4310,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         keyboard = [
-            [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]]
-        if user_id == ADMIN_ID:
-            keyboard.append([InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")])
+            [InlineKeyboardButton("🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]
+        ]
 
+        keyboard.append([InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")])
         keyboard.append([
             InlineKeyboardButton("⭐ مستواي", callback_data="my_level"),
             InlineKeyboardButton("🏆 المتصدرون", callback_data="leaderboard")
@@ -4651,8 +4651,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if data.startswith("ph_u"):
 
             if user_id not in user_data:
-                await query.answer("❌ حدث خطأ", show_alert=True)
-                return
+                user_data[user_id] = {
+                    "subject": "physics",
+                    "unit": "",
+                    "score": 0,
+                    "q_index": 0
+                }
 
             unit = data.replace("ph_", "")  # u1 / u2 / u3
 
