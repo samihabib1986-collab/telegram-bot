@@ -4312,7 +4312,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")]]
         if user_id == ADMIN_ID:
-            keyboard.append([InlineKeyboardButton("⚡ الفيزياء", callback_data="physics")])
+            keyboard.append([InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")])
 
         keyboard.append([
             InlineKeyboardButton("⭐ مستواي", callback_data="my_level"),
@@ -4330,10 +4330,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context_data={}
         )
         navigation.add_screen(user_id, screen)
+                   
         
         logger.info(f"✅ بداية جديدة للمستخدم {user_id}")
     except Exception as e:
         logger.error(f"❌ خطأ في دالة START: {e}")
+
 # ================== عرض الاسم مزخرف  ==================        
     users.update_one(
         {"_id": user_id},
@@ -4657,19 +4659,20 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # حفظ الوحدة
             user_data[user_id]["unit"] = unit
 
-            # 👇 هنا التعديل المهم: عرض الأنواع مباشرة
-            keyboard = [
-                [InlineKeyboardButton("✅ اختيار من متعدد", callback_data="mcq")],
-                [InlineKeyboardButton("🧠 تفسير علمي", callback_data="explain")],
-                [InlineKeyboardButton("✏️ فراغات", callback_data="fill")],
-                [InlineKeyboardButton("🧪 تجربة", callback_data="experiment")],
-                [InlineKeyboardButton("📐 مسائل", callback_data="problem")],
-                [InlineKeyboardButton("🔙 رجوع", callback_data="back")]
-            ]
+            # ✅ هنا نربطه مع navigation
+            screen = ScreenState(
+                screen_type=ScreenType.PHYSICS_TYPES,
+                context_data={"unit": unit}
+            )
 
-            await query.message.reply_text(
-                f"📚 اختر نوع الأسئلة للوحدة ({unit}):",
-                reply_markup=InlineKeyboardMarkup(keyboard)
+            navigation.add_screen(user_id, screen)
+
+            # ✅ استدعاء builder من navigation
+            await ScreenBuilder.build_physics_types_menu(
+                context,
+                query,
+                user_id,
+                unit=unit
             )
 
             return
@@ -5072,7 +5075,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if data == "go_start":
             keyboard = [
-                [InlineKeyboardButton("🧬 علم الأحياء", callback_data="bio")],
+                [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")],
+                [InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")]
+                
                 [InlineKeyboardButton("💳 الدفع", callback_data="payment_menu")]
             ]
 
