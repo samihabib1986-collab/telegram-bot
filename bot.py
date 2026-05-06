@@ -4428,7 +4428,12 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category = info["category"]
     index = info["q_index"]
 
-    q_list = subjects.get(subject, {}).get(category)
+    q_list = subjects.get(subject, {}).get(category, [])
+
+    if not q_list:
+        print("❌ NOT FOUND:", subject, category)
+        await query.answer("❌ لا توجد أسئلة لهذا القسم", show_alert=True)
+        return
 
     if index >= len(q_list):
         text = f"👤 ID: {user_id}\n\n" + f"🎉 انتهيت!\n\n🏆 نتيجتك: {info['score']} من {len(q_list)*10}"
