@@ -155,7 +155,7 @@ uploaded_images = {
 "الغدد الصم": "AgACAgQAAxkBAAISK2nrov53uU1iaKiBKo3UPOUQKjlFAAKYDGsb74lYU1TWZ694bWrdAQADAgADeQADOwQ",
 "بنية الجلد": "AgACAgQAAxkBAAITeGnr3TZBzmxqfuIDKzZCGa090OI6AALMDGsb74lYUx8pO043oYS0AQADAgADeAADOwQ",
 "مقطع طولي في الانف": "AgACAgQAAxkBAAITemnr3dpEKisFEONqV0S65708LxWcAALODGsb74lYU_mOipPesqbFAQADAgADeAADOwQ",
-"اقسام الاذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
+"أقسام الأذن": "AgACAgQAAxkBAAITfGnr3fApziTEiufFZJ7o10maS_bNAALPDGsb74lYU3fydPVvwpp3AQADAgADeAADOwQ",
 "كرة العين": "AgACAgQAAxkBAAITf2nr3hBZxdkfGMNiLk2bFeYpd7ETAALQDGsb74lYUxk-ui92CqcHAQADAgADeAADOwQ",
 "مقارنة العظام":"AgACAgQAAxkBAAIVgGnsxaQYniAmfOJp99AHUnk1debqAAK1DGsb74lgU1oxFWFedrt3AQADAgADeQADOwQ",
 # ===== الوحدة 2 =====
