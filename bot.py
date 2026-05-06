@@ -4658,7 +4658,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "score": 0,
                     "q_index": 0
                 }
-
+            user_data[user_id]["subject"] = "physics"
             unit = data.replace("ph_", "")  # u1 / u2 / u3
 
             # حفظ الوحدة
@@ -4736,8 +4736,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             info["category"] = category
             info["q_index"] = 0
             info["score"] = 0
-
-            # 🔥 الحل هنا
             info["session"] = time.time()
 
             await send_question(update, context)
@@ -5086,7 +5084,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if data == "go_start":
             keyboard = [
                 [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")],
-                [InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")]
+                [InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")],
                 
                 [InlineKeyboardButton("💳 الدفع", callback_data="payment_menu")]
             ]
