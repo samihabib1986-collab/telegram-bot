@@ -4731,17 +4731,22 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(text)
             return
        # ============ أنواع الأسئلة  ============ 
+        if category not in subjects.get(subject, {}):
+            print(f"❌ NOT FOUND: {subject} {category}")
         if data in ["mcq", "explain", "fill", "experiment", "problem"]:
 
             info = user_data[user_id]
 
             unit = info["unit"]
-            category = f"{unit}_{data}"
+            subject = info["subject"]
+
+            if subject == "physics":
+                category = f"{unit}_{data}"
+            else:
+                section = info.get("section")
+                category = f"{unit}_{section}_{data}"
 
             info["category"] = category
-            info["q_index"] = 0
-            info["score"] = 0
-            info["session"] = time.time()
 
             await send_question(update, context)
             return
