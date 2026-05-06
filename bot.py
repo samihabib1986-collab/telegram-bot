@@ -4682,19 +4682,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
                 
-        if data == "ph_mcq":
-            await query.answer()
 
-            print("🔥 MCQ pressed")
-
-            # حفظ الحالة
-            navigation.add_screen(
-                user_id,
-                ScreenState(ScreenType.QUIZ, {"type": "mcq", "unit": "1"})
-            )
-
-            # عرض سؤال (مؤقت للتجربة)
-            await query.message.reply_text("📘 أول سؤال اختيار من متعدد")
      # ============  المنافسة ============
         if data == "leaderboard":
             # 🔝 أفضل 10
@@ -5113,7 +5101,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # حفظ الشاشة في النظام
             navigation.add_screen(
                 user_id,
-                ScreenState(ScreenType.PHYSICS_TYPES, {"unit": "1"})
+                ScreenState(ScreenType.PHYSICS_TYPES, {"unit": "u1"})
             )
 
             # عرض شاشة أنواع الأسئلة
@@ -5121,7 +5109,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 context,
                 query,
                 user_id,
-                unit="1"
+                unit="u1"
             )
         if data == "payment_menu":
             keyboard = [
