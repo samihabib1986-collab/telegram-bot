@@ -3,7 +3,6 @@ import os
 import logging
 import asyncio
 import random
-from unicodedata import category
 import qrcode
 from pymongo import MongoClient
 from qrcode.image import pil
@@ -3834,7 +3833,7 @@ subjects = {'bio':
 'options': ['بين الجذير والعجيز', 'فوق الفلقات مباشرة', 'تحت قشرة الثمرة'],
 'question': '10. حدد موقع السويقة في جنين البذرة:'}]},
 "physics" : {
-    '_electricity_explain': [
+    'u1_explain': [
         {'answer': 'بسبب نشوء القوة الكهرطيسية (قوة لابلاس) التي تؤثر في الساق',
          'options': ['بسبب نشوء القوة الكهرطيسية (قوة لابلاس) التي تؤثر في الساق', 'بسبب قوة الجاذبية الأرضية', 'بسبب انعدام الحقل المغناطيسي'],
          'question': '1. أعط تفسيراً علمياً: تدحرج الساق الناقلة في تجربة السكتين عند إغلاق الدارة:'},
@@ -3867,7 +3866,7 @@ subjects = {'bio':
          'question': '10. أعط تفسيراً علمياً: تتباعد دوائر خطوط الحقل المغناطيسي لتيار مستقيم كلما ابتعدنا عن السلك:'}
     ],
     # 2- النوع الثاني: فراغات (10 أسئلة)
-    '_electricity_fill': [
+    'u1_fill': [
         {'answer': 'متحدة - عمودية',
          'options': ['متحدة - عمودية', 'مختلفة - موازية', 'متداخلة - مائلة'],
          'question': '1. أكمل الفراغات: خطوط الحقل لتيار مستقيم هي دوائر (______) المركز ومستوياتها (______) على السلك:'},
@@ -3900,7 +3899,7 @@ subjects = {'bio':
          'question': '10. أكمل الفراغات: يقوم المحرك الكهربائي بتحويل الطاقة (______) إلى طاقة (______):'}
     ],
     # 3- النوع الثالث: اختر الإجابة الصحيحة (10 أسئلة)
-    '_electricity_mcq': [
+    'u1_mcq': [
         {'answer': 'شدة الحقل المغناطيسي',
          'options': ['شدة التيار', 'شدة الحقل المغناطيسي', 'القوة الكهرطيسية'],
          'question': '1. اختر الإجابة الصحيحة: التسلا (Tesla) هي وحدة قياس:'},
@@ -3932,7 +3931,7 @@ subjects = {'bio':
          'options': ['قوة لابلاس', 'قوة الجاذبية', 'قوة الاحتكاك'],
          'question': '10. اختر الإجابة الصحيحة: القوة التي تسبب دوران دولاب بارلو هي:'},
         ],
-    '_electricity_experiment':[
+    'u1_experiment':[
         # 4- النوع الرابع: تجربة (10 أسئلة مقسمة أ و ب)
         {'answer': 'لأن جهة القوة الكهرطيسية تتغير بتغير جهة التيار المار في الساق',
          'options': ['بسبب الجاذبية', 'لأن جهة القوة الكهرطيسية تتغير بتغير جهة التيار المار في الساق', 'بسبب زيادة الحرارة'],
@@ -3965,7 +3964,7 @@ subjects = {'bio':
          'options': ['تصبح دائرية', 'تصبح مستقيمات متوازية ومنتظمة', 'تختفي الخطوط'],
          'question': '10. (ب) يشير الشكل إلى باطن الوشيعة، كيف تظهر خطوط الحقل المغناطيسي هناك؟'}
         ],
-    '_electricity_problem':
+    'u1_problem':
     [
         # 5- النوع الخامس: مسائل (10 مسائل بأرقام معدلة)
         {'answer': '2 * 10^-5 T',
@@ -4428,12 +4427,7 @@ async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category = info["category"]
     index = info["q_index"]
 
-    q_list = subjects.get(subject, {}).get(category, [])
-
-    if not q_list:
-        print("❌ NOT FOUND:", subject, category)
-        await query.answer("❌ لا توجد أسئلة لهذا القسم", show_alert=True)
-        return
+    q_list = subjects.get(subject, {}).get(category)
 
     if index >= len(q_list):
         text = f"👤 ID: {user_id}\n\n" + f"🎉 انتهيت!\n\n🏆 نتيجتك: {info['score']} من {len(q_list)*10}"
@@ -4663,7 +4657,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "score": 0,
                     "q_index": 0
                 }
-            user_data[user_id]["subject"] = "physics"
+
             unit = data.replace("ph_", "")  # u1 / u2 / u3
 
             # حفظ الوحدة
@@ -4675,7 +4669,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 context_data={"unit": unit}
             )
 
-            navigation.add_screen(user_id,ScreenState(ScreenType.PHYSICS_TYPES, {"unit": unit}) )
+            navigation.add_screen(user_id, screen)
 
             # ✅ استدعاء builder من navigation
             await ScreenBuilder.build_physics_types_menu(
@@ -4731,22 +4725,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text(text)
             return
        # ============ أنواع الأسئلة  ============ 
-        if category not in subjects.get(subject, {}):
-            print(f"❌ NOT FOUND: {subject} {category}")
         if data in ["mcq", "explain", "fill", "experiment", "problem"]:
 
             info = user_data[user_id]
 
             unit = info["unit"]
-            subject = info["subject"]
 
-            if subject == "physics":
-                category = f"{unit}_{data}"
-            else:
-                section = info.get("section")
-                category = f"{unit}_{section}_{data}"
+            category = f"{unit}_{data}"
 
             info["category"] = category
+            info["q_index"] = 0
+            info["score"] = 0
 
             await send_question(update, context)
             return
@@ -5094,7 +5083,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if data == "go_start":
             keyboard = [
                 [InlineKeyboardButton(f"🧬🌍 علم الأحياء والأرض🌍🧬", callback_data="bio")],
-                [InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")],
+                [InlineKeyboardButton("⚡ الفيزياء⚡", callback_data="physics")]
                 
                 [InlineKeyboardButton("💳 الدفع", callback_data="payment_menu")]
             ]
@@ -5181,8 +5170,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             category = info["category"]
 
-            subject = info.get("subject")
-            q_list = subjects.get(subject, {}).get(category)
+            q_list = subjects["bio"].get(category)
             if not q_list or info["q_index"] >= len(q_list):
                 await query.answer("❌ لا توجد أسئلة", show_alert=True)
                 return
