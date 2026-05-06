@@ -5093,7 +5093,21 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 logger.error(f"❌ خطأ في عرض القائمة: {e}")
             return
+        if data == "ph_u1":
+            await query.answer()
+            # حفظ الشاشة في النظام
+            navigation.add_screen(
+                user_id,
+                ScreenState(ScreenType.PHYSICS_TYPES, {"unit": "1"})
+            )
 
+            # عرض شاشة أنواع الأسئلة
+            await ScreenBuilder.build_physics_types_menu(
+                context,
+                query,
+                user_id,
+                unit="1"
+            )
         if data == "payment_menu":
             keyboard = [
                 [InlineKeyboardButton("💳 شام كاش", callback_data="pay_shamcash")],
