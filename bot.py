@@ -4632,10 +4632,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(f"❌ خطأ في إرسال صورة المدرس: {e}")
             
             keyboard = [
-                [InlineKeyboardButton("الوحدة 1: (الكهرباء والمغناطيسية)", callback_data="phy_u1"),
-                InlineKeyboardButton("الوحدة 2: (الميكانيكا)", callback_data="phy_u2")],
-                [InlineKeyboardButton("الوحدة 3: (الضوء والبصريات)", callback_data="phy_u3")],
-                [InlineKeyboardButton("نماذج امتحانية", callback_data="nmazg_phy")]
+                [InlineKeyboardButton("الوحدة 1: (الكهرباء والمغناطيسية)", callback_data="ph_u1"),
+                InlineKeyboardButton("الوحدة 2: (الميكانيكا)", callback_data="ph_u2")],
+                [InlineKeyboardButton("الوحدة 3: (الضوء والبصريات)", callback_data="ph_u3")],
+                [InlineKeyboardButton("نماذج امتحانية", callback_data="nmazg_ph")]
             ]
             
             try:
