@@ -4731,12 +4731,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             info = user_data[user_id]
 
             unit = info["unit"]
-
             category = f"{unit}_{data}"
 
             info["category"] = category
             info["q_index"] = 0
             info["score"] = 0
+
+            # 🔥 الحل هنا
+            info["session"] = time.time()
 
             await send_question(update, context)
             return
