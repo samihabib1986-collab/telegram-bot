@@ -25,6 +25,7 @@ class ScreenType(Enum):
     ADMIN_PANEL = "admin_panel"
     RESULTS = "results"
     PHYSICS_TYPES = "physics_types"
+    PHYSICS_UNIT = "physics_unit"
 
 # ============ تمثيل حالة الشاشة ============
 @dataclass
@@ -284,7 +285,7 @@ class ScreenBuilder:
         )
 
     @staticmethod
-    async def build_unit_menu(context, query, user_id, unit):
+    async def build_physics_unit_menu(context, query, user_id, unit):
         from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
         if unit == "ph":
@@ -609,12 +610,16 @@ class ScreenBuilder:
 
 # ============ خريطة ربط أنواع الشاشات بدوال البناء ============
 SCREEN_BUILDERS = {
+# ============ العلوم   
     ScreenType.MAIN_MENU: ScreenBuilder.build_main_menu,
     ScreenType.UNIT_MENU: ScreenBuilder.build_unit_menu,
     ScreenType.SECTION_MENU: ScreenBuilder.build_section_menu,
     ScreenType.TYPES_MENU: ScreenBuilder.build_types_menu,
     ScreenType.QUIZ: ScreenBuilder.build_quiz_menu,
     ScreenType.PAYMENT: ScreenBuilder.build_payment_menu,
+    
+# ============ الفيزياء
+    ScreenType.PHYSICS_UNIT: ScreenBuilder.build_physics_unit_menu,
     ScreenType.PHYSICS_TYPES: ScreenBuilder.build_physics_types_menu,
 
 }
