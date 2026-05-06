@@ -4670,7 +4670,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 context_data={"unit": unit}
             )
 
-            navigation.add_screen(user_id, screen)
+            navigation.add_screen(user_id,ScreenState(ScreenType.PHYSICS_TYPES, {"unit": unit}) )
 
             # ✅ استدعاء builder من navigation
             await ScreenBuilder.build_physics_types_menu(
